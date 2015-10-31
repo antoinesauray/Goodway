@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/social_subheader"
+        android:title="@string/social">
+        <menu>
+            <item
+                android:id="@+id/friends"
+                android:title="@string/friends"/>
+            <item
+                android:id="@+id/events"
+                android:title="@string/events"/>
+            <item
+                android:id="@+id/engagement"
+                android:title="@string/engagement"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/option_subheader"
+        android:title="@string/settings">
+        <menu>
+            <item
+                android:id="@+id/options"
+                android:title="@string/action_settings"/>
+        </menu>
+    </item>
+
+</menu>

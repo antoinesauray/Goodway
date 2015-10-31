@@ -1,0 +1,78 @@
+<resources>
+    <string name="app_name">Goodway</string>
+    <string name="version">Version Alpha</string>
+
+    <!-- register operations -->
+    <string name="mail">Adresse mail</string>
+    <string name="fname">Prénom</string>
+    <string name="lname">Nom</string>
+    <string name="birthday">Anniversaire</string>
+    <string name="login">Connexion</string>
+    <string name="register">Inscription</string>
+    <string name="password">Mot de passe</string>
+    <string name="change">Modifier</string>
+    <string name="next">Suivant</string>
+    <string name="back">Retour</string>
+    <string name="confirm">Confirmer</string>
+    <string name="passwordFirst">Entrez votre mot de passe</string>
+    <string name="passwordSecond">Confirmez</string>
+    <string name="passwordsDiffer">Les mots de passe sont différents</string>
+
+    <string name="find_friend">Rechercher des amis</string>
+    <string name="add">Ajouter</string>
+
+    <string name="no_ways_found">Oups nous n\'avons pas trouvé de trajet</string>
+
+    <!-- drawer -->
+    <string name="social">Social</string>
+    <string name="history">Historique</string>
+    <string name="settings">Settings</string>
+
+    <string name="friends">Amis</string>
+    <string name="events">Evènements</string>
+    <string name="engagement">Engagement</string>
+    <string name="trips">Voyages</string>
+    <string name="places">Lieux</string>
+    <string name="routes">Itinéraires</string>
+    <string name="prevEvents">Evènements passés</string>
+
+    <string name="no_friends">Mince, vous n\'avez pas encore d\'amis :)</string>
+    <string name="no_friend_requests">Vous n\'avez aucune demande d\'ami en attente</string>
+
+    <string name="connexion_error">Erreur de connexion</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="action_search">Search</string>
+
+    <string name="openDrawer">Ouvrir</string>
+    <string name="closeDrawer">Fermer</string>
+
+    <string name="bus">Bus</string>
+
+    <string name="home">Maison</string>
+    <string name="your_location">Votre position</string>
+    <string name="your_location_waiting">Votre position(en attente)</string>
+    <string name="markerPosition">Position carte</string>
+
+
+    <!-- Suggestions -->
+    <string name="select">Selectionner</string>
+
+    <!-- ErrorAction message -->
+    <string name="no_from">Pas de position de départ</string>
+    <string name="no_to">Pas de destination</string>
+    <string name="not_available">non disponible</string>
+    <string name="your_location_not_available">Position non disponible</string>
+
+    <string name="from">Depuis</string>
+
+    <string name="trip">Voyage</string>
+    <string name="store_pass">3AuZT55u2y4309ji6PKS7NvPvuZyQsHAcqlD8NUR</string>
+
+    <!-- transitions -->
+    <string name="transition_event_image">transition_event_image</string>
+
+
+</resources>

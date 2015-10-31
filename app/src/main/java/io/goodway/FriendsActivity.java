@@ -1,0 +1,290 @@
+package io.goodway;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import io.goodway.model.User;
+import io.goodway.model.adapter.UserAdapter;
+import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.navitia_android.Action;
+import io.goodway.navitia_android.ErrorAction;
+
+
+/**
+ * Detailed profile
+ * @author Antoine Sauray
+ * @version 2.0
+ */
+public class FriendsActivity extends AppCompatActivity {
+
+    // ----------------------------------- Model
+    /**
+     * Unique identifier for this activity
+     */
+    private static final String TAG = "STOP_ACTIVITY";
+
+    // ----------------------------------- UI
+
+    /**
+     * Toolbar widget
+     */
+    private Toolbar toolbar;
+    private ViewPager viewPager;
+    private PagerAdapter pagerAdapter;
+
+    private User user;
+    private String password;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_friends);
+        Bundle extras = this.getIntent().getExtras();
+        user = extras.getParcelable("USER");
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.friends);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+
+        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
+                MODE_PRIVATE);
+        password = shared_preferences.getString("password", null);
+
+        pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setAdapter(pagerAdapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void fabClick(View v){
+        startActivity(new Intent(FriendsActivity.this, AddFriendActivity.class));
+    }
+
+    // Since this is an object collection, use a FragmentStatePagerAdapter,
+// and NOT a FragmentPagerAdapter.
+    public class PagerAdapter extends FragmentStatePagerAdapter {
+
+        FriendsFragment f1;
+        FriendRequestFragment f2;
+
+        public PagerAdapter(FragmentManager fm) {
+            super(fm);
+            f1 = new FriendsFragment();
+            f2 = new FriendRequestFragment();
+
+            Bundle args = new Bundle();
+            // Our object is just an integer :-P
+            args.putString("mail", user.getMail());
+            args.putString("password", password);
+            f1.setArguments(args);
+            f2.setArguments(args);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            switch (i){
+                case 0:
+                    return f1;
+                case 1:
+                    return f2;
+                default:
+                    return null;
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position){
+                case 0:
+                    return "Friends";
+                case 1:
+                    return "Pending";
+                default:
+                    return null;
+            }
+        }
+    }
+
+    // Instances of this class are fragments representing a single
+// object in our collection.
+    public static class FriendsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+        public static final String ARG_OBJECT = "object";
+        RecyclerView recyclerView;
+        SwipeRefreshLayout swipeLayout;
+        LinearLayoutManager layoutManager;
+        TextView error;
+        UserAdapter adapter;
+        String mail, password;
+        @Override
+        public View onCreateView(LayoutInflater inflater,
+                                 ViewGroup container, Bundle savedInstanceState) {
+            // The last two arguments ensure LayoutParams are inflated
+            // properly.
+            View rootView = inflater.inflate(
+                    R.layout.fragment_friends, container, false);
+            recyclerView = (RecyclerView) rootView.findViewById(R.id.list);
+
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            error = (TextView) rootView.findViewById(R.id.error);
+            layoutManager = new LinearLayoutManager(getActivity());
+            adapter = new UserAdapter(getActivity(), R.layout.view_user, mail, password);
+
+            Bundle extras = getArguments();
+            mail = extras.getString("mail");
+            password = extras.getString("password");
+            GoodwayHttpsClient.getFriends(getActivity(), new Action<User>() {
+                @Override
+                public void action(User e) {
+                    swipeLayout.setRefreshing(false);
+                    adapter.add(e);
+                }
+            }, new ErrorAction() {
+                @Override
+                public void action() {
+                    swipeLayout.setRefreshing(false);
+                    error.setText(R.string.no_friends);
+                    error.setVisibility(View.VISIBLE);
+                }
+            }, mail, password);
+
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(adapter);
+            swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+            swipeLayout.setOnRefreshListener(this);
+            swipeLayout.setColorSchemeColors(R.color.accent);
+            swipeLayout.setRefreshing(true);
+            return rootView;
+        }
+
+        @Override
+        public void onRefresh() {
+            swipeLayout.setRefreshing(true);
+            adapter.clear();
+            error.setVisibility(View.INVISIBLE);
+            GoodwayHttpsClient.getFriends(getActivity(), new Action<User>() {
+                @Override
+                public void action(User e) {
+                    swipeLayout.setRefreshing(false);
+                    adapter.add(e);
+                }
+            }, new ErrorAction() {
+                @Override
+                public void action() {
+                    swipeLayout.setRefreshing(false);
+                    error.setText(R.string.no_friends);
+                    error.setVisibility(View.VISIBLE);
+                }
+            },mail, password);
+        }
+    }
+    public static class FriendRequestFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+        public static final String ARG_OBJECT = "object";
+        RecyclerView recyclerView;
+        SwipeRefreshLayout swipeLayout;
+        LinearLayoutManager layoutManager;
+        TextView error;
+        UserAdapter adapter;
+        String mail, password;
+        @Override
+        public View onCreateView(LayoutInflater inflater,
+                                 ViewGroup container, Bundle savedInstanceState) {
+            // The last two arguments ensure LayoutParams are inflated
+            // properly.
+            View rootView = inflater.inflate(
+                    R.layout.fragment_friends, container, false);
+            recyclerView = (RecyclerView) rootView.findViewById(R.id.list);
+
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+            layoutManager = new LinearLayoutManager(getActivity());
+
+            error = (TextView) rootView.findViewById(R.id.error);
+
+            Bundle extras = getArguments();
+            mail = extras.getString("mail");
+            password = extras.getString("password");
+
+            adapter = new UserAdapter(getActivity(), R.layout.view_friend_request, mail, password);
+
+            GoodwayHttpsClient.getFriendsRequest(getActivity(), new Action<User>() {
+                @Override
+                public void action(User e) {
+                    adapter.add(e);
+                }
+            }, new ErrorAction() {
+                @Override
+                public void action() {
+                    swipeLayout.setRefreshing(false);
+                    error.setText(R.string.no_friend_requests);
+                    error.setVisibility(View.VISIBLE);
+                }
+            },mail, password);
+
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(adapter);
+            swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+            swipeLayout.setOnRefreshListener(this);
+            swipeLayout.setColorSchemeColors(R.color.accent);
+            swipeLayout.setRefreshing(true);
+            return rootView;
+        }
+
+        @Override
+        public void onRefresh() {
+            swipeLayout.setRefreshing(true);
+            adapter.clear();
+            error.setVisibility(View.INVISIBLE);
+            GoodwayHttpsClient.getFriendsRequest(getActivity(), new Action<User>() {
+                @Override
+                public void action(User e) {
+                    swipeLayout.setRefreshing(false);
+                    adapter.add(e);
+                }
+            }, new ErrorAction() {
+                @Override
+                public void action() {
+                    swipeLayout.setRefreshing(false);
+                    error.setText(R.string.no_friend_requests);
+                    error.setVisibility(View.VISIBLE);
+                }
+            }, mail, password);
+        }
+    }
+}
