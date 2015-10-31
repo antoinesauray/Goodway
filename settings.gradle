@@ -1,0 +1,2 @@
+include ':app'
+include ':../Navitia-Android:navitia-android'
