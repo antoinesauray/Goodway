@@ -35,6 +35,7 @@
     <string name="places">Lieux</string>
     <string name="routes">Itinéraires</string>
     <string name="prevEvents">Evènements passés</string>
+    <string name="finished">Trajet terminé</string>
 
     <string name="no_friends">Mince, vous n\'avez pas encore d\'amis :)</string>
     <string name="no_friend_requests">Vous n\'avez aucune demande d\'ami en attente</string>

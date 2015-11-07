@@ -103,8 +103,8 @@ public class WayAdapter extends RecyclerView.Adapter<WayAdapter.ViewHolder> {
 
         @Override
         public void onClick(View v) {
-            //Intent intent = new Intent(activity, DetailedWayActivity.class);
-            Intent intent = new Intent(activity, WayFinishedActivity.class);
+            Intent intent = new Intent(activity, DetailedWayActivity.class);
+            //Intent intent = new Intent(activity, WayFinishedActivity.class);
             intent.putExtra("WAY", item);
             activity.startActivity(intent);
         }
