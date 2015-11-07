@@ -22,12 +22,12 @@ public class WayFinishedActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_way);
+        setContentView(R.layout.activity_way_finished);
 
         Bundle extras = this.getIntent().getExtras();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.routes);
+        toolbar.setTitle(R.string.finished);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);

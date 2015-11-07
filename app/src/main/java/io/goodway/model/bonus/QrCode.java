@@ -18,11 +18,12 @@ public class QrCode {
         com.google.zxing.Writer writer = new QRCodeWriter();
         String finaldata = Uri.encode(data, "utf-8");
 
-        BitMatrix bm = writer.encode(finaldata, BarcodeFormat.QR_CODE,150, 150);
-        Bitmap ret = Bitmap.createBitmap(150, 150, Bitmap.Config.ARGB_8888);
+        int size = 500;
+        BitMatrix bm = writer.encode(finaldata, BarcodeFormat.QR_CODE,size, size);
+        Bitmap ret = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
 
-        for (int i = 0; i < 150; i++) {//width
-            for (int j = 0; j < 150; j++) {//height
+        for (int i = 0; i < size; i++) {//width
+            for (int j = 0; j < size; j++) {//height
                 ret.setPixel(i, j, bm.get(i, j) ? Color.BLACK: Color.WHITE);
             }
         }
