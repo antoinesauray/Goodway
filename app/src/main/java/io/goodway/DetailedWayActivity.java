@@ -69,7 +69,7 @@ public class DetailedWayActivity extends AppCompatActivity{
         from.setText(getString(R.string.from) + " " + way.getFrom().getName(this));
         */
 
-        toolbar.setTitle(way.toString());
+        toolbar.setTitle(way.getFrom().getName(this)+" vers "+way.getTo().getName(this));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
