@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.zxing.WriterException;
 
@@ -31,6 +32,7 @@ public class WayFinishedActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
         SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
                 MODE_PRIVATE);
         mail = shared_preferences.getString("mail", null);
