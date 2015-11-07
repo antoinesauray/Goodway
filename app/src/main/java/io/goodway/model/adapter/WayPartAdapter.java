@@ -64,12 +64,7 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
         // - replace the contents of the view with that element
         WayPart way = mDataset.get(position);
         holder.setItem(way);
-        String[] departure = Address.toHumanTime(way.getDepartureDateTime());
-        String[] arrival = Address.toHumanTime(way.getArrivalDateTime());
-        holder.departure.setText("Départ à "+departure[0]+"h"+departure[1]);
-        holder.arrival.setText("Arrivée à "+arrival[0]+"h"+arrival[1]);
-        holder.duration.setText(way.getDuration()+"");
-        holder.type.setText(way.getType());
+        holder.description.setText(way.toString());
     }
 
     public void add(WayPart item) {
@@ -93,17 +88,14 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         // each data item is just a string in this case
-        TextView type, departure, arrival, duration;
+        TextView description;
         WayPart item;
         Activity activity;
 
         public ViewHolder(Activity activity, View lyt_main) {
             super(lyt_main);
             this.activity = activity;
-            type = (TextView) lyt_main.findViewById(R.id.type);
-            departure = (TextView) lyt_main.findViewById(R.id.departure);
-            arrival = (TextView) lyt_main.findViewById(R.id.arrival);
-            duration = (TextView) lyt_main.findViewById(R.id.duration);
+            description = (TextView) lyt_main.findViewById(R.id.description);
         }
 
 

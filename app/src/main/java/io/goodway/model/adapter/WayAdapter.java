@@ -15,6 +15,7 @@ import java.util.List;
 
 import io.goodway.DetailedWayActivity;
 import io.goodway.R;
+import io.goodway.WayFinishedActivity;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.Way;
 
@@ -102,7 +103,8 @@ public class WayAdapter extends RecyclerView.Adapter<WayAdapter.ViewHolder> {
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(activity, DetailedWayActivity.class);
+            //Intent intent = new Intent(activity, DetailedWayActivity.class);
+            Intent intent = new Intent(activity, WayFinishedActivity.class);
             intent.putExtra("WAY", item);
             activity.startActivity(intent);
         }
