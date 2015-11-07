@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.text.SimpleDateFormat;
@@ -108,14 +109,16 @@ public class WayActivity extends AppCompatActivity implements SwipeRefreshLayout
 
         //pairs.add(new Pair("from", fromLongitude.substring(0, fromLongitude.length()-1) + ";" + fromLatitude.substring(0, fromLatitude.length() - 1)));
         //pairs.add(new Pair("to", toLongitude.substring(0, toLongitude.length() - 1) + ";" + toLatitude.substring(0, toLatitude.length() - 1)));
-        pairs.add(new Pair("from", fromLongitude+";" + fromLatitude));
-        pairs.add(new Pair("to", toLongitude+";" + toLatitude));
+        pairs.add(new Pair("from", fromLatitude+";" + fromLongitude));
+        pairs.add(new Pair("to", toLatitude+";" + toLongitude));
         pairs.add(new Pair("datetime", date));
 
         //pairs.add(new Pair("to", "-1.673421;48.112963"));
         Log.d("from", from.getLongitude() + ";" + from.getLatitude());
         Log.d("to", to.getLongitude() + ";" + to.getLatitude());
         Log.d("sdf time", date);
+
+        adapter.clear();
         Request.getWays(new Action<Way>() {
 
             @Override

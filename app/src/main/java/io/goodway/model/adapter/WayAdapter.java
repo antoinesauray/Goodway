@@ -60,8 +60,8 @@ public class WayAdapter extends RecyclerView.Adapter<WayAdapter.ViewHolder> {
         //holder.icon.setImageDrawable(activity.getResources().getDrawable(t.getImage(), activity.getTheme()));
         String[] departure = Address.toHumanTime(way.getDepartureDateTime());
         String[] arrival = Address.toHumanTime(way.getArrivalDateTime());
-        holder.departure.setText("Départ à "+departure[0]+"h"+departure[1]);
-        holder.arrival.setText("Arrivée à "+arrival[0]+"h"+arrival[1]);
+        holder.departure.setText("Départ à "+departure[3]+"h"+departure[4]);
+        holder.arrival.setText("Arrivée à "+arrival[3]+"h"+arrival[4]);
         holder.destination.setText(way.getLabel());
     }
 
