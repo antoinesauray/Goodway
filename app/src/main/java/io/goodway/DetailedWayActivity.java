@@ -1,13 +1,14 @@
 package io.goodway;
 
+import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,12 +18,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.Arrays;
 
@@ -39,6 +41,7 @@ import io.goodway.navitia_android.WayPart;
 public class DetailedWayActivity extends AppCompatActivity{
 
     private Toolbar toolbar;
+    private AppBarLayout appBarLayout;
 
     private TextView from, to;
 
@@ -61,19 +64,12 @@ public class DetailedWayActivity extends AppCompatActivity{
         Bundle extras = this.getIntent().getExtras();
         way = extras.getParcelable("WAY");
 
-        /*
-        from = (TextView) findViewById(R.id.from);
-        to = (TextView) findViewById(R.id.to);
-
-        to.setText(way.getTo().getName(this));
-        from.setText(getString(R.string.from) + " " + way.getFrom().getName(this));
-        */
-
-        toolbar.setTitle(way.getFrom().getName(this)+" vers "+way.getTo().getName(this));
+        toolbar.setTitle(way.getFrom().getName(this) + " vers " + way.getTo().getName(this));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         recyclerView = (RecyclerView) findViewById(R.id.list);
+        appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -98,9 +94,30 @@ public class DetailedWayActivity extends AppCompatActivity{
         GoodwayHttpsClient.sendRoute(this, new Action<Integer>() {
             @Override
             public void action(Integer e) {
-                Toast.makeText(DetailedWayActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+
             }
         }, null, mail, password, Arrays.asList(2), way);
+
+        if(way.getImgUrl()!=null) {
+            Picasso.with(this).load(way.getImgUrl())
+                    .error(R.mipmap.ic_event_black_36dp).into(new Target() {
+
+                @Override
+                public void onPrepareLoad(Drawable arg0) {
+                }
+
+                @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom arg1) {
+                    // TODO Create your drawable from bitmap and append where you like.
+                    appBarLayout.setBackground(new BitmapDrawable(getResources(), bitmap));
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable arg0) {
+                }
+            });
+        }
     }
 
     @Override
@@ -127,4 +144,19 @@ public class DetailedWayActivity extends AppCompatActivity{
             return false;
         }
     }
+
+    public void fabClick(View v){
+        Toast.makeText(this, "lets go", Toast.LENGTH_SHORT).show();
+    }
+
+    private LatLngBounds getCenter(LatLng from, LatLng to){
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        Log.d(from.toString(), "from latlng");
+        Log.d(to.toString(), "to latlng");
+        builder.include(from);
+        builder.include(to);
+        LatLngBounds bounds = builder.build();
+        return bounds;
+    }
+
 }

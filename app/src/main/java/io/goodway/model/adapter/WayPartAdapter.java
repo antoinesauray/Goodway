@@ -1,21 +1,18 @@
 package io.goodway.model.adapter;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.goodway.DetailedWayActivity;
 import io.goodway.R;
-import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.WayPart;
 
 
@@ -64,7 +61,43 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
         // - replace the contents of the view with that element
         WayPart way = mDataset.get(position);
         holder.setItem(way);
-        holder.description.setText(way.toString());
+        int[] times = WayPart.splitToComponentTimes(way.getDuration());
+        String timeStr="";
+        if(times[0]!=0){
+            if(times[1]!=0){
+                timeStr+=times[0]+":";
+            }
+            else{
+                timeStr+=times[1]+" "+activity.getString(R.string.hours);
+            }
+        }
+        if(times[1]!=0){
+            if(times[0]!=0){
+                timeStr+=times[1];
+            }
+            else{
+                timeStr+=times[1]+" "+activity.getString(R.string.minutes);
+            }
+        }
+        holder.from.setText(activity.getString(R.string.from) + " " + way.getFrom().toString());
+        Log.d("way.getLocaleType()", way.getType());
+        holder.type.setText(activity.getString(getResource(way.getType())) +" "+ activity.getString(R.string.during)+" "+timeStr);
+        holder.to.setText(activity.getString(R.string.to)+" "+way.getTo().toString());
+    }
+
+    private int getResource(String type){
+        switch (type){
+            case "Bus Trip":
+                return R.string.bustrip;
+            case "Walking":
+                return R.string.walking;
+            case "Waiting":
+                return R.string.waiting;
+            case "Transfer":
+                return R.string.transfer;
+            default:
+                return R.string.unknown;
+        }
     }
 
     public void add(WayPart item) {
@@ -88,17 +121,18 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         // each data item is just a string in this case
-        TextView description;
+        TextView time, from, to, type;
         WayPart item;
         Activity activity;
 
         public ViewHolder(Activity activity, View lyt_main) {
             super(lyt_main);
             this.activity = activity;
-            description = (TextView) lyt_main.findViewById(R.id.description);
+            time = (TextView) lyt_main.findViewById(R.id.time);
+            from = (TextView) lyt_main.findViewById(R.id.from);
+            to = (TextView) lyt_main.findViewById(R.id.to);
+            type = (TextView) lyt_main.findViewById(R.id.type);
         }
-
-
         public void setItem(WayPart item) {
             this.item = item;
         }

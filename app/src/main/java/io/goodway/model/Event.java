@@ -9,7 +9,7 @@ import android.os.Parcelable;
 public class Event implements Parcelable {
 
     private int id;
-    private String name, description, date;
+    private String name, url, date;
     private double latitude, longitude;
 
     public final static String BASEURL="http://gorilla.goodway.io/event_";
@@ -25,10 +25,10 @@ public class Event implements Parcelable {
                 }
             };
 
-    public Event(int id, String name, String description, String date, double latitude, double longitude){
+    public Event(int id, String name, String url, String date, double latitude, double longitude){
         this.id = id;
         this.name = name;
-        this.description = description;
+        this.url = url;
         this.date = date;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -42,8 +42,8 @@ public class Event implements Parcelable {
         return name;
     }
 
-    public String getDescription(){
-        return description;
+    public String getUrl(){
+        return url;
     }
 
     public String getDate(){return date;}
@@ -62,7 +62,7 @@ public class Event implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(name);
-        dest.writeString(description);
+        dest.writeString(url);
         dest.writeString(date);
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
@@ -70,7 +70,7 @@ public class Event implements Parcelable {
     private void readFromParcel(Parcel in) {
         id = in.readInt();
         name = in.readString();
-        description = in.readString();
+        url = in.readString();
         date = in.readString();
         latitude = in.readDouble();
         longitude = in.readDouble();

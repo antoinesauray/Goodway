@@ -21,5 +21,18 @@
                 </item>
                 <item name="android:windowSharedElementReturnTransition">@android:transition/move
                 </item>
+
+                <item name="android:dialogTheme">@style/Theme.Dialog</item> <!-- TimePicker dialog -->
+                <item name="android:alertDialogTheme">@style/Theme.Dialog</item> <!-- Alert dialog -->
+
+                <item name="android:windowActionBarOverlay">true</item>
+        </style>
+
+        <style name="Theme.Dialog" parent="android:Theme.Material.Light.Dialog">
+
+                <item name="android:colorAccent">@color/primary</item>
+                <item name="android:colorPrimary">@color/primary</item>
+                <item name="android:colorPrimaryDark">@color/primary_dark</item>
+
         </style>
 </resources>

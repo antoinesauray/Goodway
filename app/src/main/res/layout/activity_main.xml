@@ -28,12 +28,6 @@
             android:layout_height="match_parent">
 
 
-            <fragment
-                android:id="@+id/map"
-                class="com.google.android.gms.maps.MapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
             <android.support.design.widget.AppBarLayout
                 android:id="@+id/appBar"
                 android:elevation="@dimen/toolbar_elevation"
@@ -53,14 +47,33 @@
 
             </android.support.design.widget.AppBarLayout>
 
-            <fragment
-                android:id="@+id/fragment"
+
+            <com.sothree.slidinguppanel.SlidingUpPanelLayout
+                xmlns:sothree="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/sliding_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_anchorGravity="bottom|center"
-                class="io.goodway.view.fragment.BottomFragment"
-                app:layout_anchor="@id/coordinatorLayout"
-                android:elevation="@dimen/fab_elevation" />
+                android:layout_height="match_parent"
+                android:elevation="@dimen/toolbar_elevation"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:gravity="bottom"
+                sothree:umanoPanelHeight="150dp"
+                sothree:umanoShadowHeight="4dp">
+
+                <fragment
+                    android:id="@+id/map"
+                    class="com.google.android.gms.maps.MapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <fragment
+                    android:id="@+id/fragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_anchorGravity="bottom|center"
+                    class="io.goodway.view.fragment.BottomFragment"
+                    app:layout_anchor="@id/coordinatorLayout"
+                    android:elevation="@dimen/toolbar_elevation"/>
+            </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"

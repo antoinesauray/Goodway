@@ -133,11 +133,11 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
             public Event processJson(JSONObject jsonObject) {
                 Integer id = jsonObject.optInt("Id");
                 String name = jsonObject.optString("Name");
-                String description = jsonObject.optString("Description");
                 String date = jsonObject.optString("Date");
                 double lat = jsonObject.optDouble("Latitude");
                 double lng = jsonObject.optDouble("Longitude");
-                return new Event(id, name, description, date, lat, lng);
+                String url = jsonObject.optString("Url");
+                return new Event(id, name, url, date, lat, lng);
             }
         }, action, error, "https://sgorilla.goodway.io/events.php").execute(new Pair("Mail", mail), new Pair("Password", password));
     }

@@ -67,13 +67,25 @@
     <string name="not_available">non disponible</string>
     <string name="your_location_not_available">Position non disponible</string>
 
+    <string name="today">Aujourd\'hui</string>
+    <string name="hours">heures</string>
+    <string name="minutes">minutes</string>
+
     <string name="from">Depuis</string>
+    <string name="to">Vers</string>
 
     <string name="trip">Voyage</string>
     <string name="store_pass">3AuZT55u2y4309ji6PKS7NvPvuZyQsHAcqlD8NUR</string>
 
     <!-- transitions -->
     <string name="transition_event_image">transition_event_image</string>
+    <string name="transition_way_image">transition_way_image</string>
 
+    <string name="bustrip">Bus</string>
+    <string name="waiting">Attendre</string>
+    <string name="transfer">Correspondance</string>
+    <string name="walking">Marcher</string>
+    <string name="unknown">Tapis volant</string>
 
+    <string name="during">pendant</string>
 </resources>

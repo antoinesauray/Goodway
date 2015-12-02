@@ -34,11 +34,13 @@
                 android:layout_marginRight="36dp"/>
             <TextView
                 android:id="@+id/from"
+                android:padding="8dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@android:color/white"
                 android:gravity="center_vertical"
                 android:onClick="changeLocation"
-                android:textColor="@android:color/white"
+                android:textColor="@color/primary"
                 android:text="@string/your_location"/>
         </LinearLayout>
 
@@ -65,15 +67,16 @@
                 android:layout_marginRight="36dp"/>
 
             <TextView
-            android:id="@+id/to"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="changeLocation"
-            android:layout_marginTop="16dp"
-            android:gravity="center_vertical"
-            android:alpha="0.54"
-            android:textColor="@android:color/white"
-            android:text="Choisir destination"/>
+                android:id="@+id/to"
+                android:padding="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:onClick="changeLocation"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/primary"
+                android:text="Choisir destination"/>
 
             </LinearLayout>
     </LinearLayout>

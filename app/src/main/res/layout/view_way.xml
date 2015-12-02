@@ -12,49 +12,61 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
     <ImageView
         android:id="@+id/icon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_plane"/>
-
-    <LinearLayout
-        android:id="@+id/timeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:background="@color/semitransparent_grey"
-        android:paddingLeft="16dp"
-        android:paddingBottom="16dp">
-
-        <TextView
-            android:id="@+id/departure"
+        android:transitionName="@string/transition_way_image"
+        android:scaleType="centerCrop" />
+        <ProgressBar
+            android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@android:color/white"/>
-        <TextView
-            android:id="@+id/arrival"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:textColor="@android:color/white"
-            android:layout_marginLeft="16dp"/>
+            android:layout_centerInParent="true"/>
 
-    </LinearLayout>
-        <TextView
-            android:id="@+id/destination"
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_above="@id/timeLayout"
-            android:textSize="24sp"
-            android:textColor="@android:color/white"
+            android:orientation="vertical"
+            android:background="@color/semitransparent_grey"
             android:paddingLeft="16dp"
-            android:paddingBottom="8dp"
-            android:background="@color/semitransparent_grey"/>
+            android:paddingBottom="16dp"
+            android:layout_alignParentBottom="true">
+            <TextView
+                android:id="@+id/type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textColor="@android:color/white"
+                android:text="type trajet"/>
+
+        <LinearLayout
+            android:id="@+id/timeLayout"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/departure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="departure"
+                android:textColor="@android:color/white"/>
+            <TextView
+                android:id="@+id/arrival"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="arrival"
+                android:textColor="@android:color/white"
+                android:layout_marginLeft="16dp"/>
+
+        </LinearLayout>
+        </LinearLayout>
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>

@@ -1,26 +1,29 @@
 package io.goodway;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.DatePicker;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.TimePicker;
 
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import io.goodway.model.adapter.WayAdapter;
 import io.goodway.navitia_android.Action;
@@ -38,11 +41,13 @@ public class WayActivity extends AppCompatActivity implements SwipeRefreshLayout
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeLayout;
     private LinearLayoutManager layoutManager;
+    private TextView time, date;
     private TextView noWaysFound;
     private WayAdapter adapter;
     private Address from, to;
 
     private String mail, password;
+    private Calendar departureTime, today;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +69,8 @@ public class WayActivity extends AppCompatActivity implements SwipeRefreshLayout
 
         recyclerView = (RecyclerView) findViewById(R.id.list);
         noWaysFound = (TextView) findViewById(R.id.no_ways_found);
+        time = (TextView) findViewById(R.id.time);
+        date = (TextView) findViewById(R.id.date);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -76,6 +83,8 @@ public class WayActivity extends AppCompatActivity implements SwipeRefreshLayout
                 MODE_PRIVATE);
         mail = shared_preferences.getString("mail", null);
         password = shared_preferences.getString("password", null);
+        departureTime =  Calendar.getInstance();
+        today = Calendar.getInstance();
         onRefresh();
 
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
@@ -102,21 +111,30 @@ public class WayActivity extends AppCompatActivity implements SwipeRefreshLayout
         String toLongitude = ((Double)to.getLongitude()).toString();
         String toLatitude = ((Double)to.getLatitude()).toString();
 
-        Date d = new Date();
-        String date = (new SimpleDateFormat("yyyyMMdd HHmm")).format(d);
-
-        date = date.replaceAll("\\s+", "T");
+        String dateStr = (new SimpleDateFormat("yyyyMMdd HHmm")).format(departureTime.getTime());
+        dateStr = dateStr.replaceAll("\\s+", "T");
 
         //pairs.add(new Pair("from", fromLongitude.substring(0, fromLongitude.length()-1) + ";" + fromLatitude.substring(0, fromLatitude.length() - 1)));
         //pairs.add(new Pair("to", toLongitude.substring(0, toLongitude.length() - 1) + ";" + toLatitude.substring(0, toLatitude.length() - 1)));
-        pairs.add(new Pair("from", fromLatitude+";" + fromLongitude));
-        pairs.add(new Pair("to", toLatitude+";" + toLongitude));
-        pairs.add(new Pair("datetime", date));
+        pairs.add(new Pair("from", fromLongitude + ";" + fromLatitude));
+        pairs.add(new Pair("to", toLongitude + ";" + toLatitude));
+        pairs.add(new Pair("datetime", dateStr));
 
-        //pairs.add(new Pair("to", "-1.673421;48.112963"));
         Log.d("from", from.getLongitude() + ";" + from.getLatitude());
         Log.d("to", to.getLongitude() + ";" + to.getLatitude());
-        Log.d("sdf time", date);
+        Log.d("sdf time", dateStr);
+
+        String[] times = Address.toHumanTime(dateStr);
+        time.setText(times[3]+"h"+times[4]);
+
+        if(departureTime.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH) && departureTime.get(Calendar.MONTH) == today.get(Calendar.MONTH) && departureTime.get(Calendar.YEAR) == today.get(Calendar.YEAR)){
+            date.setText(getString(R.string.today));
+        }
+        else{
+            date.setText(departureTime.get(Calendar.DAY_OF_MONTH)
+                    + " "+departureTime.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+                    + " "+departureTime.get(Calendar.YEAR));
+        }
 
         adapter.clear();
         Request.getWays(new Action<Way>() {
@@ -134,5 +152,29 @@ public class WayActivity extends AppCompatActivity implements SwipeRefreshLayout
                 noWaysFound.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    public void onClick(View v){
+        switch (v.getId()){
+            case R.id.time:
+                new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        departureTime.set(departureTime.get(Calendar.YEAR), departureTime.get(Calendar.MONTH), departureTime.get(Calendar.DAY_OF_MONTH), hourOfDay, minute);
+                        onRefresh();
+                    }
+                }, departureTime.get(Calendar.HOUR_OF_DAY), departureTime.get(Calendar.MINUTE), true).show();
+                break;
+            case R.id.date:
+                new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        departureTime.set(year, monthOfYear, dayOfMonth, departureTime.get(Calendar.HOUR_OF_DAY), departureTime.get(Calendar.MINUTE));
+                        onRefresh();
+                    }
+                }, departureTime.get(Calendar.YEAR), departureTime.get(Calendar.MONTH), departureTime.get(Calendar.DAY_OF_MONTH)).show();
+                break;
+        }
     }
 }

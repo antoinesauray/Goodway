@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -17,7 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -49,22 +54,25 @@ public class EventActivity extends AppCompatActivity {
      */
     private Toolbar toolbar;
     private Event event;
-    private TextView date, description;
+    private TextView date;
+    private WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().requestFeature(Window.FEATURE_PROGRESS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
         Bundle extras = this.getIntent().getExtras();
         event = extras.getParcelable("EVENT");
-
-        description = (TextView) findViewById(R.id.description);
-        description.setText(event.getDescription());
         final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBar);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(event.getName());
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN) {
-            Picasso.with(this).load(event.BASEURL + event.getId() + ".png")
+        webView = (WebView) findViewById(R.id.webView);
+        webView.setBackgroundColor(Color.argb(1, 0, 0, 0));
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setAllowFileAccess(true);
+
+        Picasso.with(this).load(event.BASEURL + event.getId() + ".png")
                     .error(R.mipmap.ic_event_black_36dp).into(new Target() {
 
                 @Override
@@ -101,8 +109,8 @@ public class EventActivity extends AppCompatActivity {
 
 
                 }
-            });
-        }
+        });
+
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -110,7 +118,26 @@ public class EventActivity extends AppCompatActivity {
 
         date = (TextView) findViewById(R.id.date);
         String[] dateSplit = Address.toHumanTime(event.getDate());
-        date.setText("Le "+dateSplit[2]+" "+formatMonth(dateSplit[3])+" "+dateSplit[4]+" à "+dateSplit[1]+"h"+dateSplit[0]);
+        date.setText("Le " + dateSplit[2] + " " + formatMonth(dateSplit[3]) + " " + dateSplit[4] + " à " + dateSplit[1] + "h" + dateSplit[0]);
+
+        webView.getSettings().setJavaScriptEnabled(true);
+
+        final Activity activity = this;
+        webView.setWebChromeClient(new WebChromeClient() {
+            public void onProgressChanged(WebView view, int progress) {
+                // Activities and WebViews measure progress with different scales.
+                // The progress meter will automatically disappear when we reach 100%
+                activity.setProgress(progress * 1000);
+            }
+        });
+        webView.setWebViewClient(new WebViewClient() {
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                Toast.makeText(activity, "Oh no! " + description, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        webView.loadUrl(event.getUrl());
+
     }
 
     private String formatMonth(String month) {
