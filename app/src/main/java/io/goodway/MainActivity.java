@@ -1,19 +1,21 @@
 package io.goodway;
 
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -24,6 +26,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,14 +37,12 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -51,7 +52,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import io.goodway.model.Event;
 import io.goodway.model.User;
 import io.goodway.navitia_android.Address;
-import io.goodway.view.fragment.BottomFragment;
+import io.goodway.view.fragment.MainFragment;
+import io.goodway.view.fragment.SearchFragment;
+import io.goodway.view.fragment.SearchPlacesFragment;
 
 
 /**
@@ -59,7 +62,7 @@ import io.goodway.view.fragment.BottomFragment;
  * @author Antoine Sauray
  * @version 2.0
  */
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMyLocationChangeListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener{
 
     // ----------------------------------- UI
 
@@ -80,14 +83,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     private Toolbar toolbar;
     /**
-     * The map
-     */
-    private GoogleMap googleMap;
-    /**
-     * The fragmentView which contains the map
-     */
-    private MapFragment mapFragment;
-    /**
      * The user interface for the current mode selected
      */
     private View ui;
@@ -95,10 +90,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private NavigationView navigationView;
 
     private CoordinatorLayout coordinatorLayout;
-    private FloatingActionButton floatingActionButton;
-    private View fragmentView;
-    private BottomFragment fragment;
+    private FrameLayout fragmentView;
+
+
     private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle actionBarDrawerToggle;
+    private TabLayout tabLayout;
 
     private FusedLocationProviderApi fusedLocationProviderApi;
     private GoogleApiClient googleApiClient;
@@ -111,6 +108,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Location userLocation;
 
     private User currentUser;
+
+    public static final int DEPARTURE=1, DESTINATION=2;
+
+    private Fragment search, current;
+    private MainFragment main;
 
     // ----------------------------------- Constants
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -134,9 +136,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.openDrawer, R.string.closeDrawer){
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.openDrawer, R.string.closeDrawer){
 
             @Override
             public void onDrawerClosed(View drawerView) {
@@ -147,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onDrawerOpened(View drawerView) {
                 // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
-
                 super.onDrawerOpened(drawerView);
             }
         };
@@ -163,16 +164,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
-        fragmentView =  findViewById(R.id.fragment);
-        fragment = (BottomFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+        fragmentView = (FrameLayout) findViewById(R.id.fragment);
 
+        main = new MainFragment();
+        search = new SearchFragment();
+        switchToMain(new Bundle());
+        /*
+        autocomplete = (EditText) fragmentView.getRootView().findViewById(R.id.autocomplete);
+
+
+
+*/
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         //((TextView)navigationView.findViewById(R.id.name)).setText(currentUser.getName());
-        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
 
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
-        floatingActionButton.setBaselineAlignBottom(true);
+
+
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -193,6 +200,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
     }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        actionBarDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        actionBarDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+
+        if(current==search){
+            onBackPressed();
+            return true;
+        }
+        else{
+            if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
+                return true;
+            }
+        }
+
+        // Handle your other action bar items...
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Override
     protected void onResume() {
@@ -234,8 +275,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void changeLocation(View v){
-        changeLocation(v.getId());
+        int request=0;
+        switch (v.getId()) {
+            case R.id.from:
+                request = DEPARTURE;
+                break;
+            case R.id.to:
+                request = DESTINATION;
+                break;
+        }
+        Bundle b = new Bundle();
+        b.putInt("REQUEST", request);
+        switchToSearch(b);
     }
+
     public void changeLocation(int viewId){
         //Intent i = new Intent(this, SearchActivity.class);
         try {
@@ -249,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 case R.id.from:
                     //intent.putExtra("FROM", true);
                     code = FROM_LOCATION;
-                    if(from==null){bounds = googleMap.getProjection().getVisibleRegion().latLngBounds;}
+                    if(from==null){bounds = main.getGoogleMap().getProjection().getVisibleRegion().latLngBounds;}
                     else{
                         bounds = LatLngBounds.builder().include(new LatLng(from.getLatitude(), from.getLongitude())).build();
                     }
@@ -257,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 case R.id.to:
                     //intent.putExtra("TO", false);
                     code = TO_LOCATION;
-                    if(to==null){bounds = googleMap.getProjection().getVisibleRegion().latLngBounds;}
+                    if(to==null){bounds = main.getGoogleMap().getProjection().getVisibleRegion().latLngBounds;}
                     else{bounds = LatLngBounds.builder().include(new LatLng(to.getLatitude(), to.getLongitude())).build();}
                     break;
             }
@@ -310,46 +363,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        this.googleMap = googleMap;
-        googleMap.setPadding(0, 0, 0, fragment.getView().getHeight());
-        googleMap.setMyLocationEnabled(true);
-        googleMap.getUiSettings().setMapToolbarEnabled(false);
-        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        googleMap.setOnMyLocationChangeListener(this);
-
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(47, 2))      // Sets the center of the map to Mountain View
-                .zoom(14)                   // Sets the zoom
-                        //.tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-
-        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-    }
-
-    public void toolbarClick(View v) {
-
-        Intent i = new Intent(this, SearchActivity.class);
-
-        if(v.getId() == R.id.speechRecognition){
-            i.putExtra("SPEECH", true);
-        }
-        else{
-            i.putExtra("SPEECH", false);
-        }
-
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
-            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this,
-                    findViewById(R.id.appBar), "search");
-            MainActivity.this.startActivity(i, options.toBundle());
-        }
-        else{
-            startActivity(i);
-        }
-    }
-
     public void swap(View v){
         Log.d("swap", "swap");
         TextView from = (TextView) fragmentView.getRootView().findViewById(R.id.from);
@@ -362,68 +375,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         to.setAlpha(fromAlpha);
     }
 
-    private void openBottomSheet(){
-        fragment.setOpenedState(true);
-        ObjectAnimator translationTop = ObjectAnimator.ofFloat(fragmentView, "translationY", fragmentView.getHeight(), 0);
-        translationTop.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                fragmentView.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        translationTop.setDuration(200);
-        translationTop.start();
-    }
-
-    private void closeBottomSheet(){
-        fragment.setOpenedState(false);
-        ObjectAnimator translationBack = ObjectAnimator.ofFloat(fragmentView, "translationY", 0, fragmentView.getHeight());
-        translationBack.setDuration(200);
-        translationBack.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                fragmentView.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        translationBack.start();
-    }
-
     public void fabClick(View v){
-        if(fragmentView.getVisibility()==View.GONE){
-            openBottomSheet();
-        }
-        else{
-            if(this.from == null && this.to==null){
+        if(this.from == null && this.to==null){
                 Snackbar.make(coordinatorLayout, R.string.no_to, Snackbar.LENGTH_LONG)
                         .setAction(R.string.select, new View.OnClickListener() {
                             @Override
@@ -476,8 +429,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
 
-            }
         }
+
     }
 
     public void drawerHeaderClick(View v){
@@ -486,8 +439,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
             startActivity(intent, options.toBundle());
-        }
-        else{
+        } else {
             startActivity(intent);
         }
     }
@@ -510,11 +462,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onMyLocationChange(Location location) {
-        userLocation = location;
-    }
-
-    @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         try {
             return super.dispatchTouchEvent(ev);
@@ -523,21 +470,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void setStart(Address adress){
+    public void setStart(Address adress){
         this.from = adress;
         Log.d("setStart", "setStart : " + adress.getLatitude() + ";" + adress.getLongitude());
-        TextView from = (TextView) fragmentView.getRootView().findViewById(R.id.from);
-        from.setText(adress.getName(this));
-        from.setAlpha(1f);
-        googleMap.clear();
-        googleMap.addMarker(new MarkerOptions()
+        main.getGoogleMap().clear();
+        main.getGoogleMap().addMarker(new MarkerOptions()
                 .position(new LatLng(this.from.getLatitude(), this.from.getLongitude()))
                         //.alpha(0.8f)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
                 .title("Départ"));
 
         if(to != null){
-            googleMap.addMarker(new MarkerOptions()
+            main.getGoogleMap().addMarker(new MarkerOptions()
                     .position(new LatLng(to.getLatitude(), to.getLongitude()))
                             //.alpha(0.8f)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
@@ -551,23 +495,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void setDestination(Address adress){
+    public void setDestination(Address adress){
         this.to = adress;
         Log.d("setDestination", "setDestination : " + adress.getLatitude() + ";" + adress.getLongitude());
-        TextView to = (TextView) (fragmentView.getRootView().findViewById(R.id.to));
-        to.setText(adress.getName(this));
-        to.setAlpha(1f);
-
-        googleMap.clear();
-
-        googleMap.addMarker(new MarkerOptions()
+        main.getGoogleMap().clear();
+        main.getGoogleMap().addMarker(new MarkerOptions()
                 .position(new LatLng(this.to.getLatitude(), this.to.getLongitude()))
                         //.alpha(0.8f)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                 .title("Destination"));
 
         if(from != null){
-            googleMap.addMarker(new MarkerOptions()
+            main.getGoogleMap().addMarker(new MarkerOptions()
                     .position(new LatLng(from.getLatitude(), from.getLongitude()))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
                     .title("Départ"));
@@ -583,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .target(new LatLng(this.to.getLatitude(), this.to.getLongitude()))      // Sets the center of the map to Mountain View
                     .zoom(14)                   // Sets the zoom// Sets the tilt of the camera to 30 degrees
                     .build();                   // Creates a CameraPosition from the builder
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            main.getGoogleMap().animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
     private void setAppropriateZoom(LatLng from, LatLng to){
@@ -595,7 +534,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LatLngBounds bounds = builder.build();
         int padding = 100; // offset from edges of the map in pixels
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        googleMap.animateCamera(cu);
+        main.getGoogleMap().animateCamera(cu);
     }
 
     @Override
@@ -608,7 +547,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         //.tilt(30)                   // Sets the tilt of the camera to 30 degrees
                 .build();                   // Creates a CameraPosition from the builder
 
-        googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        //googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 /*
         if (from != null) {
                 TextView from = (TextView) (fragmentView.getRootView().findViewById(R.id.from));
@@ -687,5 +626,36 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             setDestination(this.to);
         }
         */
+    }
+
+    public void onBackPressed(){
+        if(current==search){
+            switchToMain(new Bundle());
+        }
+    }
+    private void switchFragment(Fragment fragment, Bundle bundle)
+    {
+        fragment.setArguments(bundle);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment, fragment);
+        fragmentTransaction.commit();
+        current = fragment;
+    }
+
+    public void switchToSearch(Bundle bundle){
+        switchFragment(search, bundle);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        tabLayout.setVisibility(View.VISIBLE);
+    }
+
+    public void switchToMain(Bundle bundle){
+        switchFragment(main, bundle);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        actionBarDrawerToggle.syncState();
+        tabLayout.setVisibility(View.INVISIBLE);
     }
 }

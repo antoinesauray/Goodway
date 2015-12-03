@@ -88,4 +88,7 @@
     <string name="unknown">Tapis volant</string>
 
     <string name="during">pendant</string>
+
+    <string name="departure">Départ</string>
+    <string name="arrival">Destination</string>
 </resources>

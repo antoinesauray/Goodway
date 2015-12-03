@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:clickable="true"
+    android:layout_height="match_parent">
 
-    android:background="@color/primary"
-    android:fitsSystemWindows="true"
-    android:orientation="horizontal">
-
+        <fragment
+            android:id="@+id/map"
+            class="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp">
+        android:background="@color/primary"
+        android:layout_gravity="bottom"
+        android:foregroundGravity="bottom"
+        android:padding="16dp"
+        android:id="@+id/bottom"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -45,13 +46,15 @@
         </LinearLayout>
 
 
-    
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/white"
-        android:layout_marginTop="16dp"
-        android:layout_marginLeft="48dp"/>
+
+        <View
+            android:id="@+id/line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/white"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="48dp"
+            android:layout_marginRight="36dp"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -78,19 +81,36 @@
                 android:textColor="@color/primary"
                 android:text="Choisir destination"/>
 
-            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
     <ImageButton
         android:clickable="true"
         android:onClick="swap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        app:layout_anchor="@id/line"
+        app:layout_anchorGravity="center_vertical|right|end"
+        android:layout_marginLeft="16dp"
         android:src="@mipmap/ic_swap_vert_white_24dp"
         android:background="@null"/>
-    </RelativeLayout>
-</LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:onClick="fabClick"
+            android:src="@mipmap/ic_directions_white_48dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="@dimen/fab_margin"
+            android:layout_marginRight="10dp"
+            app:elevation="@dimen/fab_elevation"
+            app:borderWidth="0dp"
+            app:rippleColor="@color/accent"
+            app:backgroundTint="@color/accent"
+            app:layout_anchor="@id/bottom"
+            app:layout_anchorGravity="top|right|end"
+            />
+
+    </android.support.design.widget.CoordinatorLayout>

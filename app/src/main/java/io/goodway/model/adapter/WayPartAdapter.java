@@ -79,10 +79,14 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
                 timeStr+=times[1]+" "+activity.getString(R.string.minutes);
             }
         }
-        holder.from.setText(activity.getString(R.string.from) + " " + way.getFrom().toString());
+        if(way.getFrom()!=null) {
+            holder.from.setText(activity.getString(R.string.from) + " " + way.getFrom().toString());
+        }
         Log.d("way.getLocaleType()", way.getType());
         holder.type.setText(activity.getString(getResource(way.getType())) +" "+ activity.getString(R.string.during)+" "+timeStr);
-        holder.to.setText(activity.getString(R.string.to)+" "+way.getTo().toString());
+        if(way.getTo()!=null) {
+            holder.to.setText(activity.getString(R.string.to) + " " + way.getTo().toString());
+        }
     }
 
     private int getResource(String type){
