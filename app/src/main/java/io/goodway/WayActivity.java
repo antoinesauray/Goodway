@@ -2,8 +2,10 @@ package io.goodway;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +28,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import io.goodway.model.adapter.WayAdapter;
+import io.goodway.model.callback.WayCallback;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
@@ -75,7 +78,16 @@ public class WayActivity extends AppCompatActivity implements SwipeRefreshLayout
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         layoutManager = new LinearLayoutManager(this);
-        adapter = new WayAdapter(this);
+        adapter = new WayAdapter(this, new WayCallback() {
+            @Override
+            public void action(Way w) {
+                Intent intent = new Intent(WayActivity.this, DetailedWayActivity.class);
+                intent.putExtra("WAY", w);
+                //ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(WayActivity.this,
+                //        icon, WayActivity.this.getString(R.string.transition_way_image));
+                WayActivity.this.startActivity(intent);
+            }
+        });
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 

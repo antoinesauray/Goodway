@@ -1,6 +1,6 @@
 package io.goodway.view.fragment;
 
-import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,39 +8,23 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.style.CharacterStyle;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.AutocompletePrediction;
-import com.google.android.gms.location.places.AutocompletePredictionBuffer;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.PlaceBuffer;
-import com.google.android.gms.location.places.Places;
-import com.google.android.gms.maps.model.LatLng;
+import com.cocosw.bottomsheet.BottomSheet;
 
 import io.goodway.MainActivity;
 import io.goodway.R;
 import io.goodway.model.User;
-import io.goodway.model.adapter.AdressSearchAdapter;
 import io.goodway.model.adapter.UserAdapter;
-import io.goodway.model.callback.AddressSelected;
+import io.goodway.model.callback.UserCallback;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
-import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
 
 
@@ -73,7 +57,25 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         error = (TextView) root.findViewById(R.id.error);
-        adapter = new UserAdapter(getActivity(), R.layout.view_user, mail, password);
+        adapter = new UserAdapter(new UserCallback() {
+            @Override
+            public void action(User u) {
+                new BottomSheet.Builder(getActivity()).title("Place").sheet(1, "Home").sheet(2, "Work").listener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 1:
+                                Toast.makeText(getActivity(), "home", Toast.LENGTH_SHORT).show();
+                                break;
+
+                            case 2:
+                                Toast.makeText(getActivity(), "work", Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                }).show();
+            }
+        }, mail, password);
 
         Bundle extras = getArguments();
         mail = extras.getString("mail");
@@ -124,5 +126,13 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                 error.setVisibility(View.VISIBLE);
             }
         },mail, password);
+    }
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser){
+            ((SearchFragment) getParentFragment()).closeKeyboard();
+        }
+
     }
 }

@@ -38,9 +38,6 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
      * Toolbar widget
      */
     private Toolbar toolbar;
-    private RecyclerView recyclerView;
-    private GridLayoutManager layoutManager;
-    private WayAdapter adapter;
     private User user;
     private SwipeRefreshLayout swipeLayout;
 
@@ -60,24 +57,12 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        recyclerView = (RecyclerView) findViewById(R.id.list);
 
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        layoutManager = new GridLayoutManager(this, 3);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                //return mDataset.get(position).getSpans();
-                return 3;
-            }
-        });
-        adapter = new WayAdapter(this);
         SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
                 MODE_PRIVATE);
         mail = shared_preferences.getString("mail", null);
         password = shared_preferences.getString("password", null);
+        /*
         GoodwayHttpsClient.getTrips(this, new Action<Way>() {
             @Override
             public void action(Way e) {
@@ -90,9 +75,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 swipeLayout.setRefreshing(false);
             }
         }, mail, password, user.getId());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
-
+       */
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         swipeLayout.setOnRefreshListener(this);
         swipeLayout.setColorSchemeColors(R.color.accent);
@@ -110,12 +93,10 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
     @Override
     public void onRefresh() {
-        adapter.clear();
         swipeLayout.setRefreshing(true);
         GoodwayHttpsClient.getTrips(this, new Action<Way>() {
             @Override
             public void action(Way e) {
-                adapter.add(e);
                 swipeLayout.setRefreshing(false);
             }
         }, new ErrorAction() {

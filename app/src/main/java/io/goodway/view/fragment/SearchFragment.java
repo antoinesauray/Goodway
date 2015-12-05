@@ -40,6 +40,9 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
     private int request;
     private MainActivity mainActivity;
 
+    private SearchPlacesFragment f1;
+    private SearchFriendsFragment f2;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_search, container, false);
@@ -66,14 +69,24 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         return root;
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        viewPager.setCurrentItem(0);
+    }
+
+    public void closeKeyboard(){
+        f1.closeKeyboard();
+    }
+
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        SearchPlacesFragment searchPlacesFragment = new SearchPlacesFragment();
-        searchPlacesFragment.setArguments(getArguments());
-        SearchFriendsFragment searchFriendsFragment = new SearchFriendsFragment();
-        searchFriendsFragment.setArguments(getArguments());
-        adapter.addFragment(searchPlacesFragment);
-        adapter.addFragment(searchFriendsFragment);
+        f1 = new SearchPlacesFragment();
+        f1.setArguments(getArguments());
+        f2 = new SearchFriendsFragment();
+        f2.setArguments(getArguments());
+        adapter.addFragment(f1);
+        adapter.addFragment(f2);
         viewPager.setAdapter(adapter);
     }
 

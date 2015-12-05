@@ -1,6 +1,8 @@
 package io.goodway.view.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -34,6 +35,8 @@ import io.goodway.R;
 import io.goodway.model.adapter.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;
 import io.goodway.navitia_android.Address;
+import io.goodway.navitia_android.Home;
+import io.goodway.navitia_android.Work;
 
 
 /**
@@ -57,7 +60,6 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_google_places, container, false);
-
         request = getArguments().getInt("REQUEST");
 
         mainActivity = (MainActivity) getActivity();
@@ -86,27 +88,64 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
         searchAdapter = new AdressSearchAdapter(new AddressSelected() {
             @Override
             public void action(Address address) {
-                searchAdapter.clear();
-                switch (request){
-                    case MainActivity.DEPARTURE:
-                        mainActivity.setStart(address);
-                        Bundle b1 = new Bundle();
-                        b1.putParcelable("DEPARTURE", address);
-                        mainActivity.switchToMain(b1);
-                        break;
-                    case MainActivity.DESTINATION:
-                        mainActivity.setDestination(address);
-                        Bundle b2 = new Bundle();
-                        b2.putParcelable("DESTINATION", address);
-                        mainActivity.switchToMain(b2);
-                        break;
-
+                if(address.getClass() == Home.class && address.getLatitude() == 0 && address.getLongitude()==0){
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("Set Home")
+                            .setMessage("Your home is not set yet. Do you want to add it ?")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // continue with delete
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // do nothing
+                                }
+                            })
+                            //.setIcon(android.R.drawable.ic_dialog_info)
+                            .show();
                 }
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(autocomplete.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                else if(address.getClass()==Work.class && address.getLatitude() == 0 && address.getLongitude()==0){
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle("Set Work")
+                            .setMessage("Your work is not set yet. Do you want to add it ?")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // continue with delete
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // do nothing
+                                }
+                            })
+                            //.setIcon(android.R.drawable.ic_dialog_info)
+                            .show();
+                }
+                else{
+                    searchAdapter.clear();
+                    switch (request){
+                        case MainActivity.DEPARTURE:
+                            mainActivity.setStart(address);
+                            Bundle b1 = new Bundle();
+                            b1.putParcelable("DEPARTURE", address);
+                            mainActivity.switchToMain(b1);
+                            break;
+                        case MainActivity.DESTINATION:
+                            mainActivity.setDestination(address);
+                            Bundle b2 = new Bundle();
+                            b2.putParcelable("DESTINATION", address);
+                            mainActivity.switchToMain(b2);
+                            break;
+
+                    }
+                    closeKeyboard();
+                }
             }
         });
         recyclerView.setAdapter(searchAdapter);
+        searchAdapter.add(new Home(getString(R.string.home), R.mipmap.ic_home_black_24dp));
+        searchAdapter.add(new Work(getString(R.string.work), R.mipmap.ic_home_black_24dp));
         autocomplete.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -157,9 +196,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
     public void onResume(){
         super.onResume();
         googleApiClient.connect();
-        autocomplete.requestFocus();
-        InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        mgr.showSoftInput(autocomplete, InputMethodManager.SHOW_IMPLICIT);
+        showKeyboard();
     }
 
     @Override
@@ -168,8 +205,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
         if (googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(autocomplete.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        closeKeyboard();
     }
 
     @Override
@@ -190,5 +226,28 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(getActivity()!=null && autocomplete!=null) {
+            if (isVisibleToUser) {
+                showKeyboard();
+            }
+        }
+    }
+
+    public void closeKeyboard(){
+        if(autocomplete!=null) {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(autocomplete.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    public void showKeyboard(){
+        autocomplete.requestFocus();
+        InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.showSoftInput(autocomplete, InputMethodManager.SHOW_IMPLICIT);
     }
 }

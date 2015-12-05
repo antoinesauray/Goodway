@@ -1,6 +1,7 @@
 package io.goodway.model.adapter;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -8,11 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.goodway.R;
+import io.goodway.navitia_android.DataConverter;
 import io.goodway.navitia_android.WayPart;
 
 
@@ -61,32 +64,10 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
         // - replace the contents of the view with that element
         WayPart way = mDataset.get(position);
         holder.setItem(way);
-        int[] times = WayPart.splitToComponentTimes(way.getDuration());
-        String timeStr="";
-        if(times[0]!=0){
-            if(times[1]!=0){
-                timeStr+=times[0]+":";
-            }
-            else{
-                timeStr+=times[1]+" "+activity.getString(R.string.hours);
-            }
-        }
-        if(times[1]!=0){
-            if(times[0]!=0){
-                timeStr+=times[1];
-            }
-            else{
-                timeStr+=times[1]+" "+activity.getString(R.string.minutes);
-            }
-        }
-        if(way.getFrom()!=null) {
-            holder.from.setText(activity.getString(R.string.from) + " " + way.getFrom().toString());
-        }
         Log.d("way.getLocaleType()", way.getType());
-        holder.type.setText(activity.getString(getResource(way.getType())) +" "+ activity.getString(R.string.during)+" "+timeStr);
-        if(way.getTo()!=null) {
-            holder.to.setText(activity.getString(R.string.to) + " " + way.getTo().toString());
-        }
+        holder.action.setText(way.toString());
+        Toast.makeText(activity, way.getDuration()+"", Toast.LENGTH_SHORT).show();
+        holder.time.setText(secondToStr(activity, way.getDuration()));
     }
 
     private int getResource(String type){
@@ -116,6 +97,28 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
         mDataset.clear();
         notifyItemRangeRemoved(0, size);
     }
+    public String secondToStr(Context c, int seconds){
+        int[] times = WayPart.splitToComponentTimes(seconds);
+        String timeStr="";
+        if(times[0]!=0){
+            if(times[1]!=0){
+                timeStr+=times[0]+":";
+            }
+            else{
+                timeStr+=times[1]+" "+c.getString(R.string.hours);
+            }
+        }
+        if(times[1]!=0){
+            if(times[0]!=0){
+                timeStr+=times[1];
+            }
+            else{
+                timeStr+=times[1]+" "+c.getString(R.string.minutes);
+            }
+        }
+        if(timeStr==""){timeStr="0 "+c.getString(R.string.minutes);}
+        return timeStr;
+    }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
@@ -125,7 +128,7 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         // each data item is just a string in this case
-        TextView time, from, to, type;
+        TextView time, action;
         WayPart item;
         Activity activity;
 
@@ -133,9 +136,7 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
             super(lyt_main);
             this.activity = activity;
             time = (TextView) lyt_main.findViewById(R.id.time);
-            from = (TextView) lyt_main.findViewById(R.id.from);
-            to = (TextView) lyt_main.findViewById(R.id.to);
-            type = (TextView) lyt_main.findViewById(R.id.type);
+            action = (TextView) lyt_main.findViewById(R.id.action);
         }
         public void setItem(WayPart item) {
             this.item = item;

@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import io.goodway.model.User;
+import io.goodway.model.adapter.FriendAdapter;
 import io.goodway.model.adapter.UserAdapter;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
@@ -148,7 +149,7 @@ public class FriendsActivity extends AppCompatActivity {
         SwipeRefreshLayout swipeLayout;
         LinearLayoutManager layoutManager;
         TextView error;
-        UserAdapter adapter;
+        FriendAdapter adapter;
         String mail, password;
         @Override
         public View onCreateView(LayoutInflater inflater,
@@ -163,7 +164,7 @@ public class FriendsActivity extends AppCompatActivity {
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             error = (TextView) rootView.findViewById(R.id.error);
             layoutManager = new LinearLayoutManager(getActivity());
-            adapter = new UserAdapter(getActivity(), R.layout.view_user, mail, password);
+            adapter = new FriendAdapter(getActivity(), R.layout.view_user, mail, password);
 
             Bundle extras = getArguments();
             mail = extras.getString("mail");
@@ -219,7 +220,7 @@ public class FriendsActivity extends AppCompatActivity {
         SwipeRefreshLayout swipeLayout;
         LinearLayoutManager layoutManager;
         TextView error;
-        UserAdapter adapter;
+        FriendAdapter adapter;
         String mail, password;
         @Override
         public View onCreateView(LayoutInflater inflater,
@@ -241,7 +242,7 @@ public class FriendsActivity extends AppCompatActivity {
             mail = extras.getString("mail");
             password = extras.getString("password");
 
-            adapter = new UserAdapter(getActivity(), R.layout.view_friend_request, mail, password);
+            adapter = new FriendAdapter(getActivity(), R.layout.view_friend_request, mail, password);
 
             GoodwayHttpsClient.getFriendsRequest(getActivity(), new Action<User>() {
                 @Override

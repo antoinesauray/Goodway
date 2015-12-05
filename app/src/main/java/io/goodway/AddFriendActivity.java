@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import io.goodway.model.User;
+import io.goodway.model.adapter.FriendAdapter;
 import io.goodway.model.adapter.UserAdapter;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
@@ -41,7 +42,7 @@ public class AddFriendActivity extends AppCompatActivity{
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
-    private UserAdapter adapter;
+    private FriendAdapter adapter;
     private String mail, password;
     private EditText findFriends;
     private AsyncTask task;
@@ -112,7 +113,7 @@ public class AddFriendActivity extends AppCompatActivity{
         mail = shared_preferences.getString("mail", null);
         password = shared_preferences.getString("password", null);
 
-        adapter = new UserAdapter(this, R.layout.view_friend_add, mail, password);
+        adapter = new FriendAdapter(this, R.layout.view_friend_add, mail, password);
 
 
         recyclerView.setLayoutManager(layoutManager);

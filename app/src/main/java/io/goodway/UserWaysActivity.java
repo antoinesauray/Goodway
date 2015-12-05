@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import io.goodway.model.Event;
 import io.goodway.model.User;
 import io.goodway.model.adapter.WayAdapter;
+import io.goodway.model.callback.WayCallback;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.ErrorAction;
@@ -76,7 +77,12 @@ public class UserWaysActivity extends AppCompatActivity implements SwipeRefreshL
                 return 3;
             }
         });
-        adapter = new WayAdapter(this);
+        adapter = new WayAdapter(this, new WayCallback() {
+            @Override
+            public void action(Way w) {
+
+            }
+        });
         SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
                 MODE_PRIVATE);
         mail = shared_preferences.getString("mail", null);

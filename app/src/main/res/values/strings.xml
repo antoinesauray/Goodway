@@ -53,6 +53,7 @@
     <string name="bus">Bus</string>
 
     <string name="home">Maison</string>
+    <string name="work">Travail</string>
     <string name="your_location">Votre position</string>
     <string name="your_location_waiting">Votre position(en attente)</string>
     <string name="markerPosition">Position carte</string>

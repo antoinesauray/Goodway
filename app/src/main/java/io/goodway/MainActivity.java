@@ -284,53 +284,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 request = DESTINATION;
                 break;
         }
+        changeLocation(request);
+    }
+
+    public void changeLocation(int request){
         Bundle b = new Bundle();
         b.putInt("REQUEST", request);
         switchToSearch(b);
-    }
-
-    public void changeLocation(int viewId){
-        //Intent i = new Intent(this, SearchActivity.class);
-        try {
-            PlacePicker.IntentBuilder intentBuilder =
-                    new PlacePicker.IntentBuilder();
-            LatLngBounds bounds = null;
-            // Start the intent by requesting a result,
-            // identified by a request code.
-            int code = -1;
-            switch (viewId){
-                case R.id.from:
-                    //intent.putExtra("FROM", true);
-                    code = FROM_LOCATION;
-                    if(from==null){bounds = main.getGoogleMap().getProjection().getVisibleRegion().latLngBounds;}
-                    else{
-                        bounds = LatLngBounds.builder().include(new LatLng(from.getLatitude(), from.getLongitude())).build();
-                    }
-                    break;
-                case R.id.to:
-                    //intent.putExtra("TO", false);
-                    code = TO_LOCATION;
-                    if(to==null){bounds = main.getGoogleMap().getProjection().getVisibleRegion().latLngBounds;}
-                    else{bounds = LatLngBounds.builder().include(new LatLng(to.getLatitude(), to.getLongitude())).build();}
-                    break;
-            }
-            intentBuilder.setLatLngBounds(bounds);
-            Intent intent = intentBuilder.build(this);
-            startActivityForResult(intent, code);
-
-        } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-            // ...
-            e.printStackTrace();
-        }
-
-    /*
-        if(viewId == R.id.speechRecognition){
-            i.putExtra("SPEECH", true);
-        }
-        else{
-            i.putExtra("SPEECH", false);
-        }
-*/
     }
 
     @Override
@@ -400,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                             .setAction(R.string.select, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    changeLocation(R.id.from);
+                                    changeLocation(DEPARTURE);
                                 }
                             }).show();
                 }
@@ -409,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                             .setAction(R.string.select, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    changeLocation(R.id.to);
+                                    changeLocation(DESTINATION);
                                 }
                             }).show();
                 }

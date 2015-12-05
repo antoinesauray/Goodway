@@ -23,6 +23,7 @@ import io.goodway.DetailedWayActivity;
 import io.goodway.EventsActivity;
 import io.goodway.R;
 import io.goodway.WayFinishedActivity;
+import io.goodway.model.callback.WayCallback;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.BusTrip;
 import io.goodway.navitia_android.Walking;
@@ -40,12 +41,14 @@ public class WayAdapter extends RecyclerView.Adapter<WayAdapter.ViewHolder> {
 
     private List<Way> mDataset;
     private Activity activity;
+    private WayCallback callback;
 
     private static final String TAG="LINE_ADAPTER";
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public WayAdapter(Activity activity) {
+    public WayAdapter(Activity activity, WayCallback callback) {
         this.activity = activity;
+        this.callback = callback;
         mDataset = new ArrayList<Way>();
     }
 
@@ -146,11 +149,7 @@ public class WayAdapter extends RecyclerView.Adapter<WayAdapter.ViewHolder> {
 
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(activity, DetailedWayActivity.class);
-            intent.putExtra("WAY", item);
-            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
-                    icon, activity.getString(R.string.transition_way_image));
-            activity.startActivity(intent, options.toBundle());
+            callback.action(item);
         }
 
         public void setItem(Way item) {

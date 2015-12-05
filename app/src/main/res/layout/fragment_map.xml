@@ -20,10 +20,16 @@
         android:foregroundGravity="bottom"
         android:padding="16dp"
         android:id="@+id/bottom"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginRight="56dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
@@ -36,7 +42,7 @@
             <TextView
                 android:id="@+id/from"
                 android:padding="8dp"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
                 android:gravity="center_vertical"
@@ -45,19 +51,8 @@
                 android:text="@string/your_location"/>
         </LinearLayout>
 
-
-
-        <View
-            android:id="@+id/line"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@android:color/white"
-            android:layout_marginTop="16dp"
-            android:layout_marginLeft="48dp"
-            android:layout_marginRight="36dp"/>
-
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
@@ -72,7 +67,7 @@
             <TextView
                 android:id="@+id/to"
                 android:padding="8dp"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/white"
                 android:onClick="changeLocation"
@@ -89,11 +84,10 @@
         android:onClick="swap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_anchor="@id/line"
-        app:layout_anchorGravity="center_vertical|right|end"
-        android:layout_marginLeft="16dp"
         android:src="@mipmap/ic_swap_vert_white_24dp"
         android:background="@null"/>
+
+</LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
