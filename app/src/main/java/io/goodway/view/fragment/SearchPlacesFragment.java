@@ -124,21 +124,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
                 }
                 else{
                     searchAdapter.clear();
-                    switch (request){
-                        case MainActivity.DEPARTURE:
-                            mainActivity.setStart(address);
-                            Bundle b1 = new Bundle();
-                            b1.putParcelable("DEPARTURE", address);
-                            mainActivity.switchToMain(b1);
-                            break;
-                        case MainActivity.DESTINATION:
-                            mainActivity.setDestination(address);
-                            Bundle b2 = new Bundle();
-                            b2.putParcelable("DESTINATION", address);
-                            mainActivity.switchToMain(b2);
-                            break;
-
-                    }
+                    finish(address);
                     closeKeyboard();
                 }
             }
@@ -249,5 +235,23 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
         autocomplete.requestFocus();
         InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         mgr.showSoftInput(autocomplete, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    private void finish(Address address){
+        switch (request){
+            case MainActivity.DEPARTURE:
+                mainActivity.setFrom(address);
+                Bundle b1 = new Bundle();
+                b1.putParcelable("DEPARTURE", address);
+                mainActivity.switchToMain(b1, request);
+                break;
+            case MainActivity.DESTINATION:
+                mainActivity.setTo(address);
+                Bundle b2 = new Bundle();
+                b2.putParcelable("DESTINATION", address);
+                mainActivity.switchToMain(b2, request);
+                break;
+
+        }
     }
 }

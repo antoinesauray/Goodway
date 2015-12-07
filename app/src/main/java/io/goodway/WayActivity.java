@@ -154,7 +154,6 @@ public class WayActivity extends AppCompatActivity implements SwipeRefreshLayout
             @Override
             public void action(Way e) {
                 swipeLayout.setRefreshing(false);
-                //Toast.makeText(WayActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                 adapter.add(e);
             }
 

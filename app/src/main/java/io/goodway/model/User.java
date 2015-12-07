@@ -10,6 +10,7 @@ public class User implements Parcelable {
 
     private String fname, lname, mail;
     private int id, image;
+    private boolean sharesHome, sharesWork;
 
     public static final Creator CREATOR =
             new Creator() {
@@ -27,10 +28,12 @@ public class User implements Parcelable {
         this.fname = fname;
         this.lname = lname;
     }
-    public User(int id, String fname, String lname){
+    public User(int id, String fname, String lname, boolean sharesHome, boolean sharesWork){
         this.id = id;
         this.fname = fname;
         this.lname = lname;
+        this.sharesHome = sharesHome;
+        this.sharesWork = sharesWork;
     }
 
     public User(String fname, String lname, String mail){
@@ -63,6 +66,10 @@ public class User implements Parcelable {
         return fname+" "+lname;
     }
 
+    public boolean sharesHome(){return sharesHome;}
+
+    public boolean sharesWork(){return sharesWork;}
+
     @Override
     public int describeContents() {
         return 3;
@@ -75,6 +82,8 @@ public class User implements Parcelable {
         dest.writeString(lname);
         dest.writeString(mail);
         dest.writeInt(image);
+        dest.writeByte((byte) (sharesHome ? 1 : 0));
+        dest.writeByte((byte) (sharesWork ? 1 : 0));
     }
     private void readFromParcel(Parcel in) {
         id = in.readInt();
@@ -82,5 +91,7 @@ public class User implements Parcelable {
         lname = in.readString();
         mail = in.readString();
         image = in.readInt();
+        sharesHome = in.readByte() != 0;
+        sharesWork = in.readByte() != 0;
     }
 }

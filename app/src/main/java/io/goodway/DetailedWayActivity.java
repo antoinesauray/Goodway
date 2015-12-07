@@ -91,13 +91,6 @@ public class DetailedWayActivity extends AppCompatActivity{
             }
         }
 
-        GoodwayHttpsClient.sendRoute(this, new Action<Integer>() {
-            @Override
-            public void action(Integer e) {
-
-            }
-        }, null, mail, password, Arrays.asList(2), way);
-
         if(way.getImgUrl()!=null) {
             Picasso.with(this).load(way.getImgUrl())
                     .error(R.mipmap.ic_event_black_36dp).into(new Target() {
@@ -146,7 +139,12 @@ public class DetailedWayActivity extends AppCompatActivity{
     }
 
     public void fabClick(View v){
-        Toast.makeText(this, "lets go", Toast.LENGTH_SHORT).show();
+        GoodwayHttpsClient.sendRoute(this, new Action<Integer>() {
+            @Override
+            public void action(Integer e) {
+                Toast.makeText(DetailedWayActivity.this, "route sent", Toast.LENGTH_SHORT).show();
+            }
+        }, null, mail, password, Arrays.asList(2), way);
     }
 
     private LatLngBounds getCenter(LatLng from, LatLng to){

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.goodway.R;
-import io.goodway.navitia_android.DataConverter;
 import io.goodway.navitia_android.WayPart;
 
 
@@ -65,24 +64,8 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
         WayPart way = mDataset.get(position);
         holder.setItem(way);
         Log.d("way.getLocaleType()", way.getType());
-        holder.action.setText(way.toString());
-        Toast.makeText(activity, way.getDuration()+"", Toast.LENGTH_SHORT).show();
+        holder.action.setText(way.getLabel(activity));
         holder.time.setText(secondToStr(activity, way.getDuration()));
-    }
-
-    private int getResource(String type){
-        switch (type){
-            case "Bus Trip":
-                return R.string.bustrip;
-            case "Walking":
-                return R.string.walking;
-            case "Waiting":
-                return R.string.waiting;
-            case "Transfer":
-                return R.string.transfer;
-            default:
-                return R.string.unknown;
-        }
     }
 
     public void add(WayPart item) {

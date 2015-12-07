@@ -132,9 +132,9 @@ public class FriendsActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position){
                 case 0:
-                    return "Friends";
+                    return getString(R.string.friends);
                 case 1:
-                    return "Pending";
+                    return getString(R.string.pending);
                 default:
                     return null;
             }

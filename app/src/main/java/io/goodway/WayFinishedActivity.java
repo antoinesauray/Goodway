@@ -32,7 +32,6 @@ public class WayFinishedActivity extends AppCompatActivity{
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
         SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
                 MODE_PRIVATE);
         mail = shared_preferences.getString("mail", null);

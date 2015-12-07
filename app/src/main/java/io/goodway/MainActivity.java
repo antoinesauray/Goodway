@@ -29,32 +29,19 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import io.goodway.model.Event;
 import io.goodway.model.User;
 import io.goodway.navitia_android.Address;
 import io.goodway.view.fragment.MainFragment;
 import io.goodway.view.fragment.SearchFragment;
-import io.goodway.view.fragment.SearchPlacesFragment;
 
 
 /**
@@ -113,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private Fragment search, current;
     private MainFragment main;
+    private static final int MAIN=1, SEARCH=2;
 
     // ----------------------------------- Constants
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -133,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         Bundle extras = this.getIntent().getExtras();
         currentUser = extras.getParcelable("USER");
-
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -168,7 +155,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         main = new MainFragment();
         search = new SearchFragment();
-        switchToMain(new Bundle());
+
+        switchToMain(new Bundle(), -1);
         /*
         autocomplete = (EditText) fragmentView.getRootView().findViewById(R.id.autocomplete);
 
@@ -176,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
 */
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        //((TextView)navigationView.findViewById(R.id.name)).setText(currentUser.getName());
+        ((TextView)navigationView.getHeaderView(0).findViewById(R.id.name)).setText(currentUser.getName());
 
 
 
@@ -194,6 +182,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         Intent i2 = new Intent(MainActivity.this, EventsActivity.class);
                         i2.putExtra("USER", currentUser);
                         startActivityForResult(i2, EVENT_REQUEST);
+                        break;
+                    case R.id.preferences:
+                        Intent i3 = new Intent(MainActivity.this, PreferencesActivity.class);
+                        startActivity(i3);
                         break;
                 }
                 return false;
@@ -216,9 +208,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Pass the event to ActionBarDrawerToggle, if it returns
-        // true, then it has handled the app icon touch event
-
         if(current==search){
             onBackPressed();
             return true;
@@ -228,9 +217,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 return true;
             }
         }
-
-        // Handle your other action bar items...
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -249,29 +235,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
-    }
-
-    protected void onRestoreInstanceState (Bundle savedInstanceState){
-        from = savedInstanceState.getParcelable("FROM");
-        to = savedInstanceState.getParcelable("TO");
-
-        if(from != null){
-            TextView from = (TextView) fragmentView.getRootView().findViewById(R.id.from);
-            from.setText(this.from.getName(this));
-            from.setAlpha(1f);
-        }
-        if(to != null){
-            TextView to = (TextView) fragmentView.getRootView().findViewById(R.id.to);
-            to.setText(this.to.getName(this));
-            to.setAlpha(1f);
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState (Bundle outState){
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("FROM", from);
-        outState.putParcelable("TO", to);
     }
 
     public void changeLocation(View v){
@@ -299,26 +262,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             if(resultCode == RESULT_OK){
                 Log.d("EVENT_REQUEST", "request code");
                 Event event = data.getExtras().getParcelable("EVENT");
-                setDestination(new Address(event.getName(), event.getLatitude(), event.getLongitude()));
+                Address eventAddr = new Address(event.getName(), event.getLatitude(), event.getLongitude());
+                setTo(eventAddr);
+                main.setTo(eventAddr);
                 drawerLayout.closeDrawer(GravityCompat.START);
-            }
-        }
-        else{
-            if (resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(data, this);
-                String toastMsg = String.format("Place: %s", place.getName());
-                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
-                Address address = new Address(place.getName().toString(), place.getLatLng().latitude, place.getLatLng().longitude);
-                switch (requestCode) {
-                    case FROM_LOCATION:
-                        Log.d("FROM_LOCATION", "request code");
-                        setStart(address);
-                        break;
-                    case TO_LOCATION:
-                        setDestination(address);
-                        Log.d("TO_LOCATION", "request code");
-                        break;
-                }
             }
         }
     }
@@ -430,122 +377,36 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-    public void setStart(Address adress){
+    public void setFrom(Address adress){
         this.from = adress;
-        Log.d("setStart", "setStart : " + adress.getLatitude() + ";" + adress.getLongitude());
+        Log.d("setFrom", "setFrom : " + adress.getLatitude() + ";" + adress.getLongitude());
+        /*
         main.getGoogleMap().clear();
         main.getGoogleMap().addMarker(new MarkerOptions()
                 .position(new LatLng(this.from.getLatitude(), this.from.getLongitude()))
                         //.alpha(0.8f)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                .title("Départ"));
+                .title(getString(R.string.departure)));
 
-        if(to != null){
-            main.getGoogleMap().addMarker(new MarkerOptions()
-                    .position(new LatLng(to.getLatitude(), to.getLongitude()))
-                            //.alpha(0.8f)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                    .title("Destination"));
-            setAppropriateZoom(new LatLng(this.from.getLatitude(), this.from.getLongitude()), new LatLng(this.to.getLatitude(), this.to.getLongitude()));
-        }
-        else if(userLocation!=null){
-            setAppropriateZoom(new LatLng(this.from.getLatitude(), this.from.getLongitude()), new LatLng(this.userLocation.getLatitude(), this.userLocation.getLongitude()));
-        }
-
-
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(new LatLng(this.from.getLatitude(), this.from.getLongitude()))      // Sets the center of the map to Mountain View
+                .zoom(14)                   // Sets the zoom// Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+        main.getGoogleMap().animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        */
     }
 
-    public void setDestination(Address adress){
+    public void setTo(Address adress){
         this.to = adress;
-        Log.d("setDestination", "setDestination : " + adress.getLatitude() + ";" + adress.getLongitude());
-        main.getGoogleMap().clear();
-        main.getGoogleMap().addMarker(new MarkerOptions()
-                .position(new LatLng(this.to.getLatitude(), this.to.getLongitude()))
-                        //.alpha(0.8f)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                .title("Destination"));
-
-        if(from != null){
-            main.getGoogleMap().addMarker(new MarkerOptions()
-                    .position(new LatLng(from.getLatitude(), from.getLongitude()))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                    .title("Départ"));
-            setAppropriateZoom(new LatLng(this.from.getLatitude(), this.from.getLongitude()), new LatLng(this.to.getLatitude(), this.to.getLongitude()));
-        }
-        else if(userLocation!=null){
-            Log.d("userLocation", "userLocation");
-            setAppropriateZoom(new LatLng(this.userLocation.getLatitude(), this.userLocation.getLongitude()), new LatLng(this.to.getLatitude(), this.to.getLongitude()));
-        }
-        else{
-            Log.d("userLocation=null", "userLocation=null");
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(this.to.getLatitude(), this.to.getLongitude()))      // Sets the center of the map to Mountain View
-                    .zoom(14)                   // Sets the zoom// Sets the tilt of the camera to 30 degrees
-                    .build();                   // Creates a CameraPosition from the builder
-            main.getGoogleMap().animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        }
-    }
-    private void setAppropriateZoom(LatLng from, LatLng to){
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        Log.d(from.toString(), "from latlng");
-        Log.d(to.toString(), "to latlng");
-        builder.include(from);
-        builder.include(to);
-        LatLngBounds bounds = builder.build();
-        int padding = 100; // offset from edges of the map in pixels
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        main.getGoogleMap().animateCamera(cu);
     }
 
     @Override
     public void onConnected(Bundle bundle) {
         userLocation = LocationServices.FusedLocationApi.getLastLocation(
                 googleApiClient);
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))      // Sets the center of the map to Mountain View
-                .zoom(14)                   // Sets the zoom
-                        //.tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
+        /*
+        if(main.getGoogleMap()!=null) {
 
-        //googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-/*
-        if (from != null) {
-                TextView from = (TextView) (fragmentView.getRootView().findViewById(R.id.from));
-                if(this.from.getType() == AddressType.POSITION) {
-                    if(userLocation != null){
-                        from.setText(getString(R.string.your_location));
-                        this.from.setLatitude(userLocation.getLatitude());
-                        this.from.setLongitude(userLocation.getLongitude());
-                        setStart(this.from);
-                    }
-                    else{
-                        from.setText(getString(R.string.your_location)+" ("+getString(R.string.not_available)+")");
-                    }
-                }
-                else{
-                    from.setText(this.from.getName(this));
-                    setStart(this.from);
-                }
-
-            } else if (to != null) {
-                TextView to = (TextView) (fragmentView.getRootView().findViewById(R.id.to));
-                if(this.to.getType() == AddressType.POSITION) {
-
-                    if(userLocation != null){
-                        to.setText(getString(R.string.your_location));
-                        this.to.setLatitude(userLocation.getLatitude());
-                        this.to.setLongitude(userLocation.getLongitude());
-                        setDestination(this.to);
-                    }
-                    else{
-                        to.setText(getString(R.string.your_location)+" ("+getString(R.string.not_available)+")");
-                    }
-
-                }
-                else {
-                    to.setText(this.to.getName(this));
-                    setStart(this.to);
-                }
         }
         */
     }
@@ -570,31 +431,31 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onLocationChanged(Location location) {
         userLocation = location;
-        /*
-        if(from != null && this.from.getType() == AddressType.POSITION){
-            TextView from = (TextView) (fragmentView.getRootView().findViewById(R.id.from));
-            from.setText(getString(R.string.your_location));
-            this.from.setLatitude(userLocation.getLatitude());
-            this.from.setLongitude(userLocation.getLongitude());
-            setStart(this.from);
-        }
-        else if (to != null && this.to.getType() == AddressType.POSITION){
-            TextView to = (TextView) (fragmentView.getRootView().findViewById(R.id.to));
-            to.setText(getString(R.string.your_location));
-            this.to.setLatitude(userLocation.getLatitude());
-            this.to.setLongitude(userLocation.getLongitude());
-            setDestination(this.to);
-        }
-        */
     }
 
     public void onBackPressed(){
-        if(current==search){
-            switchToMain(new Bundle());
+        if(current==search) {
+            Bundle extras = new Bundle();
+            int request = -1;
+            if (from != null) {
+                extras.putParcelable("DEPARTURE", from);
+                request = DEPARTURE;
+            }
+            if (to != null) {
+                extras.putParcelable("DESTINATION", to);
+                request = DESTINATION;
+            }
+            switchToMain(extras, request);
         }
     }
     private void switchFragment(Fragment fragment, Bundle bundle)
     {
+        if(bundle.getParcelable("DEPARTURE")==null){
+            bundle.putParcelable("DEPARTURE", from);
+        }
+        if(bundle.getParcelable("DESTINATION")==null){
+            bundle.putParcelable("DESTINATION", to);
+        }
         fragment.setArguments(bundle);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -611,11 +472,32 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         tabLayout.setVisibility(View.VISIBLE);
     }
 
-    public void switchToMain(Bundle bundle){
+    public void switchToMain(Bundle bundle, int request){
         switchFragment(main, bundle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         actionBarDrawerToggle.syncState();
         tabLayout.setVisibility(View.INVISIBLE);
+        switch(request){
+            case DEPARTURE:
+                setFrom(from);
+                main.setFrom(from);
+                break;
+            case DESTINATION:
+                setTo(to);
+                main.setTo(to);
+                break;
+            default:
+                /*
+                if(userLocation!=null){
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))      // Sets the center of the map to Mountain View
+                            .zoom(14)                   // Sets the zoom
+                                    //.tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                            .build();                   // Creates a CameraPosition from the
+                    main.getGoogleMap().animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                }
+                */
+        }
     }
 }

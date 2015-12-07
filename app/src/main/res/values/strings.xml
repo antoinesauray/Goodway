@@ -20,13 +20,14 @@
 
     <string name="find_friend">Rechercher des amis</string>
     <string name="add">Ajouter</string>
+    <string name="pending">En attente</string>
 
     <string name="no_ways_found">Oups nous n\'avons pas trouvé de trajet</string>
 
     <!-- drawer -->
     <string name="social">Social</string>
     <string name="history">Historique</string>
-    <string name="settings">Settings</string>
+    <string name="settings">Réglages</string>
 
     <string name="friends">Amis</string>
     <string name="events">Evènements</string>
@@ -58,6 +59,9 @@
     <string name="your_location_waiting">Votre position(en attente)</string>
     <string name="markerPosition">Position carte</string>
 
+    <string name="home_not_available">Maison (non partagée)</string>
+    <string name="work_not_available">Lieu de travail (non partagé)</string>
+    <string name="linked_to">en lien avec</string>
 
     <!-- Suggestions -->
     <string name="select">Selectionner</string>
@@ -71,6 +75,7 @@
     <string name="today">Aujourd\'hui</string>
     <string name="hours">heures</string>
     <string name="minutes">minutes</string>
+    <string name="at">à</string>
 
     <string name="from">Depuis</string>
     <string name="to">Vers</string>
@@ -92,4 +97,6 @@
 
     <string name="departure">Départ</string>
     <string name="arrival">Destination</string>
+
+    <string name="preferences">Préférences</string>
 </resources>

@@ -1,6 +1,7 @@
 package io.goodway.view.fragment;
 
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,7 @@ import io.goodway.model.adapter.UserAdapter;
 import io.goodway.model.callback.UserCallback;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
+import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
 
 
@@ -54,26 +56,66 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
         mainActivity = (MainActivity) getActivity();
         recyclerView = (RecyclerView) root.findViewById(R.id.list);
 
+        SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
+                getActivity().MODE_PRIVATE);
+        mail = shared_preferences.getString("mail", null);
+        password = shared_preferences.getString("password", null);
+
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         error = (TextView) root.findViewById(R.id.error);
         adapter = new UserAdapter(new UserCallback() {
             @Override
-            public void action(User u) {
-                new BottomSheet.Builder(getActivity()).title("Place").sheet(1, "Home").sheet(2, "Work").listener(new DialogInterface.OnClickListener() {
+            public void action(final User u) {
+                BottomSheet.Builder sheet = new BottomSheet.Builder(getActivity()).title(getString(R.string.places)+ " "+getString(R.string.linked_to)+" "+u.getFirstName()).listener(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
-                            case 1:
-                                Toast.makeText(getActivity(), "home", Toast.LENGTH_SHORT).show();
-                                break;
+                            case 0:
+                                // Home
+                                if(u.sharesHome()) {
+                                    GoodwayHttpsClient.getUserHome(getActivity(), new Action<Address>() {
+                                        @Override
+                                        public void action(Address e) {
+                                            if(e!=null){
+                                                finish(e);
+                                            }
+                                            else{
+                                                Toast.makeText(SearchFriendsFragment.this.getActivity(), "user did not provide location", Toast.LENGTH_SHORT).show();
+                                            }
 
-                            case 2:
-                                Toast.makeText(getActivity(), "work", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }, mail, password, u.getId(), u.getFirstName());
+                                }
+                                break;
+                            case 1:
+                                // Home
+                                if(u.sharesWork()) {
+                                    GoodwayHttpsClient.getUserWork(getActivity(), new Action<Address>() {
+                                        @Override
+                                        public void action(Address e) {
+                                            if(e!=null) {
+                                                finish(e);
+                                            }
+                                            else{
+                                                Toast.makeText(SearchFriendsFragment.this.getActivity(), "user did not provide location", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }, mail, password, u.getId(), u.getFirstName());
+                                }
                                 break;
                         }
                     }
-                }).show();
+                });
+                int i=0;
+                if(u.sharesHome()) {
+                    sheet.sheet(i, R.string.home);
+                    i++;
+                }
+                if(u.sharesWork()) {
+                    sheet.sheet(i, R.string.work);
+                }
+                sheet.show();
             }
         }, mail, password);
 
@@ -133,6 +175,23 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
         if(isVisibleToUser){
             ((SearchFragment) getParentFragment()).closeKeyboard();
         }
+    }
 
+    private void finish(Address address){
+        switch (request){
+            case MainActivity.DEPARTURE:
+                mainActivity.setFrom(address);
+                Bundle b1 = new Bundle();
+                b1.putParcelable("DEPARTURE", address);
+                mainActivity.switchToMain(b1, request);
+                break;
+            case MainActivity.DESTINATION:
+                mainActivity.setTo(address);
+                Bundle b2 = new Bundle();
+                b2.putParcelable("DESTINATION", address);
+                mainActivity.switchToMain(b2, request);
+                break;
+
+        }
     }
 }

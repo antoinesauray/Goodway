@@ -75,7 +75,7 @@ public class WayAdapter extends RecyclerView.Adapter<WayAdapter.ViewHolder> {
         String[] arrival = Address.toHumanTime(way.getArrivalDateTime());
         holder.departure.setText("Départ à "+departure[3]+"h"+departure[4]);
         holder.arrival.setText("Arrivée à "+arrival[3]+"h"+arrival[4]);
-        holder.type.setText(way.getLabel());
+        holder.type.setText(way.getLocalizedLabel(activity));
 
         int type=1; // 1 stands for walk
 

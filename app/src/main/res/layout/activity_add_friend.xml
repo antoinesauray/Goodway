@@ -28,6 +28,7 @@
             android:inputType="textPersonName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/find_friend"
             android:layout_margin="16dp"/>
 
         <android.support.v7.widget.RecyclerView

@@ -74,6 +74,37 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
             }
         }, action, null, "https://sgorilla.goodway.io/users.php").execute(new Pair("Mail", mail), new Pair("Password", password));
     }
+    public static AsyncTask getUserHome(final Context c, Action<Address> action, String mail, String password, int userId, final String fname){
+        return new GoodwayHttpsClient<>(c, new ProcessJson<Address>() {
+            @Override
+            public Address processJson(JSONObject jsonObject) {
+                String lat = jsonObject.optString("LatitudeHome");
+                String lon = jsonObject.optString("LongitudeHome");
+                try{
+                    return new Address(c.getString(R.string.home)+" "+fname, Double.parseDouble(lat), Double.parseDouble(lon));
+                }
+                catch (NumberFormatException e){
+                    return null;
+                }
+
+            }
+        }, action, null, "https://sgorilla.goodway.io/user_home.php").execute(new Pair("Mail", mail), new Pair("Password", password), new Pair("UserId", Integer.toString(userId)));
+    }
+    public static AsyncTask getUserWork(final Context c, Action<Address> action, String mail, String password, int userId, final String fname){
+        return new GoodwayHttpsClient<>(c, new ProcessJson<Address>() {
+            @Override
+            public Address processJson(JSONObject jsonObject) {
+                String lat = jsonObject.optString("LatitudeWork");
+                String lon = jsonObject.optString("LongitudeWork");
+                try{
+                    return new Address(c.getString(R.string.work) + " " + fname, Double.parseDouble(lat), Double.parseDouble(lon));
+                }
+                catch (NumberFormatException e){
+                    return null;
+                }
+            }
+        }, action, null, "https://sgorilla.goodway.io/user_home.php").execute(new Pair("Mail", mail), new Pair("Password", password), new Pair("UserId", Integer.toString(userId)));
+    }
     public static AsyncTask checkMailAvailability(Context c, Action<Integer> action, ErrorAction error, String mail){
         return new GoodwayHttpsClient<>(c, new ProcessJson<Integer>() {
             @Override
@@ -101,7 +132,9 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 Integer id = jsonObject.optInt("Id");
                 String fname = jsonObject.optString("FirstName");
                 String lname = jsonObject.optString("LastName");
-                return new User(id, fname, lname);
+                int sharesHome = jsonObject.optInt("SharesHome");
+                int sharesWork = jsonObject.optInt("SharesWork");
+                return new User(id, fname, lname, sharesHome==1, sharesWork==1);
             }
         }, action, error, "https://sgorilla.goodway.io/friends.php").execute(new Pair("Mail", mail), new Pair("Password", password));
     }
@@ -112,7 +145,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 Integer id = jsonObject.optInt("Id");
                 String fname = jsonObject.optString("FirstName");
                 String lname = jsonObject.optString("LastName");
-                return new User(id, fname, lname);
+                return new User(id, fname, lname, false, false);
             }
         }, action, null, "https://sgorilla.goodway.io/friends_pending.php").execute(new Pair("Mail", mail), new Pair("Password", password));
     }
@@ -123,7 +156,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 Integer id = jsonObject.optInt("Id");
                 String fname = jsonObject.optString("FirstName");
                 String lname = jsonObject.optString("LastName");
-                return new User(id, fname, lname);
+                return new User(id, fname, lname, false, false);
             }
         }, action, error, "https://sgorilla.goodway.io/friends_request.php").execute(new Pair("Mail", mail), new Pair("Password", password));
     }
@@ -203,6 +236,18 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                     new Pair("Mail", mail), new Pair("Password", password));
     }
 
+    public static AsyncTask setSharing(Context c, Action<Boolean> action, ErrorAction error, String mail, String password, int id, boolean home, boolean work){
+        return new GoodwayHttpsClient<>(c, new ProcessJson<Boolean>() {
+            @Override
+            public Boolean processJson(JSONObject jsonObject) {
+                return true;
+            }
+        }, action, error, "https://sgorilla.goodway.io/update_sharing.php").execute(
+                new Pair("Friend", Integer.toString(id)),
+                new Pair("Mail", mail), new Pair("Password", password),
+                new Pair("Home", Integer.toString(home ? 1 : 0)), new Pair("Work", Integer.toString(work ? 1 : 0)));
+    }
+
 
     public static AsyncTask getUsersFromName(Context c, Action<User> action, ErrorAction error, String mail, String password, String fname, String lname){
         if(fname != null ){
@@ -213,7 +258,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                         Integer id = jsonObject.optInt("Id");
                         String fname = jsonObject.optString("FirstName");
                         String lname = jsonObject.optString("LastName");
-                        return new User(id, fname, lname);
+                        return new User(id, fname, lname, false, false);
                     }
                 }, action, error, "https://sgorilla.goodway.io/users.php").execute(
                         new Pair("Name1", fname), new Pair("Name2", lname),
@@ -226,7 +271,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                         Integer id = jsonObject.optInt("Id");
                         String fname = jsonObject.optString("FirstName");
                         String lname = jsonObject.optString("LastName");
-                        return new User(id, fname, lname);
+                        return new User(id, fname, lname, false, false);
                     }
                 }, action, error, "https://sgorilla.goodway.io/users.php").execute(
                         new Pair("Name1", fname),

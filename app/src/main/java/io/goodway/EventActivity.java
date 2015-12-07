@@ -118,7 +118,7 @@ public class EventActivity extends AppCompatActivity {
 
         date = (TextView) findViewById(R.id.date);
         String[] dateSplit = Address.toHumanTime(event.getDate());
-        date.setText("Le " + dateSplit[2] + " " + formatMonth(dateSplit[3]) + " " + dateSplit[4] + " à " + dateSplit[1] + "h" + dateSplit[0]);
+        date.setText(dateSplit[3] + " " + formatMonth(dateSplit[1]) + " " + dateSplit[0] + " "+getString(R.string.at)+" " + dateSplit[3] + "h" + dateSplit[4]);
 
         webView.getSettings().setJavaScriptEnabled(true);
 
