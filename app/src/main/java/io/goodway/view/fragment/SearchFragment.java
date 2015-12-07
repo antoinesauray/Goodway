@@ -40,15 +40,16 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
     private int request;
     private MainActivity mainActivity;
 
-    private SearchPlacesFragment f1;
-    private SearchFriendsFragment f2;
+    private SearchPlacesFragment f2;
+    private SearchFriendsFragment f1;
+    private SearchEventsFragment f3;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_search, container, false);
 
         request = getArguments().getInt("REQUEST");
-
+        int item = getArguments().getInt("ITEM", 1);
         mainActivity = (MainActivity) getActivity();
         googleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addApi(LocationServices.API)
@@ -62,32 +63,34 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
 
         tabLayout = (TabLayout) mainActivity.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        int[] icons = new int[]{R.drawable.ic_action_search, R.drawable.ic_person_white};
+        int[] icons = new int[]{R.drawable.ic_person_white, R.drawable.ic_action_search, R.mipmap.ic_event_black_36dp};
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             tabLayout.getTabAt(i).setIcon(icons[i]);
         }
+        viewPager.setCurrentItem(item);
         return root;
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-        viewPager.setCurrentItem(0);
-    }
-
     public void closeKeyboard(){
-        f1.closeKeyboard();
+        f2.closeKeyboard();
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        f1 = new SearchPlacesFragment();
+        f1 = new SearchFriendsFragment();
         f1.setArguments(getArguments());
-        f2 = new SearchFriendsFragment();
+        f2 = new SearchPlacesFragment();
         f2.setArguments(getArguments());
+        f3 = new SearchEventsFragment();
+        f3.setArguments(getArguments());
         adapter.addFragment(f1);
         adapter.addFragment(f2);
+        adapter.addFragment(f3);
         viewPager.setAdapter(adapter);
+    }
+
+    public void setCurrentItem(int item){
+        viewPager.setCurrentItem(item);
     }
 
     @Override

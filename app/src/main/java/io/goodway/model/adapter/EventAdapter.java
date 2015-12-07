@@ -2,9 +2,6 @@ package io.goodway.model.adapter;
 
 
 import android.app.Activity;
-import android.content.Intent;
-import android.os.Build;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +16,9 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.goodway.EventActivity;
-import io.goodway.EventsActivity;
 import io.goodway.R;
 import io.goodway.model.Event;
+import io.goodway.model.callback.EventCallback;
 
 
 /**
@@ -35,12 +31,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     private List<Event> mDataset;
     private Activity activity;
+    private EventCallback callback;
 
     private static final String TAG="LINE_ADAPTER";
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public EventAdapter(Activity activity) {
+    public EventAdapter(Activity activity, EventCallback callback) {
         this.activity = activity;
+        this.callback = callback;
         mDataset = new ArrayList<Event>();
     }
 
@@ -116,17 +114,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
         @Override
         public void onClick(View v) {
-            Intent i = new Intent(activity, EventActivity.class);
-            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(activity,
-                    eventImage, activity.getString(R.string.transition_event_image));
-            i.putExtra("EVENT", item);
-            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN) {
-                activity.startActivityForResult(i, EventsActivity.EVENT_REQUEST, options.toBundle());
-            }
-            else{
-                activity.startActivityForResult(i, EventsActivity.EVENT_REQUEST);
-            }
-
+            callback.action(item);
         }
 
         public void setItem(Event item) {

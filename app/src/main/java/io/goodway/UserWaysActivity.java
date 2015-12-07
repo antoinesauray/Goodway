@@ -54,7 +54,7 @@ public class UserWaysActivity extends AppCompatActivity implements SwipeRefreshL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_events);
+        setContentView(R.layout.fragment_search_events);
         Bundle extras = this.getIntent().getExtras();
         user = extras.getParcelable("USER");
         toolbar = (Toolbar) findViewById(R.id.toolbar);

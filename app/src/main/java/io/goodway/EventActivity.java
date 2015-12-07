@@ -57,6 +57,8 @@ public class EventActivity extends AppCompatActivity {
     private TextView date;
     private WebView webView;
 
+    private int request;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().requestFeature(Window.FEATURE_PROGRESS);
@@ -64,12 +66,12 @@ public class EventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event);
         Bundle extras = this.getIntent().getExtras();
         event = extras.getParcelable("EVENT");
+        request = extras.getInt("REQUEST");
         final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBar);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(event.getName());
         webView = (WebView) findViewById(R.id.webView);
         webView.setBackgroundColor(Color.argb(1, 0, 0, 0));
-        webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setAllowFileAccess(true);
 
         Picasso.with(this).load(event.BASEURL + event.getId() + ".png")
@@ -164,7 +166,9 @@ public class EventActivity extends AppCompatActivity {
     public void fabClick(View v){
         Intent returnIntent = new Intent();
         returnIntent.putExtra("EVENT", event);
+        returnIntent.putExtra("REQUEST", request);
         setResult(Activity.RESULT_OK, returnIntent);
+        webView.onPause();
         finish();
     }
 }

@@ -49,7 +49,7 @@ import io.goodway.view.fragment.SearchFragment;
  * @author Antoine Sauray
  * @version 2.0
  */
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener{
+public class MainActivity extends AppCompatActivity{
 
     // ----------------------------------- UI
 
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
      *
      * @see
      */
-    private static final int FROM_LOCATION = 1, TO_LOCATION = 2, EVENT_REQUEST =3;
+    public static final int FROM_LOCATION = 1, TO_LOCATION = 2, EVENT_REQUEST =3;
 
     private static final String TAG = "HOME_ACTIVITY";
     /**
@@ -76,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private NavigationView navigationView;
 
-    private CoordinatorLayout coordinatorLayout;
     private FrameLayout fragmentView;
 
 
@@ -85,20 +84,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private TabLayout tabLayout;
 
     private FusedLocationProviderApi fusedLocationProviderApi;
-    private GoogleApiClient googleApiClient;
 
     // ----------------------------------- Model
     /**
      * Provides markers on a marker. The key is the marker title attribute
      */
     private Address from, to;
-    private Location userLocation;
 
     private User currentUser;
 
     public static final int DEPARTURE=1, DESTINATION=2;
 
-    private Fragment search, current;
+    private Fragment current;
+    private SearchFragment search;
     private MainFragment main;
     private static final int MAIN=1, SEARCH=2;
 
@@ -113,11 +111,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         //from = new Address(R.string.your_location, R.mipmap.ic_home_black_24dp, AddressType.POSITION);
 
         fusedLocationProviderApi = LocationServices.FusedLocationApi;
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
 
         Bundle extras = this.getIntent().getExtras();
         currentUser = extras.getParcelable("USER");
@@ -147,22 +140,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         actionBarDrawerToggle.syncState();
         actionBar.setDisplayShowTitleEnabled(false);
-        toolbar.setLogo(getDrawable(R.drawable.goodway_text_very_small));
+        toolbar.setLogo(R.drawable.goodway_text_very_small);
 
-
-        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         fragmentView = (FrameLayout) findViewById(R.id.fragment);
 
         main = new MainFragment();
         search = new SearchFragment();
 
         switchToMain(new Bundle(), -1);
-        /*
-        autocomplete = (EditText) fragmentView.getRootView().findViewById(R.id.autocomplete);
-
-
-
-*/
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         ((TextView)navigationView.getHeaderView(0).findViewById(R.id.name)).setText(currentUser.getName());
 
@@ -177,11 +162,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                         Intent i = new Intent(MainActivity.this, FriendsActivity.class);
                         i.putExtra("USER", currentUser);
                         startActivity(i);
-                        break;
-                    case R.id.events:
-                        Intent i2 = new Intent(MainActivity.this, EventsActivity.class);
-                        i2.putExtra("USER", currentUser);
-                        startActivityForResult(i2, EVENT_REQUEST);
                         break;
                     case R.id.preferences:
                         Intent i3 = new Intent(MainActivity.this, PreferencesActivity.class);
@@ -221,22 +201,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        googleApiClient.connect();
-        if(from!=null){Log.d("from=" + from.getLatitude() + ";" + from.getLongitude(), "from=" + from.getName(this));}
-        if(to!=null){Log.d("to=" + to.getLatitude() + ";" + to.getLongitude(), "to=" + to.getName(this));}
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (googleApiClient.isConnected()) {
-            googleApiClient.disconnect();
-        }
-    }
-
     public void changeLocation(View v){
         int request=0;
         switch (v.getId()) {
@@ -263,9 +227,33 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 Log.d("EVENT_REQUEST", "request code");
                 Event event = data.getExtras().getParcelable("EVENT");
                 Address eventAddr = new Address(event.getName(), event.getLatitude(), event.getLongitude());
-                setTo(eventAddr);
-                main.setTo(eventAddr);
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                Bundle bundle = new Bundle();
+                int request = data.getIntExtra("REQUEST", DESTINATION);
+                switch(request){
+                    case DESTINATION:
+                        setTo(eventAddr);
+                        bundle.putParcelable("DESTINATION", eventAddr);
+                        break;
+                    case DEPARTURE:
+                        setFrom(eventAddr);
+                        bundle.putParcelable("DEPARTURE", eventAddr);
+                        break;
+                }
                 drawerLayout.closeDrawer(GravityCompat.START);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                actionBarDrawerToggle.syncState();
+                tabLayout.setVisibility(View.INVISIBLE);
+                toolbar.setLogo(R.drawable.goodway_text_very_small);
+                main.setArguments(bundle);
+                fragmentTransaction.replace(R.id.fragment, main);
+                fragmentTransaction.commitAllowingStateLoss();
+                current=main;
+            } else{
+                search.setCurrentItem(2);
             }
         }
     }
@@ -282,63 +270,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         to.setAlpha(fromAlpha);
     }
 
-    public void fabClick(View v){
-        if(this.from == null && this.to==null){
-                Snackbar.make(coordinatorLayout, R.string.no_to, Snackbar.LENGTH_LONG)
-                        .setAction(R.string.select, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                changeLocation(R.id.to);
-                            }
-                        }).show();
-            }
-            else{
-                if(this.from==null && userLocation!=null){
-                    Log.d("setting user location", "setting user location");
-                    this.from = new Address(getString(R.string.your_location), userLocation.getLatitude(), userLocation.getLongitude());
-                }
-                else if (this.to == null & userLocation!=null){
-                    Log.d("setting user location", "setting user location");
-                    this.to = new Address(getString(R.string.your_location), userLocation.getLatitude(), userLocation.getLongitude());
-                }
-
-                if(this.from==null){
-                    Snackbar.make(coordinatorLayout, R.string.your_location_not_available, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.select, new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    changeLocation(DEPARTURE);
-                                }
-                            }).show();
-                }
-                else if(this.to==null){
-                    Snackbar.make(coordinatorLayout, R.string.your_location_not_available, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.select, new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    changeLocation(DESTINATION);
-                                }
-                            }).show();
-                }
-                else{
-                    Intent intent = new Intent(MainActivity.this, WayActivity.class);
-                    intent.putExtra("FROM", this.from);
-                    intent.putExtra("TO", this.to);
-
-                    Log.d(from.toString(), "from");
-                    Log.d(to.toString(), "to");
-                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
-                        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
-                        startActivity(intent, options.toBundle());
-                    }
-                    else{
-                        startActivity(intent);
-                    }
-                }
-
-        }
-
-    }
 
     public void drawerHeaderClick(View v){
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
@@ -380,57 +311,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void setFrom(Address adress){
         this.from = adress;
         Log.d("setFrom", "setFrom : " + adress.getLatitude() + ";" + adress.getLongitude());
-        /*
-        main.getGoogleMap().clear();
-        main.getGoogleMap().addMarker(new MarkerOptions()
-                .position(new LatLng(this.from.getLatitude(), this.from.getLongitude()))
-                        //.alpha(0.8f)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
-                .title(getString(R.string.departure)));
-
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(this.from.getLatitude(), this.from.getLongitude()))      // Sets the center of the map to Mountain View
-                .zoom(14)                   // Sets the zoom// Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-        main.getGoogleMap().animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        */
     }
 
     public void setTo(Address adress){
         this.to = adress;
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        userLocation = LocationServices.FusedLocationApi.getLastLocation(
-                googleApiClient);
-        /*
-        if(main.getGoogleMap()!=null) {
-
-        }
-        */
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        if(from != null){
-            TextView from = (TextView) (fragmentView.getRootView().findViewById(R.id.from));
-            from.setText(getString(R.string.your_location)+" ("+getString(R.string.not_available)+")");
-        }
-        else if (to != null){
-            TextView to = (TextView) (fragmentView.getRootView().findViewById(R.id.to));
-            to.setText(getString(R.string.your_location)+" ("+getString(R.string.not_available)+")");
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        userLocation = location;
     }
 
     public void onBackPressed(){
@@ -447,16 +331,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             }
             switchToMain(extras, request);
         }
+        else{
+            super.onBackPressed();
+        }
     }
     private void switchFragment(Fragment fragment, Bundle bundle)
     {
-        if(bundle.getParcelable("DEPARTURE")==null){
-            bundle.putParcelable("DEPARTURE", from);
+        if(bundle!=null) {
+            if (bundle.getParcelable("DEPARTURE") == null) {
+                bundle.putParcelable("DEPARTURE", from);
+            }
+            if (bundle.getParcelable("DESTINATION") == null) {
+                bundle.putParcelable("DESTINATION", to);
+            }
+            Log.d("fragment with bundle", "fragment with bundle");
+            fragment.setArguments(bundle);
         }
-        if(bundle.getParcelable("DESTINATION")==null){
-            bundle.putParcelable("DESTINATION", to);
-        }
-        fragment.setArguments(bundle);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment, fragment);
@@ -470,6 +360,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         tabLayout.setVisibility(View.VISIBLE);
+        toolbar.setLogo(null);
     }
 
     public void switchToMain(Bundle bundle, int request){
@@ -478,6 +369,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         actionBarDrawerToggle.syncState();
         tabLayout.setVisibility(View.INVISIBLE);
+        toolbar.setLogo(R.drawable.goodway_text_very_small);
         switch(request){
             case DEPARTURE:
                 setFrom(from);
@@ -487,17 +379,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 setTo(to);
                 main.setTo(to);
                 break;
-            default:
-                /*
-                if(userLocation!=null){
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()))      // Sets the center of the map to Mountain View
-                            .zoom(14)                   // Sets the zoom
-                                    //.tilt(30)                   // Sets the tilt of the camera to 30 degrees
-                            .build();                   // Creates a CameraPosition from the
-                    main.getGoogleMap().animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                }
-                */
         }
     }
 }

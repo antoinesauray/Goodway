@@ -23,6 +23,7 @@
     <string name="pending">En attente</string>
 
     <string name="no_ways_found">Oups nous n\'avons pas trouvé de trajet</string>
+    <string name="no_events">Pas d\'évènements disponibles</string>
 
     <!-- drawer -->
     <string name="social">Social</string>

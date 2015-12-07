@@ -169,6 +169,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
             }
         },mail, password);
     }
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
