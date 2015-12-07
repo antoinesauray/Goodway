@@ -3,7 +3,6 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true">
 
     <LinearLayout
@@ -33,12 +32,80 @@
             />
     </android.support.design.widget.AppBarLayout>
 
-        <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <io.goodway.view.PercentView
+            android:id="@+id/percentView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginRight="16dp"
+            android:layout_gravity="center_vertical"/>
+            <ProgressBar
+                android:id="@+id/impactProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/impact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical" />
+        </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:orientation="horizontal">
+
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_home_black"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="16dp"
+                    android:alpha="0.54"/>
+
+                <TextView
+                    android:id="@+id/home"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="adresse xxx"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/ic_work_black"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="16dp"
+                    android:alpha="0.54"/>
+
+                <TextView
+                    android:id="@+id/work"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="adresse xxx"/>
+            </LinearLayout>
 
 
     </LinearLayout>

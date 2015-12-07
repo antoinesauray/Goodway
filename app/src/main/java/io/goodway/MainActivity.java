@@ -164,8 +164,8 @@ public class MainActivity extends AppCompatActivity{
                         startActivity(i);
                         break;
                     case R.id.preferences:
-                        Intent i3 = new Intent(MainActivity.this, PreferencesActivity.class);
-                        startActivity(i3);
+                        //Intent i3 = new Intent(MainActivity.this, PreferencesActivity.class);
+                        //startActivity(i3);
                         break;
                 }
                 return false;

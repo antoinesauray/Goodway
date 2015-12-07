@@ -10,6 +10,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import io.goodway.model.User;
 import io.goodway.model.adapter.WayAdapter;
@@ -17,6 +21,7 @@ import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.ErrorAction;
 import io.goodway.navitia_android.Way;
+import io.goodway.view.PercentView;
 
 
 /**
@@ -39,10 +44,12 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
      */
     private Toolbar toolbar;
     private User user;
-    private SwipeRefreshLayout swipeLayout;
 
     private String mail, password;
+    private TextView impact, home, work;
+    private PercentView percentView;
 
+    private ProgressBar impactProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,24 +69,23 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 MODE_PRIVATE);
         mail = shared_preferences.getString("mail", null);
         password = shared_preferences.getString("password", null);
-        /*
-        GoodwayHttpsClient.getTrips(this, new Action<Way>() {
+
+        impact = (TextView) findViewById(R.id.impact);
+        home = (TextView) findViewById(R.id.home);
+        work = (TextView) findViewById(R.id.work);
+        percentView = (PercentView) findViewById(R.id.percentView);
+        impactProgress = (ProgressBar) findViewById(R.id.impactProgress);
+
+
+
+        GoodwayHttpsClient.getUserCo2(this, new Action<Integer>() {
             @Override
-            public void action(Way e) {
-                adapter.add(e);
-                swipeLayout.setRefreshing(false);
-            }
-        }, new ErrorAction() {
-            @Override
-            public void action() {
-                swipeLayout.setRefreshing(false);
+            public void action(Integer e) {
+                impactProgress.setVisibility(View.INVISIBLE);
+                impact.setText(e + "g co2");
+                percentView.setPercentage(30f);
             }
         }, mail, password, user.getId());
-       */
-        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        swipeLayout.setOnRefreshListener(this);
-        swipeLayout.setColorSchemeColors(R.color.accent);
-        swipeLayout.setRefreshing(true);
     }
 
     @Override
@@ -93,16 +99,15 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
     @Override
     public void onRefresh() {
-        swipeLayout.setRefreshing(true);
         GoodwayHttpsClient.getTrips(this, new Action<Way>() {
             @Override
             public void action(Way e) {
-                swipeLayout.setRefreshing(false);
+
             }
         }, new ErrorAction() {
             @Override
             public void action() {
-                swipeLayout.setRefreshing(false);
+
             }
         }, mail, password, user.getId());
     }

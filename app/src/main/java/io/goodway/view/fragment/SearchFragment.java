@@ -63,7 +63,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
 
         tabLayout = (TabLayout) mainActivity.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        int[] icons = new int[]{R.drawable.ic_person_white, R.drawable.ic_action_search, R.mipmap.ic_event_black_36dp};
+        int[] icons = new int[]{R.mipmap.ic_person_white, R.mipmap.ic_action_search, R.mipmap.ic_event_available};
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             tabLayout.getTabAt(i).setIcon(icons[i]);
         }

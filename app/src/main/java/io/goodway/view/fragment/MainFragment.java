@@ -101,7 +101,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
-        googleMap.setPadding(0, 0, 0, root.getHeight());
+        googleMap.setPadding(0, 0, 0, bottom.getHeight());
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);

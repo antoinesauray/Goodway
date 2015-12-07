@@ -105,6 +105,22 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
             }
         }, action, null, "https://sgorilla.goodway.io/user_home.php").execute(new Pair("Mail", mail), new Pair("Password", password), new Pair("UserId", Integer.toString(userId)));
     }
+
+    public static AsyncTask getUserCo2(final Context c, Action<Integer> action, String mail, String password, int userId){
+        return new GoodwayHttpsClient<>(c, new ProcessJson<Integer>() {
+            @Override
+            public Integer processJson(JSONObject jsonObject) {
+                String co2 = jsonObject.optString("SUM(Emission)");
+                try{
+                    return Integer.parseInt(co2);
+                }
+                catch (NumberFormatException e){
+                    return null;
+                }
+            }
+        }, action, null, "https://sgorilla.goodway.io/user_co2.php").execute(new Pair("Mail", mail), new Pair("Password", password), new Pair("UserId", Integer.toString(userId)));
+    }
+
     public static AsyncTask checkMailAvailability(Context c, Action<Integer> action, ErrorAction error, String mail){
         return new GoodwayHttpsClient<>(c, new ProcessJson<Integer>() {
             @Override
