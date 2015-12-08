@@ -81,7 +81,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                                                 finish(e);
                                             }
                                             else{
-                                                Toast.makeText(SearchFriendsFragment.this.getActivity(), "user did not provide location", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(SearchFriendsFragment.this.getActivity(), u.getFirstName()+" "+getString(R.string.did_not_give_location), Toast.LENGTH_SHORT).show();
                                             }
 
                                         }
@@ -98,7 +98,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                                                 finish(e);
                                             }
                                             else{
-                                                Toast.makeText(SearchFriendsFragment.this.getActivity(), "user did not provide location", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(SearchFriendsFragment.this.getActivity(), u.getFirstName()+" "+getString(R.string.did_not_give_location), Toast.LENGTH_SHORT).show();
                                             }
                                         }
                                     }, mail, password, u.getId(), u.getFirstName());

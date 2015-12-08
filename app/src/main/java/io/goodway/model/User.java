@@ -120,10 +120,12 @@ public class User implements Parcelable {
         dest.writeInt(image);
         dest.writeByte((byte) (sharesHome ? 1 : 0));
         dest.writeByte((byte) (sharesWork ? 1 : 0));
-        dest.writeDouble(homeLat);
-        dest.writeDouble(homeLon);
-        dest.writeDouble(workLat);
-        dest.writeDouble(workLon);
+        if(homeLat!=null && homeLon!=null && workLat!=null && workLon!=null) {
+            dest.writeDouble(homeLat);
+            dest.writeDouble(homeLon);
+            dest.writeDouble(workLat);
+            dest.writeDouble(workLon);
+        }
     }
     private void readFromParcel(Parcel in) {
         id = in.readInt();

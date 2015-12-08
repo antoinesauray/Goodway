@@ -106,4 +106,5 @@
     <string name="failed_updating_options">Echec de la mise à jour des paramètres</string>
 
     <string name="home_not_set">Votre addresse n\'a pas été renseignée. Voulez-vous l\'ajouter ?</string>
+    <string name="did_not_give_location">n\'a pas renseigné cette information</string>
 </resources>
