@@ -22,6 +22,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import io.goodway.model.User;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
@@ -106,6 +108,12 @@ public class SplashScreenActivity extends AppCompatActivity {
         int id = shared_preferences.getInt("id", -1);
         String fname = shared_preferences.getString("firstname", null);
         String lname = shared_preferences.getString("lastname", null);
+        boolean shareshome = shared_preferences.getBoolean("shareshome", false);
+        boolean shareswork = shared_preferences.getBoolean("shareswork", false);
+        Float homelat = shared_preferences.getFloat("homelat", 0);
+        Float homelon = shared_preferences.getFloat("homelon", 0);
+        Float worklat = shared_preferences.getFloat("worklat", 0);
+        Float workLon = shared_preferences.getFloat("worklon", 0);
 
         logo = (ImageView) findViewById(R.id.logo);
         register = (LinearLayout) findViewById(R.id.register);
@@ -115,6 +123,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                 GoodwayHttpsClient.authenticate(this, new Action<User>() {
                     @Override
                     public void action(User e) {
+                        Log.d("user authenticated", "authentication : "+e.getHome()+" ; "+e.getWork());
+
                         start(e);
                         connectedAs.setText(e.getMail());
                     }
@@ -127,7 +137,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 }, mail, password);
             }
             else{
-                start(new User(id, fname, lname, mail));
+                start(new User(id, fname, lname, mail, shareshome, shareswork, homelat.doubleValue(), homelon.doubleValue(), worklat.doubleValue(), workLon.doubleValue()));
                 connectedAs.setText(mail);
             }
 
@@ -257,6 +267,18 @@ public class SplashScreenActivity extends AppCompatActivity {
                         editor.putInt("id", e.getId());
                         editor.putString("firstname", e.getFirstName());
                         editor.putString("lastname", e.getLastName());
+                        editor.putBoolean("shareshome", e.sharesHome());
+                        editor.putBoolean("shareswork", e.sharesWork());
+                        LatLng home = e.getHome();
+                        LatLng work = e.getWork();
+                        if (home != null) {
+                            editor.putFloat("homelat", (float) home.latitude);
+                            editor.putFloat("homelon", (float) home.longitude);
+                        }
+                        if (work != null) {
+                            editor.putFloat("worklat", (float) work.latitude);
+                            editor.putFloat("worklon", (float) work.longitude);
+                        }
                         editor.commit();
                         Intent i = new Intent(SplashScreenActivity.this, MainActivity.class);
                         i.putExtra("USER", e);

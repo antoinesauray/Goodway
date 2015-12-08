@@ -24,6 +24,7 @@ import java.util.List;
 
 import io.goodway.MainActivity;
 import io.goodway.R;
+import io.goodway.model.User;
 
 
 /**
@@ -33,7 +34,6 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
 
     private View root;
 
-    private GoogleApiClient googleApiClient;
     private ViewPager viewPager;
     private TabLayout tabLayout;
 
@@ -44,19 +44,16 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
     private SearchFriendsFragment f1;
     private SearchEventsFragment f3;
 
+    private User user;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_search, container, false);
 
         request = getArguments().getInt("REQUEST");
+        user = getArguments().getParcelable("USER");
         int item = getArguments().getInt("ITEM", 1);
         mainActivity = (MainActivity) getActivity();
-        googleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
 
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);
         setupViewPager(viewPager);

@@ -69,8 +69,10 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
             public User processJson(JSONObject jsonObject) {
                 String fname = jsonObject.optString("FirstName");
                 String lname = jsonObject.optString("LastName");
+                int sharesHome = jsonObject.optInt("SharesHome");
+                int sharesWork = jsonObject.optInt("SharesWork");
                 Log.d(fname+" "+lname, "found someone");
-                return new User(fname, lname);
+                return new User(fname, lname, sharesHome==1, sharesWork==1);
             }
         }, action, null, "https://sgorilla.goodway.io/users.php").execute(new Pair("Mail", mail), new Pair("Password", password));
     }
@@ -137,7 +139,13 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 int id = jsonObject.optInt("Id");
                 String firstName = jsonObject.optString("FirstName");
                 String lastName = jsonObject.optString("LastName");
-                return new User(id, firstName, lastName, mail);
+                int sharesHome = jsonObject.optInt("SharesHome");
+                int sharesWork = jsonObject.optInt("SharesWork");
+                double homeLat = jsonObject.optDouble("LatitudeHome");
+                double homeLon = jsonObject.optDouble("LongitudeHome");
+                double workLat = jsonObject.optDouble("LatitudeWork");
+                double workLon = jsonObject.optDouble("LongitudeWork");
+                return new User(id, firstName, lastName, mail, sharesHome==1, sharesWork==1, homeLat, homeLon, workLat, workLon);
             }
         }, action, error, "https://sgorilla.goodway.io/login.php").execute(new Pair("Mail", mail), new Pair("Password", password));
     }
@@ -252,14 +260,13 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                     new Pair("Mail", mail), new Pair("Password", password));
     }
 
-    public static AsyncTask setSharing(Context c, Action<Boolean> action, ErrorAction error, String mail, String password, int id, boolean home, boolean work){
+    public static AsyncTask setSharing(Context c, Action<Boolean> action, ErrorAction error, String mail, String password, boolean home, boolean work){
         return new GoodwayHttpsClient<>(c, new ProcessJson<Boolean>() {
             @Override
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
         }, action, error, "https://sgorilla.goodway.io/update_sharing.php").execute(
-                new Pair("Friend", Integer.toString(id)),
                 new Pair("Mail", mail), new Pair("Password", password),
                 new Pair("Home", Integer.toString(home ? 1 : 0)), new Pair("Work", Integer.toString(work ? 1 : 0)));
     }

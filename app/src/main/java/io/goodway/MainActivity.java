@@ -29,6 +29,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity{
      *
      * @see
      */
-    public static final int FROM_LOCATION = 1, TO_LOCATION = 2, EVENT_REQUEST =3;
+    public static final int FROM_LOCATION = 1, TO_LOCATION = 2, EVENT_REQUEST =3, SETLOCATION=4;
 
     private static final String TAG = "HOME_ACTIVITY";
     /**
@@ -152,8 +153,6 @@ public class MainActivity extends AppCompatActivity{
         ((TextView)navigationView.getHeaderView(0).findViewById(R.id.name)).setText(currentUser.getName());
 
 
-
-
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -200,7 +199,6 @@ public class MainActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-
     public void changeLocation(View v){
         int request=0;
         switch (v.getId()) {
@@ -217,45 +215,69 @@ public class MainActivity extends AppCompatActivity{
     public void changeLocation(int request){
         Bundle b = new Bundle();
         b.putInt("REQUEST", request);
+        b.putParcelable("USER", currentUser);
         switchToSearch(b);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == EVENT_REQUEST){
+        Log.d("onActivityResult", "onActivityResult");
+        if (requestCode == MainActivity.EVENT_REQUEST){
             if(resultCode == RESULT_OK){
                 Log.d("EVENT_REQUEST", "request code");
                 Event event = data.getExtras().getParcelable("EVENT");
                 Address eventAddr = new Address(event.getName(), event.getLatitude(), event.getLongitude());
-
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                Bundle bundle = new Bundle();
-                int request = data.getIntExtra("REQUEST", DESTINATION);
-                switch(request){
-                    case DESTINATION:
-                        setTo(eventAddr);
-                        bundle.putParcelable("DESTINATION", eventAddr);
-                        break;
-                    case DEPARTURE:
-                        setFrom(eventAddr);
-                        bundle.putParcelable("DEPARTURE", eventAddr);
-                        break;
-                }
-                drawerLayout.closeDrawer(GravityCompat.START);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                actionBarDrawerToggle.syncState();
-                tabLayout.setVisibility(View.INVISIBLE);
-                toolbar.setLogo(R.drawable.goodway_text_very_small);
-                main.setArguments(bundle);
-                fragmentTransaction.replace(R.id.fragment, main);
-                fragmentTransaction.commitAllowingStateLoss();
-                current=main;
+                switchAfterResult(data, eventAddr);
             } else{
                 search.setCurrentItem(2);
             }
         }
+        else{
+            Log.d("SETLOCATION", "SETLOCATION with request="+requestCode);
+            if(resultCode == RESULT_OK){
+                Log.d("result set location", "result set location");
+                Address address = data.getParcelableExtra("ADDRESS");
+                int place = data.getIntExtra("PLACE", ProfileActivity.HOME);
+                switchAfterResult(data, address);
+                switch(place){
+                    case ProfileActivity.HOME:
+                        // set home online
+                        Toast.makeText(this, "setting home online", Toast.LENGTH_SHORT).show();
+                        Log.d("setting home online", "setting home online");
+                        break;
+                    case ProfileActivity.WORK:
+                        // set work online
+                        break;
+                }
+            }
+        }
+    }
+
+    private void switchAfterResult(Intent data, Address addr){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        Bundle bundle = new Bundle();
+        int request = data.getIntExtra("REQUEST", DESTINATION);
+        switch(request){
+            case DESTINATION:
+                setTo(addr);
+                bundle.putParcelable("DESTINATION", addr);
+                break;
+            case DEPARTURE:
+                setFrom(addr);
+                bundle.putParcelable("DEPARTURE", addr);
+                break;
+        }
+        drawerLayout.closeDrawer(GravityCompat.START);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        actionBarDrawerToggle.syncState();
+        tabLayout.setVisibility(View.INVISIBLE);
+        toolbar.setLogo(R.drawable.goodway_text_very_small);
+        main.setArguments(bundle);
+        fragmentTransaction.replace(R.id.fragment, main);
+        fragmentTransaction.commitAllowingStateLoss();
+        current=main;
     }
 
     public void swap(View v){
@@ -274,6 +296,7 @@ public class MainActivity extends AppCompatActivity{
     public void drawerHeaderClick(View v){
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
         intent.putExtra("USER", currentUser);
+        intent.putExtra("SELF", true);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
             startActivity(intent, options.toBundle());

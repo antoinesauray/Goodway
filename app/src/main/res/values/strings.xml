@@ -100,4 +100,10 @@
     <string name="arrival">Destination</string>
 
     <string name="preferences">Préférences (non disponible)</string>
+
+    <string name="no_address">Vous n\'avez pas indiqué d\'addresse</string>
+    <string name="updating_share_options">Mise à jour des options de partages</string>
+    <string name="failed_updating_options">Echec de la mise à jour des paramètres</string>
+
+    <string name="home_not_set">Votre addresse n\'a pas été renseignée. Voulez-vous l\'ajouter ?</string>
 </resources>

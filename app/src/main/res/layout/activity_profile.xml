@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<android.support.design.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:map="http://schemas.android.com/tools"
     android:fitsSystemWindows="true">
 
     <LinearLayout
@@ -34,20 +40,21 @@
 
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
         <io.goodway.view.PercentView
             android:id="@+id/percentView"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginRight="16dp"
-            android:layout_gravity="center_vertical"/>
+            android:layout_centerInParent="true"
+            android:elevation="2dp"/>
             <ProgressBar
                 android:id="@+id/impactProgress"
                 android:layout_width="wrap_content"
@@ -59,55 +66,199 @@
             android:id="@+id/impact"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical" />
+            android:layout_gravity="center_horizontal" />
         </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@mipmap/ic_home_black"
                     android:layout_gravity="center_vertical"
                     android:layout_marginRight="16dp"
-                    android:alpha="0.54"/>
+                    android:tint="@color/primary"/>
 
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical">
                 <TextView
                     android:id="@+id/home"
+                    android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:text="adresse xxx"/>
+                    android:layout_marginRight="16dp"
+                    android:text="Maison non partagé"/>
+
+                    <CheckBox
+                        android:id="@+id/shareHome"
+                        android:visibility="invisible"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Partager"/>
+                    </FrameLayout>
+
+                    <android.support.v7.widget.CardView
+                        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/homeButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"
+                        card_view:cardBackgroundColor="@color/primary"
+                        card_view:cardCornerRadius="2dp"
+                        android:layout_margin="6dp"
+                        card_view:cardElevation="2dp">
+
+                        <TextView
+                            android:id="@+id/homeText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="8.5dp"
+                            android:paddingBottom="8.5dp"
+                            android:paddingLeft="12dp"
+                            android:paddingRight="12dp"
+                            android:textColor="@android:color/white"
+                            android:background="@color/primary"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/change" />
+
+                    </android.support.v7.widget.CardView>
+
+                    </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginBottom="16dp">
+                <fragment
+                    android:name="com.google.android.gms.maps.MapFragment"
+                    android:id="@+id/mapHome"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    map:cameraZoom="13"
+                    map:mapType="normal"
+                    map:liteMode="true"
+                    android:layout_marginBottom="16dp"/>
+
+                    <TextView
+                        android:id="@+id/error_home"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:visibility="invisible"
+                        android:textColor="@android:color/white"
+                        android:text="@string/no_address"
+                        android:background="@color/semitransparent_grey"/>
+
+                </FrameLayout>
+
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@mipmap/ic_work_black"
+                    android:tint="@color/primary"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginRight="16dp"
-                    android:alpha="0.54"/>
+                    android:layout_marginRight="16dp" />
 
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical">
                 <TextView
                     android:id="@+id/work"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="invisible"
                     android:layout_gravity="center_vertical"
-                    android:text="adresse xxx"/>
+                    android:layout_marginRight="16dp"
+                    android:text="Travail non partagé"/>
+                    <CheckBox
+                        android:id="@+id/shareWork"
+                        android:visibility="invisible"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="Partager"/>
+                    </FrameLayout>
+
+                    <android.support.v7.widget.CardView
+                        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/workButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"
+                        card_view:cardBackgroundColor="@color/primary"
+                        card_view:cardCornerRadius="2dp"
+                        android:layout_margin="6dp"
+                        card_view:cardElevation="2dp">
+
+                        <TextView
+                            android:id="@+id/workText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="8.5dp"
+                            android:paddingBottom="8.5dp"
+                            android:paddingLeft="12dp"
+                            android:paddingRight="12dp"
+                            android:textColor="@android:color/white"
+                            android:background="@color/primary"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="@string/change" />
+
+                    </android.support.v7.widget.CardView>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginBottom="16dp">
+                <fragment
+                    android:name="com.google.android.gms.maps.MapFragment"
+                    android:id="@+id/mapWork"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    map:cameraZoom="13"
+                    map:mapType="normal"
+                    map:liteMode="true" />
+                    <TextView
+                        android:id="@+id/error_work"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:visibility="invisible"
+                        android:textColor="@android:color/white"
+                        android:text="@string/no_address"
+                        android:background="@color/semitransparent_grey"/>
+                </FrameLayout>
+
             </LinearLayout>
 
 
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
+
+</ScrollView>
