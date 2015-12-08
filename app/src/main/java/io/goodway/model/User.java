@@ -88,6 +88,10 @@ public class User implements Parcelable {
 
     public boolean sharesWork(){return sharesWork;}
 
+    public void setSharesHome(boolean sharesHome){this.sharesHome=sharesHome;}
+
+    public void setSharesWork(boolean sharesWork){this.sharesWork=sharesWork;}
+
     public LatLng getHome(){
         if(homeLat!=null && homeLon!=null) {
             return new LatLng(homeLat, homeLon);

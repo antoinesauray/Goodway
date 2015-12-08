@@ -152,28 +152,28 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             }
         }, mail, password, user.getId());
 
-        if(user.sharesHome()){
-            if(shareHome!=null){shareHome.setChecked(true);}
+        if(shareHome!=null) {
+            shareHome.setChecked(user.sharesHome());
             shareHome.setOnCheckedChangeListener(this);
+        }
+        if(user.sharesHome()){
             GoodwayHttpsClient.getUserHome(this, new Action<Address>() {
                 @Override
                 public void action(Address e) {
-                    homeAddr=e;
-                    if(mapHome!=null){
-                        if(homeAddr!=null) {
+                    homeAddr = e;
+                    if (mapHome != null) {
+                        if (homeAddr != null) {
                             findViewById(R.id.error_home).setVisibility(View.INVISIBLE);
                             setHomeOnMap();
-                        }
-                        else{
+                        } else {
                             findViewById(R.id.error_home).setVisibility(View.VISIBLE);
                         }
                     }
                 }
             }, mail, password, user.getId(), user.getFirstName());
         }
+
         if(user.sharesWork()){
-            if(shareWork!=null){shareWork.setChecked(true);}
-            shareWork.setOnCheckedChangeListener(this);
             GoodwayHttpsClient.getUserWork(this, new Action<Address>() {
                 @Override
                 public void action(Address e) {
@@ -188,6 +188,10 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                     }
                 }
             }, mail, password, user.getId(), user.getFirstName());
+        }
+        if(shareWork!=null) {
+            shareWork.setChecked(user.sharesWork());
+            shareWork.setOnCheckedChangeListener(this);
         }
     }
 
@@ -295,12 +299,21 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             @Override
             public void action(Boolean e) {
                 dialog.dismiss();
-
+                user.setSharesHome(shareHome.isChecked());
+                user.setSharesWork(shareWork.isChecked());
+                SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
+                        MODE_PRIVATE);
+                SharedPreferences.Editor editor = shared_preferences.edit();
+                editor.putBoolean("shareshome", user.sharesHome());
+                editor.putBoolean("shareswork", user.sharesWork());
+                editor.commit();
             }
         }, new ErrorAction() {
             @Override
             public void action() {
                 dialog.dismiss();
+                shareHome.setChecked(user.sharesHome());
+                shareWork.setChecked(user.sharesWork());
                 new AlertDialog.Builder(ProfileActivity.this)
                         .setTitle(R.string.updating_share_options)
                         .setMessage(R.string.failed_updating_options)
