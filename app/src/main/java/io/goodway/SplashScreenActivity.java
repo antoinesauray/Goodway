@@ -137,7 +137,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 }, mail, password);
             }
             else{
-                start(new User(id, fname, lname, mail, shareshome, shareswork, homelat.doubleValue(), homelon.doubleValue(), worklat.doubleValue(), workLon.doubleValue()));
+                start(new User(id, fname, lname, mail, shareshome, shareswork, homelat.doubleValue(), homelon.doubleValue(), worklat.doubleValue(), workLon.doubleValue(), false));
                 connectedAs.setText(mail);
             }
 

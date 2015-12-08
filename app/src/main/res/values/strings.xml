@@ -107,4 +107,5 @@
 
     <string name="home_not_set">Votre addresse n\'a pas été renseignée. Voulez-vous l\'ajouter ?</string>
     <string name="did_not_give_location">n\'a pas renseigné cette information</string>
+    <string name="content_hidden">Ce contenu est reservé aux amis de</string>
 </resources>

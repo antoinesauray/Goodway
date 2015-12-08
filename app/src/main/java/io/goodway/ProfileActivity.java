@@ -28,6 +28,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.w3c.dom.Text;
+
 import io.goodway.model.User;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
@@ -121,10 +123,11 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 mapWork = googleMap;
-                if(workAddr!=null) {
+                if (workAddr != null) {
                     setWorkOnMap();
                 }
-            }});
+            }
+        });
 
         if(self){
             homeButton.setVisibility(View.VISIBLE);
@@ -147,7 +150,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             @Override
             public void action(Integer e) {
                 impactProgress.setVisibility(View.INVISIBLE);
-                impact.setText(e + "g co2");
+                impact.setText(e + " g co2");
                 percentView.setPercentage(30f);
             }
         }, mail, password, user.getId());
@@ -156,42 +159,52 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             shareHome.setChecked(user.sharesHome());
             shareHome.setOnCheckedChangeListener(this);
         }
-        if(user.sharesHome()){
-            GoodwayHttpsClient.getUserHome(this, new Action<Address>() {
-                @Override
-                public void action(Address e) {
-                    homeAddr = e;
-                    if (mapHome != null) {
-                        if (homeAddr != null) {
-                            findViewById(R.id.error_home).setVisibility(View.INVISIBLE);
-                            setHomeOnMap();
-                        } else {
-                            findViewById(R.id.error_home).setVisibility(View.VISIBLE);
-                        }
-                    }
-                }
-            }, mail, password, user.getId(), user.getFirstName());
-        }
 
-        if(user.sharesWork()){
-            GoodwayHttpsClient.getUserWork(this, new Action<Address>() {
-                @Override
-                public void action(Address e) {
-                    workAddr = e;
-                    if (mapHome != null) {
-                        if (workAddr != null) {
-                            findViewById(R.id.error_work).setVisibility(View.INVISIBLE);
-                            setWorkOnMap();
-                        } else {
-                            findViewById(R.id.error_work).setVisibility(View.VISIBLE);
-                        }
-                    }
-                }
-            }, mail, password, user.getId(), user.getFirstName());
-        }
         if(shareWork!=null) {
             shareWork.setChecked(user.sharesWork());
             shareWork.setOnCheckedChangeListener(this);
+        }
+        if(user.isFriend()) {
+            if (user.sharesHome()) {
+                GoodwayHttpsClient.getUserHome(this, new Action<Address>() {
+                    @Override
+                    public void action(Address e) {
+                        homeAddr = e;
+                        if (mapHome != null) {
+                            if (homeAddr != null) {
+                                findViewById(R.id.error_home).setVisibility(View.INVISIBLE);
+                                setHomeOnMap();
+                            } else {
+                                findViewById(R.id.error_home).setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                }, mail, password, user.getId(), user.getFirstName());
+            }
+
+            if(user.sharesWork()){
+                GoodwayHttpsClient.getUserWork(this, new Action<Address>() {
+                    @Override
+                    public void action(Address e) {
+                        workAddr = e;
+                        if (mapHome != null) {
+                            if (workAddr != null) {
+                                findViewById(R.id.error_work).setVisibility(View.INVISIBLE);
+                                setWorkOnMap();
+                            } else {
+                                findViewById(R.id.error_work).setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                }, mail, password, user.getId(), user.getFirstName());
+            }
+        }
+        else{
+            findViewById(R.id.hiddenContent1).setVisibility(View.INVISIBLE);
+            findViewById(R.id.hiddenContent2).setVisibility(View.INVISIBLE);
+            TextView no_friend = (TextView) findViewById(R.id.no_friend);
+            no_friend.setText(getString(R.string.content_hidden)+" "+user.getFirstName());
+            no_friend.setVisibility(View.VISIBLE);
         }
     }
 

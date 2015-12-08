@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 <android.support.design.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -38,15 +38,15 @@
             />
     </android.support.design.widget.AppBarLayout>
 
-
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/stats"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:orientation="vertical">
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp">
         <io.goodway.view.PercentView
@@ -69,9 +69,20 @@
             android:layout_gravity="center_horizontal" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/no_friend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            app:layout_anchor="@id/stats"
+            app:layout_anchorGravity="bottom|center_horizontal"
+            android:layout_gravity="center_horizontal|bottom"
+            android:text="@string/content_hidden"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/hiddenContent1"
                 android:layout_margin="16dp"
                 android:orientation="vertical">
 
@@ -166,8 +177,9 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:id="@+id/hiddenContent2"
                 android:layout_margin="16dp"
                 android:orientation="vertical">
 
