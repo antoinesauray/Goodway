@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary"
+    android:paddingTop="54dp"
+    android:paddingLeft="24dp"
+    android:paddingRight="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/email"
+        android:orientation="horizontal">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:hint="@string/fname"
+            android:inputType="textPersonName"
+            android:textColor="@android:color/white"
+            android:ems="10"
+            android:id="@+id/fname"
+             />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:hint="@string/lname"
+            android:inputType="textPersonName"
+            android:textColor="@android:color/white"
+            android:ems="10"
+            android:id="@+id/lname"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/mail"
+        android:inputType="textEmailAddress"
+        android:textColor="@android:color/white"
+        android:layout_weight="0.3"
+        android:ems="10"
+        android:id="@+id/email" />
+
+        <TextView
+            android:id="@+id/mailAvailibility"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+    </LinearLayout>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_marginTop="8dp"
+        android:hint="@string/password"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/password" />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_marginTop="8dp"
+        android:hint="@string/confirm"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/passwordConfirm" />
+
+    <TextView
+        android:id="@+id/birthday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        android:padding="8dp"
+        android:background="@drawable/goodway_ripple_blue"
+        android:textColor="@android:color/white"
+        android:text="@string/birthday_not_set"/>
+
+    <TextView
+        android:id="@+id/register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="42dp"
+        android:layout_gravity="center_horizontal"
+        android:textSize="16sp"
+        android:padding="8dp"
+        android:background="@drawable/goodway_ripple"
+        android:layout_centerInParent="true"
+        android:textColor="@color/primary"
+        android:text="@string/register"/>
+
+</LinearLayout>

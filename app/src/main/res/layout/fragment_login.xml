@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary"
+    android:paddingTop="56dp"
+    android:paddingRight="24dp"
+    android:paddingLeft="24dp">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:hint="@string/mail"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:id="@+id/email" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_marginTop="8dp"
+        android:hint="@string/password"
+        android:textColor="@android:color/white"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/password" />
+
+    <TextView
+        android:id="@+id/login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center_horizontal"
+        android:textSize="16sp"
+        android:padding="8dp"
+        android:background="@drawable/goodway_ripple"
+        android:textColor="@color/primary"
+        android:text="@string/login"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        android:layout_gravity="center_horizontal"/>
+</LinearLayout>
