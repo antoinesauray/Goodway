@@ -8,7 +8,7 @@ import android.os.Parcelable;
  */
 public class Event implements Parcelable {
 
-    private int id;
+    private int id, size;
     private String name, url, date;
     private double latitude, longitude;
 
@@ -25,13 +25,14 @@ public class Event implements Parcelable {
                 }
             };
 
-    public Event(int id, String name, String url, String date, double latitude, double longitude){
+    public Event(int id, String name, String url, String date, double latitude, double longitude, int size){
         this.id = id;
         this.name = name;
         this.url = url;
         this.date = date;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.size = size;
     }
 
     public Event(Parcel in){
@@ -50,6 +51,8 @@ public class Event implements Parcelable {
 
     public int getId(){return id;}
 
+    public int size(){return size;}
+
     public double getLatitude(){return latitude;}
     public double getLongitude(){return longitude;}
 
@@ -66,6 +69,7 @@ public class Event implements Parcelable {
         dest.writeString(date);
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
+        dest.writeInt(size);
     }
     private void readFromParcel(Parcel in) {
         id = in.readInt();
@@ -74,5 +78,6 @@ public class Event implements Parcelable {
         date = in.readString();
         latitude = in.readDouble();
         longitude = in.readDouble();
+        size = in.readInt();
     }
 }

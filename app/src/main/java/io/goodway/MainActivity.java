@@ -4,13 +4,12 @@ package io.goodway;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
@@ -33,9 +32,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 
 import io.goodway.model.Event;
@@ -59,7 +56,7 @@ public class MainActivity extends AppCompatActivity{
      *
      * @see
      */
-    public static final int FROM_LOCATION = 1, TO_LOCATION = 2, EVENT_REQUEST =3, SETLOCATION=4;
+    public static final int FROM_LOCATION = 1, TO_LOCATION = 2, EVENT_REQUEST =3, SETLOCATION=4, PROFILE=5;
 
     private static final String TAG = "HOME_ACTIVITY";
     /**
@@ -151,6 +148,8 @@ public class MainActivity extends AppCompatActivity{
         switchToMain(new Bundle(), -1);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         ((TextView)navigationView.getHeaderView(0).findViewById(R.id.name)).setText(currentUser.getName());
+        ((TextView)navigationView.getHeaderView(0).findViewById(R.id.version)).setText(getString(R.string.version) + " " + getVersionInfo());
+
 
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -161,10 +160,6 @@ public class MainActivity extends AppCompatActivity{
                         Intent i = new Intent(MainActivity.this, FriendsActivity.class);
                         i.putExtra("USER", currentUser);
                         startActivity(i);
-                        break;
-                    case R.id.preferences:
-                        //Intent i3 = new Intent(MainActivity.this, PreferencesActivity.class);
-                        //startActivity(i3);
                         break;
                 }
                 return false;
@@ -230,6 +225,12 @@ public class MainActivity extends AppCompatActivity{
                 switchAfterResult(data, eventAddr);
             } else{
                 search.setCurrentItem(2);
+            }
+        }
+        else if(requestCode==MainActivity.PROFILE){
+            if(resultCode == RESULT_OK) {
+                Log.d("EVENT_REQUEST", "request code");
+                currentUser = data.getExtras().getParcelable("USER");
             }
         }
         else{
@@ -299,9 +300,9 @@ public class MainActivity extends AppCompatActivity{
         intent.putExtra("SELF", true);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
-            startActivity(intent, options.toBundle());
+            startActivityForResult(intent, PROFILE, options.toBundle());
         } else {
-            startActivity(intent);
+            startActivityForResult(intent, PROFILE);
         }
     }
 
@@ -404,4 +405,19 @@ public class MainActivity extends AppCompatActivity{
                 break;
         }
     }
+    public String getVersionInfo() {
+        PackageInfo packageInfo;
+        try {
+            packageInfo = getApplicationContext()
+                    .getPackageManager()
+                    .getPackageInfo(
+                            getApplicationContext().getPackageName(),
+                            0
+                    );
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "";
+        }
+    }
+
 }

@@ -2,27 +2,38 @@ package io.goodway;
 
 
 import android.animation.Animator;
-import android.animation.AnimatorInflater;
 import android.animation.ObjectAnimator;
-import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.goodway.model.User;
 import io.goodway.model.network.GoodwayHttpsClient;
@@ -37,287 +48,375 @@ import io.goodway.navitia_android.ErrorAction;
  */
 public class SplashScreenActivity extends AppCompatActivity {
 
-    private ImageView logo;
-    private LinearLayout register;
-    private EditText mail, fname, lname;
-    private EditText loginMail, loginPassword;
-    private Button registerNext;
-    private ProgressBar progress;
-
-    private TextView connectedAs;
-
-    private LinearLayout not_connected;
-    private LinearLayout loginLayout;
 
     private AsyncTask client;
 
     private int state;
-    private static final int CHOOSE=1, LOGIN=2, REGISTER=3;
+    private static final int CHOOSE = 1, LOGIN = 2, REGISTER = 3;
 
+    private FrameLayout fragmentLayout;
+    private Fragment splash, login, register, current;
+    private FragmentManager fragmentManager;
 
     // ----------------------------------- Constants
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splashscreen);
+        fragmentLayout = (FrameLayout) findViewById(R.id.fragment);
 
-        mail = (EditText) findViewById(R.id.mail);
-        progress = (ProgressBar) findViewById(R.id.progress);
-        fname = (EditText) findViewById(R.id.fname);
-        lname = (EditText) findViewById(R.id.lname);
-        registerNext = (Button) findViewById(R.id.registerNext);
+        splash = new SplashFragment();
+        login = new LoginFragment();
+        register = new RegisterFragment();
 
-        loginMail = (EditText) findViewById(R.id.mail_login);
-        loginPassword = (EditText) findViewById(R.id.loginPassword);
-
-        not_connected = (LinearLayout) findViewById(R.id.not_connected);
-        loginLayout = (LinearLayout) findViewById(R.id.loginLayout);
-
-        connectedAs = (TextView) findViewById(R.id.connectedAs);
-
-        mail.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                progress.setVisibility(View.VISIBLE);
-                if(client!=null){client.cancel(true);}
-                client = GoodwayHttpsClient.checkMailAvailability(SplashScreenActivity.this, new Action<Integer>() {
-                    @Override
-                    public void action(Integer e) {
-                        Log.d("integer : " + e, "action");
-                        progress.setVisibility(View.INVISIBLE);
-                        mail.setTextColor(getResources().getColor(R.color.red));
-                        registerNext.setEnabled(false);
-
-                    }
-                }, new ErrorAction() {
-                    @Override
-                    public void action() {
-                        progress.setVisibility(View.INVISIBLE);
-                        mail.setTextColor(getResources().getColor(R.color.green));
-                        registerNext.setEnabled(true);
-                    }
-                }, v.getText().toString());
-                return false;
-            }
-        });
-        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
-                MODE_PRIVATE);
-        String mail = shared_preferences.getString("mail", null);
-        String password = shared_preferences.getString("password", null);
-        int id = shared_preferences.getInt("id", -1);
-        String fname = shared_preferences.getString("firstname", null);
-        String lname = shared_preferences.getString("lastname", null);
-        boolean shareshome = shared_preferences.getBoolean("shareshome", false);
-        boolean shareswork = shared_preferences.getBoolean("shareswork", false);
-        Float homelat = shared_preferences.getFloat("homelat", 0);
-        Float homelon = shared_preferences.getFloat("homelon", 0);
-        Float worklat = shared_preferences.getFloat("worklat", 0);
-        Float workLon = shared_preferences.getFloat("worklon", 0);
-
-        logo = (ImageView) findViewById(R.id.logo);
-        register = (LinearLayout) findViewById(R.id.register);
-        if (mail != null && password != null && id != -1 && fname!=null && lname != null) {
-            state=0;
-            if(GoodwayHttpsClient.isConnected(this)){
-                GoodwayHttpsClient.authenticate(this, new Action<User>() {
-                    @Override
-                    public void action(User e) {
-                        Log.d("user authenticated", "authentication : "+e.getHome()+" ; "+e.getWork());
-
-                        start(e);
-                        connectedAs.setText(e.getMail());
-                    }
-                }, new ErrorAction() {
-                    @Override
-                    public void action() {
-                        not_connected.setVisibility(View.VISIBLE);
-                        state=CHOOSE;
-                    }
-                }, mail, password);
-            }
-            else{
-                start(new User(id, fname, lname, mail, shareshome, shareswork, homelat.doubleValue(), homelon.doubleValue(), worklat.doubleValue(), workLon.doubleValue(), false));
-                connectedAs.setText(mail);
-            }
-
-
-        } else {
-            not_connected.setVisibility(View.VISIBLE);
-            state=CHOOSE;
-        }
-
+        fragmentManager = getSupportFragmentManager();
+        splash();
+    }
+    void splash() {
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+        fragmentTransaction.replace(R.id.fragment, splash);
+        fragmentTransaction.addToBackStack("splash");
+        fragmentTransaction.commit();
+        current = splash;
+    }
+    void login() {
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+        fragmentTransaction.replace(R.id.fragment, login);
+        fragmentTransaction.addToBackStack("login");
+        fragmentTransaction.commit();
+        current = login;
+    }
+    void register() {
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+        fragmentTransaction.replace(R.id.fragment, register);
+        fragmentTransaction.addToBackStack("register");
+        fragmentTransaction.commit();
+        current = register;
     }
 
-    private void animate(final View view, float from, float to, int colorAnimId, final boolean visible){
-        ObjectAnimator translationTop = ObjectAnimator.ofFloat(logo, "translationY",from, to);
-
-        ObjectAnimator colorAnim = (ObjectAnimator) AnimatorInflater.loadAnimator(this, colorAnimId);
-        colorAnim.setTarget(findViewById(R.id.mainLayout));
-
-        translationTop.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                if(visible){
-                    not_connected.setVisibility(View.INVISIBLE);
-                }
-            }
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if(!visible){
-                    not_connected.setVisibility(View.VISIBLE);
-                }
-            }@Override
-            public void onAnimationCancel(Animator animation) {}@Override
-            public void onAnimationRepeat(Animator animation) {}
-        });
-        ObjectAnimator alpha = ObjectAnimator.ofFloat(view, "alpha", from, to);
-        alpha.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                if(visible){
-                    view.setVisibility(View.VISIBLE);
-                }
-            }
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if(!visible){
-                    view.setVisibility(View.INVISIBLE);}
-                }
-            @Override
-            public void onAnimationCancel(Animator animation) {}
-            @Override
-            public void onAnimationRepeat(Animator animation) {}
-        });
-        alpha.setDuration(300);
-        alpha.start();
-        translationTop.setDuration(800);
-        translationTop.start();
-        colorAnim.start();
-    }
-    private void login(){
-        loginLayout.setVisibility(View.VISIBLE);
-    }
-    private void start(final User u){
-        ObjectAnimator alpha = ObjectAnimator.ofFloat(connectedAs, "alpha", 0f, 1f);
-        alpha.setStartDelay(400);
-        alpha.setDuration(600);
-        alpha.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                Intent i = new Intent(SplashScreenActivity.this, MainActivity.class);
-                i.putExtra("USER", u);
-                startActivity(i);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        alpha.start();
-    }
-
-    public void buttonClick(View v){
-        not_connected.setVisibility(View.INVISIBLE);
-        switch(v.getId()){
-            case R.id.loginButton:
-                state=LOGIN;
-                login();
-                animate(loginLayout, 0, 600, R.animator.blue_to_white, true);
-                break;
-            case R.id.registerButton:
-                state=REGISTER;
-                animate(register, 0, 600, R.animator.blue_to_white, true);
-                break;
+    public static void closeKeyboard(Activity context, View editText){
+        if(editText!=null) {
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(editText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
 
-    public void nextBack(View v) {
-        switch (v.getId()){
-            case R.id.registerBack:
-                animate(register, 600, 0, R.animator.white_to_blue, false);
-                break;
-            case R.id.registerNext:
+    public static void showKeyboard(Activity context, View editText){
+        editText.requestFocus();
+        InputMethodManager mgr = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        mgr.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    public void login(View v){login();}
+
+    public void register(View v){register();}
+
+    public static class SplashFragment extends Fragment{
+        View root;
+        ImageView logo;
+        TextView connectedAs;
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            root = inflater.inflate(R.layout.fragment_splashscreen, container, false);
+            SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
+                    MODE_PRIVATE);
+
+            connectedAs = (TextView) root.findViewById(R.id.connectedAs);
+
+            String mail = shared_preferences.getString("mail", null);
+            String password = shared_preferences.getString("password", null);
+            int id = shared_preferences.getInt("id", -1);
+            String fname = shared_preferences.getString("firstname", null);
+            String lname = shared_preferences.getString("lastname", null);
+            boolean shareshome = shared_preferences.getBoolean("shareshome", false);
+            boolean shareswork = shared_preferences.getBoolean("shareswork", false);
+            Float homelat = shared_preferences.getFloat("homelat", 0);
+            Float homelon = shared_preferences.getFloat("homelon", 0);
+            Float worklat = shared_preferences.getFloat("worklat", 0);
+            Float workLon = shared_preferences.getFloat("worklon", 0);
+
+            logo = (ImageView) root.findViewById(R.id.logo);
+            if (mail != null && password != null && id != -1 && fname != null && lname != null) {
+
+                if (GoodwayHttpsClient.isConnected(getActivity())) {
+                    GoodwayHttpsClient.authenticate(getActivity(), new Action<User>() {
+                        @Override
+                        public void action(User e) {
+                            Log.d("user authenticated", "authentication : " + e.getHome() + " ; " + e.getWork());
+                            start(e);
+                            connectedAs.setText(e.getMail());
+                        }
+                    }, new ErrorAction() {
+                        @Override
+                        public void action(int length) {
+                            root.findViewById(R.id.not_connected).setVisibility(View.VISIBLE);
+                        }
+                    }, mail, password);
+                } else {
+                    start(new User(id, fname, lname, mail, shareshome, shareswork, homelat.doubleValue(), homelon.doubleValue(), worklat.doubleValue(), workLon.doubleValue(), false));
+                    connectedAs.setText(mail);
+                }
 
 
-                break;
-            case R.id.loginBack:
-                animate(loginLayout, 600, 0, R.animator.white_to_blue, false);
-                break;
-            case R.id.loginNext:
-                GoodwayHttpsClient.authenticate(this, new Action<User>() {
+            } else {
+                root.findViewById(R.id.not_connected).setVisibility(View.VISIBLE);
+            }
+            return root;
+        }
+        private void start(final User u){
+            ObjectAnimator alpha = ObjectAnimator.ofFloat(connectedAs, "alpha", 0f, 1f);
+            alpha.setStartDelay(400);
+            alpha.setDuration(600);
+            alpha.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    Intent i = new Intent(getActivity(), MainActivity.class);
+                    i.putExtra("USER", u);
+                    startActivity(i);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
+            alpha.start();
+        }
+    }
+    public static class LoginFragment extends Fragment implements View.OnClickListener {
+        View root;
+        EditText mail, password;
+        TextView login;
+        ProgressBar progressBar;
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            root = inflater.inflate(R.layout.fragment_login, container, false);
+            mail = (EditText) root.findViewById(R.id.email);
+            password = (EditText) root.findViewById(R.id.password);
+            login = (TextView) root.findViewById(R.id.login);
+            progressBar = (ProgressBar) root.findViewById(R.id.progressBar);
+            login.setOnClickListener(this);
+            mail.requestFocus();
+            return root;
+        }
+
+        public void onResume(){
+            super.onResume();
+            SplashScreenActivity.showKeyboard(getActivity(), mail);
+        }
+
+        @Override
+        public void onClick(View v) {
+            closeKeyboard(getActivity(), root.findFocus());
+            if(GoodwayHttpsClient.isConnected(getActivity())) {
+                progressBar.setVisibility(View.VISIBLE);
+                GoodwayHttpsClient.authenticate(getActivity(), new Action<User>() {
                     @Override
-                    public void action(User e) {
-                        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
+                    public void action(User u) {
+                        SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
                                 MODE_PRIVATE);
                         SharedPreferences.Editor editor = shared_preferences.edit();
-                        editor.putString("mail", loginMail.getText().toString());
-                        editor.putString("password", loginPassword.getText().toString());
-                        editor.putInt("id", e.getId());
-                        editor.putString("firstname", e.getFirstName());
-                        editor.putString("lastname", e.getLastName());
-                        editor.putBoolean("shareshome", e.sharesHome());
-                        editor.putBoolean("shareswork", e.sharesWork());
-                        LatLng home = e.getHome();
-                        LatLng work = e.getWork();
-                        if (home != null) {
-                            editor.putFloat("homelat", (float) home.latitude);
-                            editor.putFloat("homelon", (float) home.longitude);
-                        }
-                        if (work != null) {
-                            editor.putFloat("worklat", (float) work.latitude);
-                            editor.putFloat("worklon", (float) work.longitude);
-                        }
+                        editor.putString("mail", mail.getText().toString());
+                        editor.putString("password", password.getText().toString());
+                        editor.putInt("id", u.getId());
+                        editor.putString("firstname", u.getFirstName());
+                        editor.putString("lastname", u.getLastName());
+                        editor.putBoolean("shareshome", u.sharesHome());
+                        editor.putBoolean("shareswork", u.sharesWork());
                         editor.commit();
-                        Intent i = new Intent(SplashScreenActivity.this, MainActivity.class);
-                        i.putExtra("USER", e);
+                        Intent i = new Intent(getActivity(), MainActivity.class);
+                        i.putExtra("USER", u);
                         startActivity(i);
                     }
                 }, new ErrorAction() {
                     @Override
-                    public void action() {
-                        Snackbar.make(loginLayout, R.string.connexion_error, Snackbar.LENGTH_LONG)
-                                .setAction(R.string.change, new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        loginMail.requestFocus();
-                                    }
-                                }).show();
+                    public void action(int length) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(getActivity(), getString(R.string.wrong_id), Toast.LENGTH_SHORT).show();
                     }
-                }, loginMail.getText().toString(), loginPassword.getText().toString());
-                break;
+                }, mail.getText().toString(), password.getText().toString());
+            }
+            else{
+                Toast.makeText(getActivity(), getString(R.string.connexion_error), Toast.LENGTH_SHORT).show();
+            }
         }
     }
+    public static class RegisterFragment extends Fragment implements View.OnClickListener {
+        View root;
+        EditText fname, lname, mail, password, confirm;
+        TextView register, birthday, mailAvailibility;
+        Calendar date;
+        boolean mailAvailable;
+        AsyncTask client;
+        static final Pattern VALID_EMAIL_ADDRESS_REGEX =
+                Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            root = inflater.inflate(R.layout.fragment_register, container, false);
+            fname = (EditText) root.findViewById(R.id.fname);
+            lname = (EditText) root.findViewById(R.id.lname);
+            mail = (EditText) root.findViewById(R.id.email);
+            password = (EditText) root.findViewById(R.id.password);
+            confirm = (EditText) root.findViewById(R.id.passwordConfirm);
+            birthday = (TextView) root.findViewById(R.id.birthday);
+            register = (TextView) root.findViewById(R.id.register);
+            mailAvailibility = (TextView) root.findViewById(R.id.mailAvailibility);
 
-    @Override
-    public void onBackPressed(){
-        switch (state){
-            case 0:
-                super.onBackPressed();
-                break;
-            case CHOOSE:
-                super.onBackPressed();
-                break;
-            case LOGIN:
-                animate(loginLayout, 600, 0, R.animator.white_to_blue, false);
-                break;
-            case REGISTER:
-                animate(register, 600, 0, R.animator.white_to_blue, false);
-                break;
-            default:
-                super.onBackPressed();
-                break;
+            fname.setNextFocusDownId(R.id.lname);
+            lname.setNextFocusDownId(R.id.email);
+            birthday.setOnClickListener(this);
+            register.setOnClickListener(this);
+
+            mail.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if(validate(s.toString())) {
+                        if (client != null) {
+                            client.cancel(true);
+                        }
+                        client = GoodwayHttpsClient.checkMailAvailability(getActivity(), new Action<Integer>() {
+                            @Override
+                            public void action(Integer e) {
+                                mailAvailable = false;
+                                mailAvailibility.setText(R.string.notAvailable);
+                                mailAvailibility.setTextColor(getResources().getColor(R.color.red));
+                            }
+                        }, new ErrorAction() {
+                            @Override
+                            public void action(int length) {
+                                mailAvailable = true;
+                                mailAvailibility.setText(R.string.available);
+                                mailAvailibility.setTextColor(getResources().getColor(R.color.green));
+                            }
+                        }, mail.getText().toString());
+                    }
+                    else{
+                        mailAvailibility.setText(R.string.not_valid);
+                        mailAvailibility.setTextColor(getResources().getColor(R.color.common_google_signin_btn_text_dark));
+                        mailAvailable = false;
+                    }
+                }
+            });
+            return root;
+        }
+        public void onResume(){
+            super.onResume();
+            SplashScreenActivity.showKeyboard(getActivity(), fname);
+        }
+        static boolean validate(String emailStr) {
+            Matcher matcher = VALID_EMAIL_ADDRESS_REGEX .matcher(emailStr);
+            return matcher.find();
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()){
+                case R.id.birthday:
+                    new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            date = Calendar.getInstance();
+                            date.set(year, monthOfYear, dayOfMonth);
+                            birthday.setText(dayOfMonth+" "+ EventActivity.formatMonth(Integer.toString(monthOfYear+1))+" "+year);
+                        }
+                    }, 2000, 1, 1).show();
+                    break;
+                case R.id.register:
+                    if(!password.getText().toString().equals(confirm.getText().toString())) {
+                        Toast.makeText(getActivity(), getString(R.string.passwordsDiffer), Toast.LENGTH_SHORT).show();
+                    }
+                    else if(mail.getText().toString()==""){
+                        Toast.makeText(getActivity(), R.string.enter_mail, Toast.LENGTH_SHORT).show();
+                    }
+                    else if(password.getText().toString()==""){
+                        Toast.makeText(getActivity(), R.string.enter_password, Toast.LENGTH_SHORT).show();
+                    }
+                    else if(fname.getText().toString()==""){
+                        Toast.makeText(getActivity(), R.string.enter_fname, Toast.LENGTH_SHORT).show();
+                    }
+                    else if(lname.getText().toString()==""){
+                        Toast.makeText(getActivity(), R.string.enter_lname, Toast.LENGTH_SHORT).show();
+                    }
+                    else if(date==null){
+                        Toast.makeText(getActivity(), R.string.enter_bday, Toast.LENGTH_SHORT).show();
+                    }
+                    else if(!mailAvailable){
+                        Toast.makeText(getActivity(), "Mail "+getString(R.string.not_available), Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        final ProgressDialog dialog = new ProgressDialog(getActivity());
+                        dialog.setMessage(getString(R.string.updating_share_options));
+                        dialog.setProgressStyle(dialog.STYLE_SPINNER);
+                        dialog.show();
+                        GoodwayHttpsClient.register(getActivity(), new Action<User>() {
+                            @Override
+                            public void action(User u) {
+                                SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
+                                        MODE_PRIVATE);
+                                SharedPreferences.Editor editor = shared_preferences.edit();
+                                editor.putString("mail", mail.getText().toString());
+                                editor.putString("password", password.getText().toString());
+                                editor.putInt("id", u.getId());
+                                editor.putString("firstname", u.getFirstName());
+                                editor.putString("lastname", u.getLastName());
+                                editor.putBoolean("shareshome", u.sharesHome());
+                                editor.putBoolean("shareswork", u.sharesWork());
+                                editor.commit();
+                                Intent i = new Intent(getActivity(), MainActivity.class);
+                                i.putExtra("USER", u);
+                                dialog.dismiss();
+                                startActivity(i);
+                            }
+                        }, new ErrorAction() {
+                            @Override
+                            public void action(int length) {
+                                dialog.dismiss();
+                                Toast.makeText(getActivity(), R.string.failure, Toast.LENGTH_SHORT).show();
+                            }
+                        }, mail.getText().toString(), password.getText().toString(), fname.getText().toString(), lname.getText().toString(), new SimpleDateFormat("yyyyMMdd").format(date.getTime()));
+                        break;
+                    }
+            }
+            /*
+            GoodwayHttpsClient.
+            SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
+                    MODE_PRIVATE);
+            SharedPreferences.Editor editor = shared_preferences.edit();
+            editor.putString("mail", mail.getText().toString());
+            editor.putString("password", password.getText().toString());
+            editor.putInt("id", e.getId());
+            editor.putString("firstname", e.getFirstName());
+            editor.putString("lastname", e.getLastName());
+            editor.commit();
+            Intent i = new Intent(getActivity(), MainActivity.class);
+            i.putExtra("USER", e);
+            startActivity(i);
+            */
         }
     }
 

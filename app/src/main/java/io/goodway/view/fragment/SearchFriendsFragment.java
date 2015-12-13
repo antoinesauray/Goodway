@@ -1,5 +1,7 @@
 package io.goodway.view.fragment;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -74,16 +76,33 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                             case 0:
                                 // Home
                                 if(u.sharesHome()) {
+                                    final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                                    progressDialog.setMessage(getString(R.string.request_location));
+                                    progressDialog.setProgressStyle(progressDialog.STYLE_SPINNER);
+                                    progressDialog.show();
                                     GoodwayHttpsClient.getUserHome(getActivity(), new Action<Address>() {
                                         @Override
                                         public void action(Address e) {
-                                            if(e!=null){
+                                            progressDialog.dismiss();
+                                            if (e != null) {
                                                 finish(e);
-                                            }
-                                            else{
-                                                Toast.makeText(SearchFriendsFragment.this.getActivity(), u.getFirstName()+" "+getString(R.string.did_not_give_location), Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Toast.makeText(SearchFriendsFragment.this.getActivity(), u.getFirstName() + " " + getString(R.string.did_not_give_location), Toast.LENGTH_SHORT).show();
                                             }
 
+                                        }
+                                    }, new ErrorAction() {
+                                        @Override
+                                        public void action(int length) {
+                                            progressDialog.dismiss();
+                                            new AlertDialog.Builder(SearchFriendsFragment.this.getActivity())
+                                                    .setTitle(R.string.failure)
+                                                    .setMessage(u.getFirstName()+" "+getString(R.string.did_not_give_location))
+                                                    .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                        }
+                                                    })
+                                                    .show();
                                         }
                                     }, mail, password, u.getId(), u.getFirstName());
                                 }
@@ -91,15 +110,33 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                             case 1:
                                 // Home
                                 if(u.sharesWork()) {
+                                    final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                                    progressDialog.setMessage(getString(R.string.request_location));
+                                    progressDialog.setProgressStyle(progressDialog.STYLE_SPINNER);
+                                    progressDialog.show();
                                     GoodwayHttpsClient.getUserWork(getActivity(), new Action<Address>() {
                                         @Override
                                         public void action(Address e) {
+                                            progressDialog.dismiss();
                                             if(e!=null) {
                                                 finish(e);
                                             }
                                             else{
                                                 Toast.makeText(SearchFriendsFragment.this.getActivity(), u.getFirstName()+" "+getString(R.string.did_not_give_location), Toast.LENGTH_SHORT).show();
                                             }
+                                        }
+                                    }, new ErrorAction() {
+                                        @Override
+                                        public void action(int length) {
+                                            progressDialog.dismiss();
+                                            new AlertDialog.Builder(SearchFriendsFragment.this.getActivity())
+                                                    .setTitle(R.string.failure)
+                                                    .setMessage(u.getFirstName()+" "+getString(R.string.did_not_give_location))
+                                                    .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                        }
+                                                    })
+                                                    .show();
                                         }
                                     }, mail, password, u.getId(), u.getFirstName());
                                 }
@@ -119,12 +156,6 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
             }
         }, mail, password);
 
-        Bundle extras = getArguments();
-        mail = extras.getString("mail");
-        password = extras.getString("password");
-
-        mail ="sauray.a@outlook.com";
-        password = "antoine";
         GoodwayHttpsClient.getFriends(getActivity(), new Action<User>() {
             @Override
             public void action(User e) {
@@ -133,10 +164,20 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
             }
         }, new ErrorAction() {
             @Override
-            public void action() {
-                swipeLayout.setRefreshing(false);
-                error.setText(R.string.no_friends);
-                error.setVisibility(View.VISIBLE);
+            public void action(int length) {
+                switch (length){
+                    case 0:
+                        swipeLayout.setRefreshing(false);
+                        error.setText(R.string.no_friends);
+                        error.setVisibility(View.VISIBLE);
+                        break;
+                    case -1:
+                        swipeLayout.setRefreshing(false);
+                        error.setText(R.string.connexion_error);
+                        error.setVisibility(View.VISIBLE);
+                        break;
+                }
+
             }
         }, mail, password);
 
@@ -162,10 +203,20 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
             }
         }, new ErrorAction() {
             @Override
-            public void action() {
-                swipeLayout.setRefreshing(false);
-                error.setText(R.string.no_friends);
-                error.setVisibility(View.VISIBLE);
+            public void action(int length) {
+                switch (length){
+                    case 0:
+                        swipeLayout.setRefreshing(false);
+                        error.setText(R.string.no_friends);
+                        error.setVisibility(View.VISIBLE);
+                        break;
+                    case -1:
+                        swipeLayout.setRefreshing(false);
+                        error.setText(R.string.connexion_error);
+                        error.setVisibility(View.VISIBLE);
+                        break;
+                }
+
             }
         },mail, password);
     }

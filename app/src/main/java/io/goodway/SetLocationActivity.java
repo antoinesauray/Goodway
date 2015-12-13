@@ -5,9 +5,11 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -39,6 +41,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -58,7 +61,10 @@ import io.goodway.model.Event;
 import io.goodway.model.User;
 import io.goodway.model.adapter.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;
+import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
+import io.goodway.navitia_android.ErrorAction;
 import io.goodway.navitia_android.Home;
 import io.goodway.navitia_android.Work;
 import io.goodway.view.fragment.MainFragment;
@@ -96,6 +102,7 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
 
     private User currentUser;
     private int request, place;
+    private String mail, password;
 
     // ----------------------------------- Constants
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -112,6 +119,11 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
         request = extras.getInt("REQUEST");
         place = extras.getInt("PLACE");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
+                MODE_PRIVATE);
+        mail = shared_preferences.getString("mail", null);
+        password = shared_preferences.getString("password", null);
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -142,14 +154,45 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
 
         searchAdapter = new AdressSearchAdapter(new AddressSelected() {
             @Override
-            public void action(Address address) {
-                    searchAdapter.clear();
-                    Intent returnIntent = new Intent();
-                    returnIntent.putExtra("ADDRESS", address);
-                    returnIntent.putExtra("PLACE", place);
-                    returnIntent.putExtra("REQUEST", request);
-                    setResult(Activity.RESULT_OK, returnIntent);
-                    finish();
+            public void action(final Address address) {
+                final ProgressDialog dialog = new ProgressDialog(SetLocationActivity.this);
+                dialog.setMessage(getString(R.string.updating_share_options));
+                dialog.setProgressStyle(dialog.STYLE_SPINNER);
+                dialog.show();
+                switch (place){
+                    case ProfileActivity.HOME:
+                        GoodwayHttpsClient.updateHome(SetLocationActivity.this, new Action<Void>() {
+                            @Override
+                            public void action(Void e) {
+                                dialog.dismiss();
+                                returnHome(address);
+                            }
+                        }, new ErrorAction() {
+                            @Override
+                            public void action(int length) {
+                                dialog.dismiss();
+                                Toast.makeText(SetLocationActivity.this, R.string.failed_updating_options, Toast.LENGTH_SHORT).show();
+                                returnHome(address);
+                            }
+                        }, mail, password, address.getLatitude(), address.getLongitude());
+                        break;
+                    case ProfileActivity.WORK:
+                        GoodwayHttpsClient.updateWork(SetLocationActivity.this, new Action<Void>() {
+                            @Override
+                            public void action(Void e) {
+                                dialog.dismiss();
+                                returnHome(address);
+                            }
+                        }, new ErrorAction() {
+                            @Override
+                            public void action(int length) {
+                                dialog.dismiss();
+                                Toast.makeText(SetLocationActivity.this, R.string.failed_updating_options, Toast.LENGTH_SHORT).show();
+                                returnHome(address);
+                            }
+                        }, mail, password, address.getLatitude(), address.getLongitude());
+                        break;
+                }
             }
             });
         recyclerView.setAdapter(searchAdapter);
@@ -214,6 +257,16 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
         if (googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
+    }
+
+    private void returnHome(Address address){
+        searchAdapter.clear();
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("ADDRESS", address);
+        returnIntent.putExtra("PLACE", place);
+        returnIntent.putExtra("REQUEST", request);
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
     }
 
     @Override

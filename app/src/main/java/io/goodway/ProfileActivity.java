@@ -1,5 +1,6 @@
 package io.goodway;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -62,8 +63,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
     private User user;
 
     private String mail, password;
-    private TextView impact, home, work;
-    private PercentView percentView;
+    private TextView home, work;
 
     private ProgressBar impactProgress;
     private View homeButton, workButton;
@@ -75,13 +75,15 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
     private GoogleMap mapHome, mapWork;
     private Address homeAddr, workAddr;
 
+    private boolean self;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         Bundle extras = this.getIntent().getExtras();
         user = extras.getParcelable("USER");
-        boolean self = extras.getBoolean("SELF", false);
+        self = extras.getBoolean("SELF", false);
         toolbar = (Toolbar) findViewById(R.id.mapToolbar);
         toolbar.setTitle(user.getName());
         setSupportActionBar(toolbar);
@@ -89,32 +91,43 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        Log.d("user shares home:" + user.sharesHome(), "user shares home:");
-        Log.d("user shares work:" + user.sharesWork(), "user shares work:");
+        Log.d("shares home", "shares home=" + user.sharesHome());
+        Log.d("shares work", "shares work="+user.sharesWork());
 
         SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
                 MODE_PRIVATE);
         mail = shared_preferences.getString("mail", null);
         password = shared_preferences.getString("password", null);
+        shareHome = (CheckBox) findViewById(R.id.shareHome);
+        shareWork = (CheckBox) findViewById(R.id.shareWork);
 
-        impact = (TextView) findViewById(R.id.impact);
+        shareHome.setChecked(user.sharesHome());
+        shareWork.setChecked(user.sharesWork());
+
+        shareHome.setOnCheckedChangeListener(this);
+        shareWork.setOnCheckedChangeListener(this);
+
         home = (TextView) findViewById(R.id.home);
         work = (TextView) findViewById(R.id.work);
-        percentView = (PercentView) findViewById(R.id.percentView);
-        impactProgress = (ProgressBar) findViewById(R.id.impactProgress);
         homeButton = findViewById(R.id.homeButton);
         workButton = findViewById(R.id.workButton);
 
-        shareHome = (CheckBox) findViewById(R.id.shareHome);
-        shareWork = (CheckBox) findViewById(R.id.shareWork);
 
         fragHome = (MapFragment) getFragmentManager().findFragmentById(R.id.mapHome);
         fragHome.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 mapHome = googleMap;
+                googleMap.getUiSettings().setMapToolbarEnabled(false);
+                googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+                Log.d("map ready home", "map ready home");
                 if(homeAddr!=null) {
-                    setHomeOnMap();
+                    Log.d("homeAddr not null", "homeAddr not null");
+                    setHomeOnMap(new LatLng(homeAddr.getLatitude(), homeAddr.getLongitude()));
+                }
+                else if (self){
+                    LatLng home=user.getHome();
+                    if(home.latitude!=0 && home.longitude!=0){setHomeOnMap(home);}
                 }
             }});
 
@@ -123,8 +136,16 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 mapWork = googleMap;
+                googleMap.getUiSettings().setMapToolbarEnabled(false);
+                googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+                Log.d("map ready work", "map ready work");
                 if (workAddr != null) {
-                    setWorkOnMap();
+                    Log.d("workAddr not null", "workAddr not null");
+                    setWorkOnMap(new LatLng(workAddr.getLatitude(), workAddr.getLongitude()));
+                }
+                else if (self){
+                    LatLng work=user.getWork();
+                    if(work.latitude!=0 && work.longitude!=0){setHomeOnMap(work);}
                 }
             }
         });
@@ -146,60 +167,93 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             work.setVisibility(View.VISIBLE);
         }
 
-        GoodwayHttpsClient.getUserCo2(this, new Action<Integer>() {
-            @Override
-            public void action(Integer e) {
-                impactProgress.setVisibility(View.INVISIBLE);
-                impact.setText(e + " g co2");
-                percentView.setPercentage(30f);
-            }
-        }, mail, password, user.getId());
-
-        if(shareHome!=null) {
-            shareHome.setChecked(user.sharesHome());
-            shareHome.setOnCheckedChangeListener(this);
-        }
-
-        if(shareWork!=null) {
-            shareWork.setChecked(user.sharesWork());
-            shareWork.setOnCheckedChangeListener(this);
-        }
-        if(user.isFriend()) {
-            if (user.sharesHome()) {
+        if(user.isFriend() || self) {
+            Log.d("friend self", "friend self");
+            if(self){
                 GoodwayHttpsClient.getUserHome(this, new Action<Address>() {
-                    @Override
-                    public void action(Address e) {
-                        homeAddr = e;
-                        if (mapHome != null) {
-                            if (homeAddr != null) {
+                        @Override
+                        public void action(Address e) {
+                            if(e!=null){
+                                homeAddr = e;
                                 findViewById(R.id.error_home).setVisibility(View.INVISIBLE);
-                                setHomeOnMap();
-                            } else {
+                                setHomeOnMap(new LatLng(e.getLatitude(), e.getLongitude()));
+                            }
+                            else{
                                 findViewById(R.id.error_home).setVisibility(View.VISIBLE);
                             }
                         }
-                    }
-                }, mail, password, user.getId(), user.getFirstName());
-            }
-
-            if(user.sharesWork()){
-                GoodwayHttpsClient.getUserWork(this, new Action<Address>() {
-                    @Override
-                    public void action(Address e) {
-                        workAddr = e;
-                        if (mapHome != null) {
-                            if (workAddr != null) {
+                    }, new ErrorAction() {
+                        @Override
+                        public void action(int length) {
+                            Toast.makeText(ProfileActivity.this, R.string.connexion_error, Toast.LENGTH_SHORT).show();
+                        }
+                    }, mail, password, user.getFirstName());
+            GoodwayHttpsClient.getUserWork(this, new Action<Address>() {
+                        @Override
+                        public void action(Address e) {
+                            if(e!=null){
+                                workAddr = e;
                                 findViewById(R.id.error_work).setVisibility(View.INVISIBLE);
-                                setWorkOnMap();
-                            } else {
+                                setWorkOnMap(new LatLng(e.getLatitude(), e.getLongitude()));
+                            }
+                            else{
                                 findViewById(R.id.error_work).setVisibility(View.VISIBLE);
                             }
                         }
-                    }
-                }, mail, password, user.getId(), user.getFirstName());
+                    }, new ErrorAction() {
+                        @Override
+                        public void action(int length) {
+                            Toast.makeText(ProfileActivity.this, R.string.connexion_error, Toast.LENGTH_SHORT).show();
+                        }
+            }, mail, password, user.getFirstName());
             }
-        }
-        else{
+            else{
+                Log.d("not friend self", "not friend self");
+                if(user.sharesHome()){
+                    Log.d("shares home", "shares home");
+                    GoodwayHttpsClient.getUserHome(this, new Action<Address>() {
+                        @Override
+                        public void action(Address e) {
+                            homeAddr = e;
+                            if (mapHome != null) {
+                                findViewById(R.id.error_home).setVisibility(View.INVISIBLE);
+                                if(homeAddr!=null) {setHomeOnMap(new LatLng(homeAddr.getLatitude(), homeAddr.getLongitude()));}
+                                else{findViewById(R.id.error_home).setVisibility(View.VISIBLE);}
+                            }
+                        }
+                    }, new ErrorAction() {
+                        @Override
+                        public void action(int length) {
+                            findViewById(R.id.error_home).setVisibility(View.VISIBLE);
+                        }
+                    }, mail, password, user.getId(), user.getFirstName());
+                }
+                else{
+                    home.setText(R.string.home_not_shared);
+                }
+                if(user.sharesWork()){
+                    GoodwayHttpsClient.getUserWork(this, new Action<Address>() {
+                        @Override
+                        public void action(Address e) {
+                            workAddr = e;
+                            if (mapWork != null) {
+                                findViewById(R.id.error_home).setVisibility(View.INVISIBLE);
+                                if(workAddr!=null){setWorkOnMap(new LatLng(workAddr.getLatitude(), workAddr.getLongitude()));}
+                                else{findViewById(R.id.error_work).setVisibility(View.VISIBLE);}
+                            }
+                        }
+                    }, new ErrorAction() {
+                        @Override
+                        public void action(int length) {
+                            findViewById(R.id.error_work).setVisibility(View.VISIBLE);
+                        }
+                    }, mail, password, user.getId(), user.getFirstName());
+                }
+                else{
+                    work.setText(R.string.work_not_shared);
+                }
+            }
+        } else {
             findViewById(R.id.hiddenContent1).setVisibility(View.INVISIBLE);
             findViewById(R.id.hiddenContent2).setVisibility(View.INVISIBLE);
             TextView no_friend = (TextView) findViewById(R.id.no_friend);
@@ -208,30 +262,30 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         }
     }
 
-    private void setHomeOnMap(){
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(homeAddr.getLatitude(), homeAddr.getLongitude()))      // Sets the center of the map to Mountain View
-                .zoom(13)                   // Sets the zoom
-                .build();                   // Creates a CameraPosition from the builder
-        mapHome.addMarker(new MarkerOptions()
-                .position(new LatLng(homeAddr.getLatitude(), homeAddr.getLongitude()))
-                        //.alpha(0.8f)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                .title(getString(R.string.home)));
-        mapHome.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    private void setHomeOnMap(LatLng position){
+        Log.d("setHomeOnMap", "setHomeOnMap");
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(position)      // Sets the center of the map to Mountain View
+                    .zoom(13)                   // Sets the zoom
+                    .build();                   // Creates a CameraPosition from the builder
+            mapHome.addMarker(new MarkerOptions()
+                    .position(position)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                    .title(getString(R.string.home)));
+            mapHome.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
-    private void setWorkOnMap(){
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(workAddr.getLatitude(), workAddr.getLongitude()))      // Sets the center of the map to Mountain View
-                .zoom(13)                   // Sets the zoom
-                .build();                   // Creates a CameraPosition from the builder
-        mapWork.addMarker(new MarkerOptions()
-                .position(new LatLng(workAddr.getLatitude(), workAddr.getLongitude()))
-                        //.alpha(0.8f)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                .title(getString(R.string.work)));
-        mapWork.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    private void setWorkOnMap(LatLng position){
+        Log.d("setWorkOnMap", "setWorkOnMap");
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(position)      // Sets the center of the map to Mountain View
+                    .zoom(13)                   // Sets the zoom
+                    .build();                   // Creates a CameraPosition from the builder
+            mapWork.addMarker(new MarkerOptions()
+                    .position(position)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                    .title(getString(R.string.work)));
+            mapWork.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     @Override
@@ -252,7 +306,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             }
         }, new ErrorAction() {
             @Override
-            public void action() {
+            public void action(int length) {
 
             }
         }, mail, password, user.getId());
@@ -280,20 +334,59 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             Address address = data.getParcelableExtra("ADDRESS");
-            Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
             switch (requestCode){
                 case HOME:
                     homeAddr = address;
+                    user.setHome(homeAddr);
+                    GoodwayHttpsClient.updateHome(this, new Action<Void>() {
+                        @Override
+                        public void action(Void e) {
+
+                        }
+                    }, new ErrorAction() {
+                        @Override
+                        public void action(int length) {
+                            if(length==-1){
+                                new AlertDialog.Builder(ProfileActivity.this)
+                                        .setTitle(R.string.update_location)
+                                        .setMessage(R.string.failure)
+                                        .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {}
+                                        })
+                                        .show();
+                            }
+                        }
+                    }, mail, password, homeAddr.getLatitude(), homeAddr.getLongitude());
                     if(mapHome!=null) {
                         findViewById(R.id.error_home).setVisibility(View.INVISIBLE);
-                        setHomeOnMap();
+                        setHomeOnMap(new LatLng(homeAddr.getLatitude(), homeAddr.getLongitude()));
                     }
                     break;
                 case WORK:
                     workAddr = address;
+                    user.setWork(workAddr);
+                    GoodwayHttpsClient.updateWork(this, new Action<Void>() {
+                        @Override
+                        public void action(Void e) {
+
+                        }
+                    }, new ErrorAction() {
+                        @Override
+                        public void action(int length) {
+                            if(length==-1){
+                                new AlertDialog.Builder(ProfileActivity.this)
+                                        .setTitle(R.string.update_location)
+                                        .setMessage(R.string.failure)
+                                        .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {}
+                                        })
+                                        .show();
+                            }
+                        }
+                    }, mail, password, workAddr.getLatitude(), workAddr.getLongitude());
                     if(mapWork!=null) {
                         findViewById(R.id.error_work).setVisibility(View.INVISIBLE);
-                        setWorkOnMap();
+                        setWorkOnMap(new LatLng(workAddr.getLatitude(), workAddr.getLongitude()));
                     }
                     break;
             }
@@ -308,22 +401,18 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         dialog.setProgressStyle(dialog.STYLE_SPINNER);
         dialog.show();
 
+        Log.d("isChecked", "isChecked=" + isChecked);
+        Log.d("isChecked()", "isChecked()="+shareHome.isChecked());
         GoodwayHttpsClient.setSharing(this, new Action<Boolean>() {
             @Override
             public void action(Boolean e) {
                 dialog.dismiss();
                 user.setSharesHome(shareHome.isChecked());
                 user.setSharesWork(shareWork.isChecked());
-                SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
-                        MODE_PRIVATE);
-                SharedPreferences.Editor editor = shared_preferences.edit();
-                editor.putBoolean("shareshome", user.sharesHome());
-                editor.putBoolean("shareswork", user.sharesWork());
-                editor.commit();
             }
         }, new ErrorAction() {
             @Override
-            public void action() {
+            public void action(int length) {
                 dialog.dismiss();
                 shareHome.setChecked(user.sharesHome());
                 shareWork.setChecked(user.sharesWork());
@@ -339,5 +428,18 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                         .show();
             }
         },mail, password, shareHome.isChecked(), shareWork.isChecked());
+    }
+
+    @Override
+    public void onBackPressed(){
+        if(self){
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("USER", user);
+            setResult(Activity.RESULT_OK, returnIntent);
+            finish();
+        }
+        else{
+            finish();
+        }
     }
 }

@@ -130,7 +130,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
                         }
                     }, new ErrorAction() {
                         @Override
-                        public void action() {
+                        public void action(int length) {
                             clear();
                         }
                     }, mail, password, item.getId());

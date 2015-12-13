@@ -16,10 +16,13 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -159,7 +162,15 @@ public class WayActivity extends AppCompatActivity implements SwipeRefreshLayout
 
         }, pairs, from, to, new ErrorAction() {
             @Override
-            public void action() {
+            public void action(int length) {
+                switch (length){
+                    case 0:
+                        noWaysFound.setText(R.string.no_ways_found);
+                        break;
+                    case -1:
+                        noWaysFound.setText(R.string.connexion_error);
+                        break;
+                }
                 noWaysFound.setVisibility(View.VISIBLE);
             }
         });

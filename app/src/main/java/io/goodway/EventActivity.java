@@ -142,7 +142,7 @@ public class EventActivity extends AppCompatActivity {
 
     }
 
-    private String formatMonth(String month) {
+    public static String formatMonth(String month) {
         SimpleDateFormat monthParse = new SimpleDateFormat("MM");
         SimpleDateFormat monthDisplay = new SimpleDateFormat("MMMM");
         try {

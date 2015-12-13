@@ -217,7 +217,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
                     .setAction(R.string.select, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            ((MainActivity)getActivity()).changeLocation(R.id.to);
+                            ((MainActivity)getActivity()).changeLocation(MainActivity.DESTINATION);
                         }
                     }).show();
         }

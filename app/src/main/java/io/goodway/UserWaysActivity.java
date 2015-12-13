@@ -95,7 +95,7 @@ public class UserWaysActivity extends AppCompatActivity implements SwipeRefreshL
             }
         }, new ErrorAction() {
             @Override
-            public void action() {
+            public void action(int length) {
                 swipeLayout.setRefreshing(false);
             }
         }, mail, password, user.getId());
@@ -152,7 +152,7 @@ public class UserWaysActivity extends AppCompatActivity implements SwipeRefreshL
             }
         }, new ErrorAction() {
             @Override
-            public void action() {
+            public void action(int length) {
                 swipeLayout.setRefreshing(false);
             }
         }, mail, password, user.getId());

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,6 +67,15 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
         Log.d("way.getLocaleType()", way.getType());
         holder.action.setText(way.getLabel(activity));
         holder.time.setText(secondToStr(activity, way.getDuration()));
+
+        switch (way.getWayPartType()){
+            case BusTrip:
+                holder.img.setImageResource(R.mipmap.ic_direction_bus_black);
+                break;
+            case Walking:
+                holder.img.setImageResource(R.mipmap.ic_direction_walk_black);
+                break;
+        }
     }
 
     public void add(WayPart item) {
@@ -80,7 +90,7 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
         mDataset.clear();
         notifyItemRangeRemoved(0, size);
     }
-    public String secondToStr(Context c, int seconds){
+    public static String secondToStr(Context c, int seconds){
         int[] times = WayPart.splitToComponentTimes(seconds);
         String timeStr="";
         if(times[0]!=0){
@@ -111,6 +121,7 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         // each data item is just a string in this case
+        ImageView img;
         TextView time, action;
         WayPart item;
         Activity activity;
@@ -120,6 +131,7 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
             this.activity = activity;
             time = (TextView) lyt_main.findViewById(R.id.time);
             action = (TextView) lyt_main.findViewById(R.id.action);
+            img = (ImageView) lyt_main.findViewById(R.id.img);
         }
         public void setItem(WayPart item) {
             this.item = item;

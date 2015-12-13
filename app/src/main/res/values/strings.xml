@@ -101,11 +101,34 @@
 
     <string name="preferences">Préférences (non disponible)</string>
 
-    <string name="no_address">Vous n\'avez pas indiqué d\'addresse</string>
+    <string name="no_address">Aucune adresse indiquée</string>
     <string name="updating_share_options">Mise à jour des options de partages</string>
     <string name="failed_updating_options">Echec de la mise à jour des paramètres</string>
 
     <string name="home_not_set">Votre addresse n\'a pas été renseignée. Voulez-vous l\'ajouter ?</string>
     <string name="did_not_give_location">n\'a pas renseigné cette information</string>
     <string name="content_hidden">Ce contenu est reservé aux amis de</string>
+
+    <string name="update_location">Mise à jour de la position</string>
+    <string name="failure">Echec</string>
+
+    <string name="request_location">Demande de position</string>
+
+    <string name="home_not_shared">Domicile non partagé</string>
+    <string name="work_not_shared">Travail non partagé</string>
+    <string name="wrong_id">Mauvais identifiants</string>
+
+    <string name="birthday_not_set">Anniversaire non renseigné</string>
+    <string name="notAvailable">Non disponible</string>
+    <string name="available">Disponible</string>
+
+    <string name="enter_mail">Entrez une adresse mail</string>
+    <string name="enter_password">Entrez un mot de passe</string>
+    <string name="enter_fname">Entrez votre prénom</string>
+    <string name="enter_lname">Entrez votre nom</string>
+    <string name="enter_bday">Entrez votre date de naissance</string>
+    <string name="not_valid">Non valide</string>
+
+    <string name="work_not_set">Travail non renseigné</string>
+    <string name="set_address">Voulez-vous renseigner cette addresse ?</string>
 </resources>

@@ -2,9 +2,11 @@ package io.goodway.view.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -41,7 +43,10 @@ import io.goodway.SetLocationActivity;
 import io.goodway.model.User;
 import io.goodway.model.adapter.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;
+import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
+import io.goodway.navitia_android.ErrorAction;
 import io.goodway.navitia_android.Home;
 import io.goodway.navitia_android.Work;
 
@@ -64,12 +69,18 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
     private int request;
     private static final CharacterStyle STYLE_BOLD = new StyleSpan(Typeface.BOLD);
     private User user;
+    private String mail, password;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_google_places, container, false);
         request = getArguments().getInt("REQUEST");
         user = getArguments().getParcelable("USER");
+
+        SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
+                getActivity().MODE_PRIVATE);
+        mail = shared_preferences.getString("mail", null);
+        password = shared_preferences.getString("password", null);
 
         mainActivity = (MainActivity) getActivity();
         googleApiClient = new GoogleApiClient.Builder(getActivity())
@@ -97,50 +108,93 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
         searchAdapter = new AdressSearchAdapter(new AddressSelected() {
             @Override
             public void action(Address address) {
-                if(address.getClass() == Home.class && user.getHome()==null){
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle(R.string.home)
-                            .setMessage(R.string.home_not_set)
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // continue with delete
-                                    Intent i = new Intent(getActivity(), SetLocationActivity.class);
-                                    i.putExtra("REQUEST", request);
-                                    i.putExtra("PLACE", ProfileActivity.HOME);
-                                    i.putExtra("USER", user);
-                                    startActivityForResult(i, MainActivity.SETLOCATION);
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // do nothing
-                                }
-                            })
-                            //.setIcon(android.R.drawable.ic_dialog_info)
-                            .show();
+                if(address.getClass() == Home.class){
+                    final ProgressDialog dialog = new ProgressDialog(getActivity());
+                    dialog.setMessage(getString(R.string.request_location));
+                    dialog.setProgressStyle(dialog.STYLE_SPINNER);
+                    dialog.show();
+                    GoodwayHttpsClient.getUserHome(getActivity(), new Action<Address>() {
+                        @Override
+                        public void action(Address e) {
+                            dialog.dismiss();
+                            if(e!=null) {
+                                searchAdapter.clear();
+                                finish(e);
+                            }
+                            else{
+                                new AlertDialog.Builder(getActivity())
+                                        .setTitle(R.string.home_not_set)
+                                        .setMessage(R.string.set_address)
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // continue with delete
+                                                Intent i = new Intent(getActivity(), SetLocationActivity.class);
+                                                i.putExtra("REQUEST", request);
+                                                i.putExtra("PLACE", ProfileActivity.HOME);
+                                                i.putExtra("USER", user);
+                                                startActivityForResult(i, MainActivity.SETLOCATION);
+                                            }
+                                        })
+                                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {}
+                                        })
+                                        .show();
+                            }
+                        }
+                    }, new ErrorAction() {
+                        @Override
+                        public void action(int length) {
+                            dialog.dismiss();
+                            Toast.makeText(getActivity(), R.string.connexion_error, Toast.LENGTH_SHORT).show();
+                        }
+                    }, mail, password, user.getFirstName());
                 }
-                else if(address.getClass()==Work.class && user.getWork()==null){
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle("Set Work")
-                            .setMessage("Your work is not set yet. Do you want to add it ?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // continue with delete
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // do nothing
-                                }
-                            })
-                            //.setIcon(android.R.drawable.ic_dialog_info)
-                            .show();
+                else if(address.getClass()==Work.class){
+                    final ProgressDialog dialog = new ProgressDialog(getActivity());
+                    dialog.setMessage(getString(R.string.request_location));
+                    dialog.setProgressStyle(dialog.STYLE_SPINNER);
+                    dialog.show();
+                    GoodwayHttpsClient.getUserWork(getActivity(), new Action<Address>() {
+                        @Override
+                        public void action(Address e) {
+                            dialog.dismiss();
+                            if (e != null) {
+                                searchAdapter.clear();
+                                finish(e);
+                            } else {
+                                new AlertDialog.Builder(getActivity())
+                                        .setTitle(R.string.work_not_set)
+                                        .setMessage(R.string.set_address)
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // continue with delete
+                                                Intent i = new Intent(getActivity(), SetLocationActivity.class);
+                                                i.putExtra("REQUEST", request);
+                                                i.putExtra("PLACE", ProfileActivity.WORK);
+                                                i.putExtra("USER", user);
+                                                startActivityForResult(i, MainActivity.SETLOCATION);
+                                            }
+                                        })
+                                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        })
+                                        .show();
+                            }
+                        }
+                    }, new ErrorAction() {
+                        @Override
+                        public void action(int length) {
+                            dialog.dismiss();
+                            Toast.makeText(getActivity(), R.string.connexion_error, Toast.LENGTH_SHORT).show();
+                        }
+                    }, mail, password, user.getFirstName());
                 }
                 else{
                     searchAdapter.clear();
                     finish(address);
-                    closeKeyboard();
                 }
+
             }
         });
         recyclerView.setAdapter(searchAdapter);
@@ -204,7 +258,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
     public void onResume(){
         super.onResume();
         googleApiClient.connect();
-        if(isVisible()) {
+        if(!getArguments().getBoolean("DEMO") && isVisible()) {
             showKeyboard();
         }
     }

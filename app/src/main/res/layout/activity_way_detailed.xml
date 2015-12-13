@@ -26,38 +26,49 @@
                     android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     app:layout_collapseMode="pin">
                 </android.support.v7.widget.Toolbar>
-        </android.support.design.widget.AppBarLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/semitransparent_grey"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:padding="8dp"
+                android:orientation="horizontal">
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:onClick="fabClick"
-            android:src="@mipmap/ic_directions_white_48dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="@dimen/fab_margin"
-            android:layout_marginRight="10dp"
-            app:elevation="@dimen/fab_elevation"
-            app:borderWidth="0dp"
-            app:rippleColor="@color/accent"
-            app:backgroundTint="@color/accent"
-            app:layout_anchor="@id/appbar"
-            app:layout_anchorGravity="bottom|right|end"
-            />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:tint="@android:color/white"
+                    android:src="@mipmap/ic_access_time"
+                    android:layout_marginLeft="16dp"/>
+
+                <TextView
+                    android:id="@+id/duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@android:color/white"
+                    android:layout_marginLeft="16dp"/>
+            </LinearLayout>
+            </LinearLayout>
+        </android.support.design.widget.AppBarLayout>
 
 
         <android.support.v7.widget.RecyclerView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="16dp"
                 android:scrollbars="vertical"
-                android:divider="@android:color/white"
-                android:dividerHeight="0dp"
+                android:divider="@color/primary"
+                android:dividerHeight="1dp"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
             </android.support.v7.widget.RecyclerView>
-
-
     </android.support.design.widget.CoordinatorLayout>
 </LinearLayout>

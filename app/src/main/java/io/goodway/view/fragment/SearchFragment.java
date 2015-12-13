@@ -1,23 +1,17 @@
 package io.goodway.view.fragment;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Places;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +24,7 @@ import io.goodway.model.User;
 /**
  * Created by sauray on 14/03/15.
  */
-public class SearchFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SearchFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
 
     private View root;
 
@@ -49,10 +43,9 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_search, container, false);
-
+        int item = getArguments().getInt("ITEM", 1);
         request = getArguments().getInt("REQUEST");
         user = getArguments().getParcelable("USER");
-        int item = getArguments().getInt("ITEM", 1);
         mainActivity = (MainActivity) getActivity();
 
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);
@@ -64,6 +57,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             tabLayout.getTabAt(i).setIcon(icons[i]);
         }
+
         viewPager.setCurrentItem(item);
         return root;
     }

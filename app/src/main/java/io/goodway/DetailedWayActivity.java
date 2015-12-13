@@ -31,6 +31,7 @@ import java.util.Arrays;
 import io.goodway.model.adapter.WayPartAdapter;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
+import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.Way;
 import io.goodway.navitia_android.WayPart;
 
@@ -53,6 +54,7 @@ public class DetailedWayActivity extends AppCompatActivity{
     // Model
     private Way way;
     private String mail, password;
+    private TextView duration;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -83,6 +85,9 @@ public class DetailedWayActivity extends AppCompatActivity{
                 MODE_PRIVATE);
         mail = shared_preferences.getString("mail", null);
         password = shared_preferences.getString("password", null);
+
+        duration = (TextView) findViewById(R.id.duration);
+        duration.setText(WayPartAdapter.secondToStr(this, way.getDuration()));
 
         if(way.getParts()!=null){
             for(WayPart p : way.getParts()){
@@ -120,13 +125,6 @@ public class DetailedWayActivity extends AppCompatActivity{
                 finish();
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
     }
 
     @Override

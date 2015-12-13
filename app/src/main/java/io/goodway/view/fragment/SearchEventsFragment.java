@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.style.CharacterStyle;
@@ -83,12 +84,27 @@ public class SearchEventsFragment extends Fragment implements SwipeRefreshLayout
             }
         }, new ErrorAction() {
             @Override
-            public void action() {
+            public void action(int length) {
+                switch (length) {
+                    case 0:
+                        error.setText(R.string.no_events);
+                        break;
+                    case -1:
+                        error.setText(R.string.connexion_error);
+                        break;
+                }
                 error.setVisibility(View.VISIBLE);
                 swipeLayout.setRefreshing(false);
             }
         }, mail, password);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 3);
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return adapter.get(position).size();
+            }
+        });
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
         swipeLayout = (SwipeRefreshLayout) root.findViewById(R.id.swipeRefreshLayout);
@@ -112,7 +128,15 @@ public class SearchEventsFragment extends Fragment implements SwipeRefreshLayout
             }
         }, new ErrorAction() {
             @Override
-            public void action() {
+            public void action(int length) {
+                switch (length){
+                    case 0:
+                        error.setText(R.string.no_events);
+                        break;
+                    case -1:
+                        error.setText(R.string.connexion_error);
+                        break;
+                }
                 swipeLayout.setRefreshing(false);
                 error.setVisibility(View.VISIBLE);
             }

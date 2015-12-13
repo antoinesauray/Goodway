@@ -29,20 +29,26 @@
 
                 <TextView
                     android:id="@+id/date"
+                    android:background="@drawable/goodway_ripple"
                     android:onClick="onClick"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    android:textColor="@android:color/white"
+                    android:padding="8dp"
+                    android:textColor="@color/primary"
+                    android:elevation="@dimen/card_elevation"
                     android:layout_marginRight="16dp"/>
 
                 <TextView
                     android:id="@+id/time"
+                    android:background="@drawable/goodway_ripple"
                     android:onClick="onClick"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="8dp"
                     android:textSize="16sp"
-                    android:textColor="@android:color/white"/>
+                    android:elevation="@dimen/card_elevation"
+                    android:textColor="@color/primary"/>
             </LinearLayout>
 
         </android.support.design.widget.AppBarLayout>

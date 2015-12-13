@@ -177,10 +177,19 @@ public class FriendsActivity extends AppCompatActivity {
                 }
             }, new ErrorAction() {
                 @Override
-                public void action() {
-                    swipeLayout.setRefreshing(false);
-                    error.setText(R.string.no_friends);
-                    error.setVisibility(View.VISIBLE);
+                public void action(int length) {
+                    switch (length){
+                        case 0:
+                            swipeLayout.setRefreshing(false);
+                            error.setText(R.string.no_friends);
+                            error.setVisibility(View.VISIBLE);
+                            break;
+                        case -1:
+                            swipeLayout.setRefreshing(false);
+                            error.setText(R.string.connexion_error);
+                            error.setVisibility(View.VISIBLE);
+                            break;
+                    }
                 }
             }, mail, password);
 
@@ -206,9 +215,17 @@ public class FriendsActivity extends AppCompatActivity {
                 }
             }, new ErrorAction() {
                 @Override
-                public void action() {
+                public void action(int length) {
+                    switch (length){
+                        case 0:
+                            error.setText(R.string.no_friends);
+                            break;
+                        case -1:
+
+                            error.setText(R.string.connexion_error);
+                            break;
+                    }
                     swipeLayout.setRefreshing(false);
-                    error.setText(R.string.no_friends);
                     error.setVisibility(View.VISIBLE);
                 }
             },mail, password);
@@ -251,9 +268,16 @@ public class FriendsActivity extends AppCompatActivity {
                 }
             }, new ErrorAction() {
                 @Override
-                public void action() {
+                public void action(int length) {
+                    switch (length){
+                        case 0:
+                            error.setText(R.string.no_friend_requests);
+                            break;
+                        case -1:
+                            error.setText(R.string.connexion_error);
+                            break;
+                    }
                     swipeLayout.setRefreshing(false);
-                    error.setText(R.string.no_friend_requests);
                     error.setVisibility(View.VISIBLE);
                 }
             },mail, password);
@@ -280,9 +304,16 @@ public class FriendsActivity extends AppCompatActivity {
                 }
             }, new ErrorAction() {
                 @Override
-                public void action() {
+                public void action(int length) {
+                    switch (length){
+                        case 0:
+                            error.setText(R.string.no_friend_requests);
+                            break;
+                        case -1:
+                            error.setText(R.string.connexion_error);
+                            break;
+                    }
                     swipeLayout.setRefreshing(false);
-                    error.setText(R.string.no_friend_requests);
                     error.setVisibility(View.VISIBLE);
                 }
             }, mail, password);

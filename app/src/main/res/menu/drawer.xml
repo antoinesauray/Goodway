@@ -10,14 +10,5 @@
                 android:title="@string/friends"/>
         </menu>
     </item>
-    <item
-        android:id="@+id/option_subheader"
-        android:title="@string/settings">
-        <menu>
-            <item
-                android:id="@+id/preferences"
-                android:title="@string/preferences"/>
-        </menu>
-    </item>
 
 </menu>

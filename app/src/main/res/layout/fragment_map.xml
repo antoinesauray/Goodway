@@ -44,10 +44,11 @@
                 android:padding="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
+                android:background="@drawable/goodway_ripple"
                 android:gravity="center_vertical"
                 android:onClick="changeLocation"
                 android:textColor="@color/primary"
+                android:elevation="@dimen/card_elevation"
                 android:text="@string/your_location"/>
         </LinearLayout>
 
@@ -69,11 +70,12 @@
                 android:padding="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
+                android:background="@drawable/goodway_ripple"
                 android:onClick="changeLocation"
                 android:layout_marginTop="16dp"
                 android:gravity="center_vertical"
                 android:textColor="@color/primary"
+                android:elevation="@dimen/card_elevation"
                 android:text="Choisir destination"/>
 
         </LinearLayout>

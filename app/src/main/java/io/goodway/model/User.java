@@ -6,6 +6,8 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import io.goodway.navitia_android.Address;
+
 /**
  * Created by root on 6/13/15.
  */
@@ -34,6 +36,10 @@ public class User implements Parcelable {
         this.lname = lname;
         this.sharesHome = sharesHome;
         this.sharesWork = sharesWork;
+        homeLat=null;
+        homeLon=null;
+        workLat=null;
+        workLon=null;
         this.friend=friend;
         Log.d("sharesHome="+sharesHome, "sharesHome user="+fname+" "+lname);
     }
@@ -43,6 +49,10 @@ public class User implements Parcelable {
         this.lname = lname;
         this.sharesHome = sharesHome;
         this.sharesWork = sharesWork;
+        homeLat=null;
+        homeLon=null;
+        workLat=null;
+        workLon=null;
         this.friend=friend;
         Log.d("sharesHome="+sharesHome, "sharesHome user="+fname+" "+lname);
     }
@@ -54,6 +64,10 @@ public class User implements Parcelable {
         this.mail = mail;
         this.sharesHome = sharesHome;
         this.sharesWork = sharesWork;
+        homeLat=null;
+        homeLon=null;
+        workLat=null;
+        workLon=null;
         this.friend=friend;
         Log.d("sharesHome="+sharesHome, "sharesHome user="+fname+" "+lname);
     }
@@ -93,25 +107,25 @@ public class User implements Parcelable {
 
     public boolean sharesWork(){return sharesWork;}
 
+    public void setHome(Address addr){
+        this.homeLat = addr.getLatitude();
+        this.homeLon = addr.getLongitude();
+    }
+
+    public void setWork(Address addr){
+        this.workLon = addr.getLatitude();
+        this.workLon = addr.getLongitude();
+    }
+
     public boolean isFriend(){return friend;}
 
     public void setSharesHome(boolean sharesHome){this.sharesHome=sharesHome;}
 
     public void setSharesWork(boolean sharesWork){this.sharesWork=sharesWork;}
 
-    public LatLng getHome(){
-        if(homeLat!=null && homeLon!=null) {
-            return new LatLng(homeLat, homeLon);
-        }
-        return null;
-    }
+    public LatLng getHome(){return new LatLng(homeLat, homeLon);}
 
-    public LatLng getWork(){
-        if(workLat!=null && workLon!=null) {
-            return new LatLng(workLat, workLon);
-        }
-        return null;
-    }
+    public LatLng getWork(){return new LatLng(workLat, workLon);}
 
     @Override
     public int describeContents() {
