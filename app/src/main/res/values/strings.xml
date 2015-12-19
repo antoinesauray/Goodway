@@ -142,4 +142,10 @@
     <string name="noCarSharing">Indisponible</string>
     <string name="noUber">Indisponible</string>
     <string name="noBike">Indisponible</string>
+
+    <string name="locations">Adresses</string>
+    <string name="recent_activity">Activité récente</string>
+    <string name="add_address">Ajouter une adresse</string>
+
+    <string name="request_places">Demande des adresse</string>
 </resources>

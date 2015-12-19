@@ -1,46 +1,27 @@
 package io.goodway;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.w3c.dom.Text;
-
 import io.goodway.model.User;
-import io.goodway.model.adapter.LocationAdapter;
 import io.goodway.model.callback.AddressSelected;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
-import io.goodway.navitia_android.Way;
-import io.goodway.view.PercentView;
+import io.goodway.navitia_android.UserLocation;
 
 
 /**
@@ -66,9 +47,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
     private User user;
 
     private String mail, password;
-    private RecyclerView recyclerView;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private LocationAdapter adapter;
+    private LinearLayout locations;
 
     private boolean self;
 
@@ -90,16 +69,15 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 MODE_PRIVATE);
         mail = shared_preferences.getString("mail", null);
         password = shared_preferences.getString("password", null);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        //swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        //swipeRefreshLayout.setOnRefreshListener(this);
-        adapter = new LocationAdapter(this);
+
+        locations = (LinearLayout) findViewById(R.id.locations);
+
         if(self){
-            GoodwayHttpsClient.getSelfLocations(this, new Action<Address>() {
+            GoodwayHttpsClient.getSelfLocations(this, new Action<UserLocation>() {
                 @Override
-                public void action(Address e) {
+                public void action(UserLocation e) {
                     Log.d("adding address", "adding address:"+e.toString());
-                    adapter.add(e);
+                    addUserLocation(e);
                 }
             }, new ErrorAction() {
                 @Override
@@ -109,17 +87,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             }, mail, password, user.getFirstName());
         }
         else if(user.isFriend()){
-            GoodwayHttpsClient.getUserLocations(this, new Action<Address>() {
-                @Override
-                public void action(Address e) {
-                    adapter.add(e);
-                }
-            }, new ErrorAction() {
-                @Override
-                public void action(int length) {
 
-                }
-            }, mail, password, user.getFirstName(), user.getId());
         }
         else{
             findViewById(R.id.not_friend).setVisibility(View.VISIBLE);
@@ -171,5 +139,27 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
     @Override
     public void action(Address address) {
 
+    }
+
+    public void addAddress(View v){
+
+    }
+
+    private void addUserLocation(final UserLocation userLocation){
+        View location = getLayoutInflater().inflate(R.layout.view_location, null);
+        location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ProfileActivity.this, userLocation.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        ((TextView)location.findViewById(R.id.name)).setText(userLocation.toString());
+        if(userLocation.shared()){
+            ((TextView)location.findViewById(R.id.shared)).setText("partagé");
+        }
+        else{
+            ((TextView)location.findViewById(R.id.shared)).setText("caché");
+        }
+        locations.addView(location, 1);
     }
 }

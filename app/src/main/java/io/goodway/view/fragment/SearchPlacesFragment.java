@@ -1,11 +1,6 @@
 package io.goodway.view.fragment;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -23,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -38,9 +32,7 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 
 import io.goodway.MainActivity;
-import io.goodway.ProfileActivity;
 import io.goodway.R;
-import io.goodway.SetLocationActivity;
 import io.goodway.model.User;
 import io.goodway.model.adapter.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;
@@ -48,8 +40,7 @@ import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
-import io.goodway.navitia_android.Home;
-import io.goodway.navitia_android.Work;
+import io.goodway.navitia_android.UserLocation;
 
 
 /**
@@ -117,9 +108,9 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
             }
         });
         recyclerView.setAdapter(searchAdapter);
-        GoodwayHttpsClient.getSelfLocations(getActivity(), new Action<Address>() {
+        GoodwayHttpsClient.getSelfLocations(getActivity(), new Action<UserLocation>() {
             @Override
-            public void action(Address e) {
+            public void action(UserLocation e) {
                 searchAdapter.add(e);
             }
         }, new ErrorAction() {

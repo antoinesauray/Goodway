@@ -21,15 +21,19 @@ import android.widget.Toast;
 
 import com.cocosw.bottomsheet.BottomSheet;
 
+import java.util.ArrayList;
+
 import io.goodway.MainActivity;
 import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.model.adapter.UserAdapter;
+import io.goodway.model.callback.FinishCallback;
 import io.goodway.model.callback.UserCallback;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
+import io.goodway.navitia_android.UserLocation;
 
 
 /**
@@ -49,6 +53,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
     private int request;
     private String mail, password;
     private static final CharacterStyle STYLE_BOLD = new StyleSpan(Typeface.BOLD);
+    private ArrayList<UserLocation> userLocations;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,17 +74,39 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
         adapter = new UserAdapter(new UserCallback() {
             @Override
             public void action(final User u) {
-                BottomSheet.Builder sheet = new BottomSheet.Builder(getActivity()).title(getString(R.string.places)+ " "+getString(R.string.linked_to)+" "+u.getFirstName()).listener(new DialogInterface.OnClickListener() {
+                final BottomSheet.Builder sheet = new BottomSheet.Builder(getActivity()).title(getString(R.string.places)+ " "+getString(R.string.linked_to)+" "+u.getFirstName()).listener(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                        }
+                        finish(userLocations.get(which-1));
                     }
                 });
-                int i=0;
+                final ProgressDialog dialog = new ProgressDialog(getActivity());
+                dialog.setMessage(getString(R.string.request_places));
+                dialog.setProgressStyle(dialog.STYLE_SPINNER);
+                dialog.show();
+                userLocations = new ArrayList<>();
+                GoodwayHttpsClient.getUserLocations(getActivity(), new Action<UserLocation>() {
+                    @Override
+                    public void action(UserLocation e) {
+                        userLocations.add(e);
+                        sheet.sheet(userLocations.size(), e.getName());
+                    }
+                }, new ErrorAction() {
+                    @Override
+                    public void action(int length) {
+                        dialog.dismiss();
+                        Toast.makeText(getActivity(), R.string.connexion_error, Toast.LENGTH_SHORT).show();
+                    }
+                }, new FinishCallback() {
+                    @Override
+                    public void action() {
+                        dialog.dismiss();
+                        sheet.show();
+                    }
+                }, mail, password, u.getFirstName(), u.getId());
+
                 // add the locations from https request
-                sheet.show();
+
             }
         }, mail, password);
 

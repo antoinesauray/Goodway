@@ -69,7 +69,7 @@ public class DetailedWayActivity extends AppCompatActivity{
         Bundle extras = this.getIntent().getExtras();
         way = extras.getParcelable("WAY");
 
-        toolbar.setTitle(way.getFrom().getName(this) + " vers " + way.getTo().getName(this));
+        toolbar.setTitle(way.getFrom().getName() + " vers " + way.getTo().getName());
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 

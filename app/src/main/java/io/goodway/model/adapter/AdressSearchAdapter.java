@@ -58,7 +58,7 @@ public class AdressSearchAdapter extends RecyclerView.Adapter<AdressSearchAdapte
         // - replace the contents of the view with that element
         holder.setItem(mDataset.get(position));
         Address a = mDataset.get(position);
-        holder.name.setText(a.getName(activity));
+        holder.name.setText(a.getName());
         //holder.icon.setImageDrawable(activity.getResources().getDrawable(a.getIcon(), activity.getTheme()));
     }
 
