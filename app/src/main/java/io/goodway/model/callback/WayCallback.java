@@ -1,5 +1,7 @@
 package io.goodway.model.callback;
 
+import android.view.View;
+
 import io.goodway.navitia_android.Way;
 
 /**
@@ -7,5 +9,5 @@ import io.goodway.navitia_android.Way;
  */
 public interface WayCallback {
 
-    public void action(Way w);
+    public void action(View v, Way w);
 }

@@ -159,40 +159,6 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
                 dialog.setMessage(getString(R.string.updating_share_options));
                 dialog.setProgressStyle(dialog.STYLE_SPINNER);
                 dialog.show();
-                switch (place){
-                    case ProfileActivity.HOME:
-                        GoodwayHttpsClient.updateHome(SetLocationActivity.this, new Action<Void>() {
-                            @Override
-                            public void action(Void e) {
-                                dialog.dismiss();
-                                returnHome(address);
-                            }
-                        }, new ErrorAction() {
-                            @Override
-                            public void action(int length) {
-                                dialog.dismiss();
-                                Toast.makeText(SetLocationActivity.this, R.string.failed_updating_options, Toast.LENGTH_SHORT).show();
-                                returnHome(address);
-                            }
-                        }, mail, password, address.getLatitude(), address.getLongitude());
-                        break;
-                    case ProfileActivity.WORK:
-                        GoodwayHttpsClient.updateWork(SetLocationActivity.this, new Action<Void>() {
-                            @Override
-                            public void action(Void e) {
-                                dialog.dismiss();
-                                returnHome(address);
-                            }
-                        }, new ErrorAction() {
-                            @Override
-                            public void action(int length) {
-                                dialog.dismiss();
-                                Toast.makeText(SetLocationActivity.this, R.string.failed_updating_options, Toast.LENGTH_SHORT).show();
-                                returnHome(address);
-                            }
-                        }, mail, password, address.getLatitude(), address.getLongitude());
-                        break;
-                }
             }
             });
         recyclerView.setAdapter(searchAdapter);

@@ -1,20 +1,19 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:ignore="RtlHardcoded">
+    android:orientation="vertical">
+<android.support.design.widget.CoordinatorLayout
 
-    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <android.support.design.widget.AppBarLayout
-            android:id="@+id/appbar"
-            android:transitionName="@string/transition_way_image"
+            android:id="@+id/appBar"
             android:layout_width="match_parent"
-            android:layout_height="192dp"
+            android:layout_height="?attr/actionBarSize"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
                 <android.support.v7.widget.Toolbar
@@ -24,44 +23,34 @@
                     android:background="@null"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                    app:layout_collapseMode="pin">
-                </android.support.v7.widget.Toolbar>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="bottom"
-                android:gravity="bottom"
-                android:orientation="horizontal">
-            <LinearLayout
+                    app:layout_collapseMode="pin"/>
+        </android.support.design.widget.AppBarLayout>
+</android.support.design.widget.CoordinatorLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_anchor="@id/appBar"
+            app:layout_anchorGravity="bottom|center"
+            android:transitionName="@string/transition_way_card"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/card"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_margin="8dp"
+                layout="@layout/view_way_card"
+                android:layout_gravity="center_horizontal" />
+
+            <android.support.v7.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/semitransparent_grey"
-                android:layout_gravity="bottom"
-                android:gravity="bottom"
-                android:padding="8dp"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:tint="@android:color/white"
-                    android:src="@mipmap/ic_access_time"
-                    android:layout_marginLeft="16dp"/>
-
-                <TextView
-                    android:id="@+id/duration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:textColor="@android:color/white"
-                    android:layout_marginLeft="16dp"/>
-            </LinearLayout>
-            </LinearLayout>
-        </android.support.design.widget.AppBarLayout>
-
-
-        <android.support.v7.widget.RecyclerView
+                android:layout_margin="8dp"
+                android:elevation="@dimen/card_elevation"
+                card_view:cardCornerRadius="@dimen/cardview_default_radius">
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -70,5 +59,6 @@
                 android:dividerHeight="1dp"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
             </android.support.v7.widget.RecyclerView>
-    </android.support.design.widget.CoordinatorLayout>
+            </android.support.v7.widget.CardView>
+        </LinearLayout>
 </LinearLayout>

@@ -2,6 +2,7 @@ package io.goodway.model.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.goodway.R;
+import io.goodway.navitia_android.Address;
+import io.goodway.navitia_android.BusTrip;
 import io.goodway.navitia_android.WayPart;
 
 
@@ -33,18 +36,9 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
     private static final String TAG="LINE_ADAPTER";
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public WayPartAdapter(Activity activity, GridLayoutManager layoutManager) {
+    public WayPartAdapter(Activity activity){
         this.activity = activity;
         mDataset = new ArrayList<WayPart>();
-
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override
-            public int getSpanSize(int position) {
-                //return mDataset.get(position).getSpans();
-                return 3;
-            }
-        });
-
     }
 
     // Create new views (invoked by the layout manager)
@@ -62,20 +56,38 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        WayPart way = mDataset.get(position);
-        holder.setItem(way);
-        Log.d("way.getLocaleType()", way.getType());
-        holder.action.setText(way.getLabel(activity));
-        holder.time.setText(secondToStr(activity, way.getDuration()));
-
-        switch (way.getWayPartType()){
+        WayPart wayPart = mDataset.get(position);
+        holder.setItem(wayPart);
+        switch (wayPart.getWayPartType()){
             case BusTrip:
-                holder.img.setImageResource(R.mipmap.ic_direction_bus_black);
+                BusTrip trip = (BusTrip)wayPart;
+                holder.action.setText(trip.getRoute().getLine().getName());
+                holder.time.setText(Address.secondToStr(activity, wayPart.getDuration()));
+                holder.destination.setText(wayPart.getTo().toString());
+                try{
+                    holder.destination.setBackgroundColor(Color.parseColor(trip.getRoute().getLine().getColor()));
+                }
+                catch(IllegalArgumentException e){
+                    holder.destination.setTextColor(activity.getResources().getColor(android.R.color.primary_text_light));
+                }
                 break;
             case Walking:
-                holder.img.setImageResource(R.mipmap.ic_direction_walk_black);
+                holder.action.setText(wayPart.getAction(activity));
+                holder.time.setText(Address.secondToStr(activity, wayPart.getDuration()));
+                holder.destination.setText(wayPart.getTo().toString());
+                break;
+            case Waiting:
+                holder.action.setText(wayPart.getAction(activity));
+                holder.time.setText(Address.secondToStr(activity, wayPart.getDuration()));
+                holder.destination.setVisibility(View.INVISIBLE);
+                break;
+            case Transfer:
+                holder.action.setText(wayPart.getAction(activity));
+                holder.time.setText(Address.secondToStr(activity, wayPart.getDuration()));
+                holder.destination.setVisibility(View.INVISIBLE);
                 break;
         }
+        Log.d("wayPart.getLocaleType()", wayPart.getType());
     }
 
     public void add(WayPart item) {
@@ -90,28 +102,6 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
         mDataset.clear();
         notifyItemRangeRemoved(0, size);
     }
-    public static String secondToStr(Context c, int seconds){
-        int[] times = WayPart.splitToComponentTimes(seconds);
-        String timeStr="";
-        if(times[0]!=0){
-            if(times[1]!=0){
-                timeStr+=times[0]+":";
-            }
-            else{
-                timeStr+=times[1]+" "+c.getString(R.string.hours);
-            }
-        }
-        if(times[1]!=0){
-            if(times[0]!=0){
-                timeStr+=times[1];
-            }
-            else{
-                timeStr+=times[1]+" "+c.getString(R.string.minutes);
-            }
-        }
-        if(timeStr==""){timeStr="0 "+c.getString(R.string.minutes);}
-        return timeStr;
-    }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
@@ -121,8 +111,7 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         // each data item is just a string in this case
-        ImageView img;
-        TextView time, action;
+        TextView time, action, destination;
         WayPart item;
         Activity activity;
 
@@ -131,7 +120,7 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
             this.activity = activity;
             time = (TextView) lyt_main.findViewById(R.id.time);
             action = (TextView) lyt_main.findViewById(R.id.action);
-            img = (ImageView) lyt_main.findViewById(R.id.img);
+            destination = (TextView) lyt_main.findViewById(R.id.destination);
         }
         public void setItem(WayPart item) {
             this.item = item;

@@ -101,7 +101,7 @@ public class SearchEventsFragment extends Fragment implements SwipeRefreshLayout
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                return adapter.get(position).size();
+                return 1;
             }
         });
         recyclerView.setLayoutManager(layoutManager);

@@ -119,8 +119,8 @@ public class EventActivity extends AppCompatActivity {
         actionBar.setHomeButtonEnabled(true);
 
         date = (TextView) findViewById(R.id.date);
-        String[] dateSplit = Address.toHumanTime(event.getDate());
-        date.setText(dateSplit[3] + " " + formatMonth(dateSplit[1]) + " " + dateSplit[0] + " "+getString(R.string.at)+" " + dateSplit[3] + "h" + dateSplit[4]);
+        String[] dateSplit = Address.splitIso8601(event.getS_time());
+        date.setText(dateSplit[2] + " " + formatMonth(dateSplit[1]) + " " + dateSplit[0] + " "+getString(R.string.at)+" " + dateSplit[3] + "h" + dateSplit[4]);
 
         webView.getSettings().setJavaScriptEnabled(true);
 

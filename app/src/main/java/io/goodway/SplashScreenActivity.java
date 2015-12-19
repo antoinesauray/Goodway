@@ -129,14 +129,8 @@ public class SplashScreenActivity extends AppCompatActivity {
             String mail = shared_preferences.getString("mail", null);
             String password = shared_preferences.getString("password", null);
             int id = shared_preferences.getInt("id", -1);
-            String fname = shared_preferences.getString("firstname", null);
-            String lname = shared_preferences.getString("lastname", null);
-            boolean shareshome = shared_preferences.getBoolean("shareshome", false);
-            boolean shareswork = shared_preferences.getBoolean("shareswork", false);
-            Float homelat = shared_preferences.getFloat("homelat", 0);
-            Float homelon = shared_preferences.getFloat("homelon", 0);
-            Float worklat = shared_preferences.getFloat("worklat", 0);
-            Float workLon = shared_preferences.getFloat("worklon", 0);
+            String fname = shared_preferences.getString("fname", null);
+            String lname = shared_preferences.getString("lname", null);
 
             logo = (ImageView) root.findViewById(R.id.logo);
             if (mail != null && password != null && id != -1 && fname != null && lname != null) {
@@ -145,7 +139,6 @@ public class SplashScreenActivity extends AppCompatActivity {
                     GoodwayHttpsClient.authenticate(getActivity(), new Action<User>() {
                         @Override
                         public void action(User e) {
-                            Log.d("user authenticated", "authentication : " + e.getHome() + " ; " + e.getWork());
                             start(e);
                             connectedAs.setText(e.getMail());
                         }
@@ -156,7 +149,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                         }
                     }, mail, password);
                 } else {
-                    start(new User(id, fname, lname, mail, shareshome, shareswork, homelat.doubleValue(), homelon.doubleValue(), worklat.doubleValue(), workLon.doubleValue(), false));
+                    start(new User(id, fname, lname, mail, false));
                     connectedAs.setText(mail);
                 }
 
@@ -233,10 +226,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                         editor.putString("mail", mail.getText().toString());
                         editor.putString("password", password.getText().toString());
                         editor.putInt("id", u.getId());
-                        editor.putString("firstname", u.getFirstName());
-                        editor.putString("lastname", u.getLastName());
-                        editor.putBoolean("shareshome", u.sharesHome());
-                        editor.putBoolean("shareswork", u.sharesWork());
+                        editor.putString("fname", u.getFirstName());
+                        editor.putString("lname", u.getLastName());
                         editor.commit();
                         Intent i = new Intent(getActivity(), MainActivity.class);
                         i.putExtra("USER", u);
@@ -382,10 +373,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                                 editor.putString("mail", mail.getText().toString());
                                 editor.putString("password", password.getText().toString());
                                 editor.putInt("id", u.getId());
-                                editor.putString("firstname", u.getFirstName());
-                                editor.putString("lastname", u.getLastName());
-                                editor.putBoolean("shareshome", u.sharesHome());
-                                editor.putBoolean("shareswork", u.sharesWork());
+                                editor.putString("fname", u.getFirstName());
+                                editor.putString("lname", u.getLastName());
                                 editor.commit();
                                 Intent i = new Intent(getActivity(), MainActivity.class);
                                 i.putExtra("USER", u);

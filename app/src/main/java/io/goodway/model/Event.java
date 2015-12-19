@@ -8,8 +8,8 @@ import android.os.Parcelable;
  */
 public class Event implements Parcelable {
 
-    private int id, size;
-    private String name, url, date;
+    private int id;
+    private String name, s_time, e_time, url;
     private double latitude, longitude;
 
     public final static String BASEURL="http://gorilla.goodway.io/event_";
@@ -25,14 +25,14 @@ public class Event implements Parcelable {
                 }
             };
 
-    public Event(int id, String name, String url, String date, double latitude, double longitude, int size){
+    public Event(int id, String name, String url, String s_time, String e_time, double latitude, double longitude){
         this.id = id;
         this.name = name;
         this.url = url;
-        this.date = date;
+        this.s_time = s_time;
+        this.e_time = e_time;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.size = size;
     }
 
     public Event(Parcel in){
@@ -47,11 +47,11 @@ public class Event implements Parcelable {
         return url;
     }
 
-    public String getDate(){return date;}
+    public String getS_time(){return s_time;}
+
+    public String getE_time(){return e_time;}
 
     public int getId(){return id;}
-
-    public int size(){return size;}
 
     public double getLatitude(){return latitude;}
     public double getLongitude(){return longitude;}
@@ -66,18 +66,18 @@ public class Event implements Parcelable {
         dest.writeInt(id);
         dest.writeString(name);
         dest.writeString(url);
-        dest.writeString(date);
+        dest.writeString(s_time);
+        dest.writeString(e_time);
         dest.writeDouble(latitude);
         dest.writeDouble(longitude);
-        dest.writeInt(size);
     }
     private void readFromParcel(Parcel in) {
         id = in.readInt();
         name = in.readString();
         url = in.readString();
-        date = in.readString();
+        s_time = in.readString();
+        e_time = in.readString();
         latitude = in.readDouble();
         longitude = in.readDouble();
-        size = in.readInt();
     }
 }

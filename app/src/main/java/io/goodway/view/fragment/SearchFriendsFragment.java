@@ -74,84 +74,11 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case 0:
-                                // Home
-                                if(u.sharesHome()) {
-                                    final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                                    progressDialog.setMessage(getString(R.string.request_location));
-                                    progressDialog.setProgressStyle(progressDialog.STYLE_SPINNER);
-                                    progressDialog.show();
-                                    GoodwayHttpsClient.getUserHome(getActivity(), new Action<Address>() {
-                                        @Override
-                                        public void action(Address e) {
-                                            progressDialog.dismiss();
-                                            if (e != null) {
-                                                finish(e);
-                                            } else {
-                                                Toast.makeText(SearchFriendsFragment.this.getActivity(), u.getFirstName() + " " + getString(R.string.did_not_give_location), Toast.LENGTH_SHORT).show();
-                                            }
-
-                                        }
-                                    }, new ErrorAction() {
-                                        @Override
-                                        public void action(int length) {
-                                            progressDialog.dismiss();
-                                            new AlertDialog.Builder(SearchFriendsFragment.this.getActivity())
-                                                    .setTitle(R.string.failure)
-                                                    .setMessage(u.getFirstName()+" "+getString(R.string.did_not_give_location))
-                                                    .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                        }
-                                                    })
-                                                    .show();
-                                        }
-                                    }, mail, password, u.getId(), u.getFirstName());
-                                }
-                                break;
-                            case 1:
-                                // Home
-                                if(u.sharesWork()) {
-                                    final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                                    progressDialog.setMessage(getString(R.string.request_location));
-                                    progressDialog.setProgressStyle(progressDialog.STYLE_SPINNER);
-                                    progressDialog.show();
-                                    GoodwayHttpsClient.getUserWork(getActivity(), new Action<Address>() {
-                                        @Override
-                                        public void action(Address e) {
-                                            progressDialog.dismiss();
-                                            if(e!=null) {
-                                                finish(e);
-                                            }
-                                            else{
-                                                Toast.makeText(SearchFriendsFragment.this.getActivity(), u.getFirstName()+" "+getString(R.string.did_not_give_location), Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    }, new ErrorAction() {
-                                        @Override
-                                        public void action(int length) {
-                                            progressDialog.dismiss();
-                                            new AlertDialog.Builder(SearchFriendsFragment.this.getActivity())
-                                                    .setTitle(R.string.failure)
-                                                    .setMessage(u.getFirstName()+" "+getString(R.string.did_not_give_location))
-                                                    .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                                        public void onClick(DialogInterface dialog, int which) {
-                                                        }
-                                                    })
-                                                    .show();
-                                        }
-                                    }, mail, password, u.getId(), u.getFirstName());
-                                }
-                                break;
                         }
                     }
                 });
                 int i=0;
-                if(u.sharesHome()) {
-                    sheet.sheet(i, R.string.home);
-                    i++;
-                }
-                if(u.sharesWork()) {
-                    sheet.sheet(i, R.string.work);
-                }
+                // add the locations from https request
                 sheet.show();
             }
         }, mail, password);

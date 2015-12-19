@@ -82,11 +82,11 @@
     <string name="to">Vers</string>
 
     <string name="trip">Voyage</string>
-    <string name="store_pass">3AuZT55u2y4309ji6PKS7NvPvuZyQsHAcqlD8NUR</string>
+    <string name="store_pass">)qiJ7Y^BrX2nEGX2Tte2</string>
 
     <!-- transitions -->
     <string name="transition_event_image">transition_event_image</string>
-    <string name="transition_way_image">transition_way_image</string>
+    <string name="transition_way_card">transition_way_card</string>
 
     <string name="bustrip">Bus</string>
     <string name="waiting">Attendre</string>
@@ -131,4 +131,15 @@
 
     <string name="work_not_set">Travail non renseigné</string>
     <string name="set_address">Voulez-vous renseigner cette addresse ?</string>
+
+    <!-- Providers -->
+    <string name="navitia">Navitia</string>
+    <string name="carSharing">Covoiturage</string>
+    <string name="uber">Uber</string>
+    <string name="bike">Vélo</string>
+
+    <string name="noNavitia">Aucun itinéraire Navitia</string>
+    <string name="noCarSharing">Indisponible</string>
+    <string name="noUber">Indisponible</string>
+    <string name="noBike">Indisponible</string>
 </resources>

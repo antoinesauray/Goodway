@@ -9,8 +9,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -34,6 +36,7 @@ import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.Way;
 import io.goodway.navitia_android.WayPart;
+import io.goodway.view.DividerItemDecoration;
 
 /**
  * Created by antoine on 8/26/15.
@@ -46,15 +49,15 @@ public class DetailedWayActivity extends AppCompatActivity{
 
     private TextView from, to;
 
-
     private RecyclerView recyclerView;
-    private GridLayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
     private WayPartAdapter adapter;
+
+    private CardView card;
 
     // Model
     private Way way;
     private String mail, password;
-    private TextView duration;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -73,11 +76,25 @@ public class DetailedWayActivity extends AppCompatActivity{
         recyclerView = (RecyclerView) findViewById(R.id.list);
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
 
+        card = (CardView) findViewById(R.id.card);
+
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        View v = getLayoutInflater().inflate(R.layout.view_way, null);
+        ((TextView)v.findViewById(R.id.description)).setText(way.getFrom().toString() + " - " + way.getTo().toString());
+        String[] departureTime = Address.splitIso8601(way.getDepartureDateTime());
+        String[] arrivalTime = Address.splitIso8601(way.getArrivalDateTime());
+        ((TextView) v.findViewById(R.id.departure)).setText(departureTime[3] + ":" + departureTime[4]);
+        ((TextView)v.findViewById(R.id.arrival)).setText(arrivalTime[3] + ":" + arrivalTime[4]);
+        ((TextView) v.findViewById(R.id.duration)).setText(Address.secondToStr(this, way.getDuration()));
+        card.addView(v);
+
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        layoutManager = new GridLayoutManager(this, 3);
-        adapter = new WayPartAdapter(this, layoutManager);
+        layoutManager = new LinearLayoutManager(this);
+        adapter = new WayPartAdapter(this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
@@ -86,8 +103,6 @@ public class DetailedWayActivity extends AppCompatActivity{
         mail = shared_preferences.getString("mail", null);
         password = shared_preferences.getString("password", null);
 
-        duration = (TextView) findViewById(R.id.duration);
-        duration.setText(WayPartAdapter.secondToStr(this, way.getDuration()));
 
         if(way.getParts()!=null){
             for(WayPart p : way.getParts()){
@@ -96,33 +111,13 @@ public class DetailedWayActivity extends AppCompatActivity{
             }
         }
 
-        if(way.getImgUrl()!=null) {
-            Picasso.with(this).load(way.getImgUrl())
-                    .error(R.mipmap.ic_event_black_36dp).into(new Target() {
-
-                @Override
-                public void onPrepareLoad(Drawable arg0) {
-                }
-
-                @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom arg1) {
-                    // TODO Create your drawable from bitmap and append where you like.
-                    appBarLayout.setBackground(new BitmapDrawable(getResources(), bitmap));
-                }
-
-                @Override
-                public void onBitmapFailed(Drawable arg0) {
-                }
-            });
-        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -137,12 +132,7 @@ public class DetailedWayActivity extends AppCompatActivity{
     }
 
     public void fabClick(View v){
-        GoodwayHttpsClient.sendRoute(this, new Action<Integer>() {
-            @Override
-            public void action(Integer e) {
-                Toast.makeText(DetailedWayActivity.this, "route sent", Toast.LENGTH_SHORT).show();
-            }
-        }, null, mail, password, Arrays.asList(2), way);
+
     }
 
     private LatLngBounds getCenter(LatLng from, LatLng to){

@@ -44,10 +44,10 @@
                 android:padding="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/goodway_ripple"
                 android:gravity="center_vertical"
                 android:onClick="changeLocation"
                 android:textColor="@color/primary"
+                android:background="@drawable/goodway_ripple"
                 android:elevation="@dimen/card_elevation"
                 android:text="@string/your_location"/>
         </LinearLayout>
@@ -70,11 +70,11 @@
                 android:padding="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/goodway_ripple"
                 android:onClick="changeLocation"
                 android:layout_marginTop="16dp"
                 android:gravity="center_vertical"
                 android:textColor="@color/primary"
+                android:background="@drawable/goodway_ripple"
                 android:elevation="@dimen/card_elevation"
                 android:text="Choisir destination"/>
 
@@ -103,7 +103,7 @@
             android:layout_marginRight="10dp"
             app:elevation="@dimen/fab_elevation"
             app:borderWidth="0dp"
-            app:rippleColor="@color/accent"
+            app:rippleColor="@android:color/white"
             app:backgroundTint="@color/accent"
             app:layout_anchor="@id/bottom"
             app:layout_anchorGravity="top|right|end"

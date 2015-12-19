@@ -300,7 +300,8 @@ public class MainActivity extends AppCompatActivity{
         intent.putExtra("SELF", true);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
-            startActivityForResult(intent, PROFILE, options.toBundle());
+            startActivityForResult(intent, PROFILE);
+            //startActivityForResult(intent, PROFILE, options.toBundle());
         } else {
             startActivityForResult(intent, PROFILE);
         }

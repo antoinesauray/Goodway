@@ -1,50 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/trip_size"
-    card_view:cardElevation="4dp"
-    card_view:cardCornerRadius="2dp"
-    card_view:cardUseCompatPadding="true">
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <View style="@style/Divider" android:layout_marginLeft="8dp" android:layout_marginRight="8dp"/>
+<LinearLayout 
+    android:orientation="horizontal"
+    android:layout_gravity="center_vertical"
+    android:padding="8dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_direction_bus_black"
+        android:layout_gravity="center_vertical"
+        android:tint="@color/primary"/>
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:transitionName="@string/transition_way_image"
-        android:scaleType="centerCrop" />
-        <ProgressBar
-            android:id="@+id/progressBar"
+        android:layout_gravity="center_vertical"
+        android:paddingLeft="8dp">
+
+        <TextView
+            android:id="@+id/description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"/>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/semitransparent_grey"
-            android:paddingLeft="16dp"
-            android:paddingBottom="16dp"
-            android:layout_alignParentBottom="true">
-            <TextView
-                android:id="@+id/type"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:textColor="@android:color/white"
-                android:text="type trajet"/>
+            android:text="Maison vers Beaujoire"
+            android:textColor="@android:color/primary_text_light"/>
 
         <LinearLayout
-            android:id="@+id/timeLayout"
-            android:layout_marginTop="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -53,20 +43,25 @@
                 android:id="@+id/departure"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:text="departure"
-                android:textColor="@android:color/white"/>
+                android:text="14h00"
+                android:textColor="@android:color/tertiary_text_light"/>
+
             <TextView
                 android:id="@+id/arrival"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:text="arrival"
-                android:textColor="@android:color/white"
-                android:layout_marginLeft="16dp"/>
-
+                android:paddingLeft="8dp"
+                android:text="15h00"
+                android:textColor="@android:color/tertiary_text_light"/>
+            <TextView
+                android:id="@+id/duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:textColor="@color/primary"/>
         </LinearLayout>
-        </LinearLayout>
-    </RelativeLayout>
 
-</android.support.v7.widget.CardView>
+    </LinearLayout>
+
+</LinearLayout>
+</LinearLayout>
