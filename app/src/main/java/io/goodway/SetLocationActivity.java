@@ -68,10 +68,9 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
 
 
     private User currentUser;
-    private int id;
     private String mail, password;
     private String s_name;
-    private boolean shared, update;
+    private boolean shared;
 
     // ----------------------------------- Constants
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -87,8 +86,6 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
         currentUser = extras.getParcelable("USER");
         s_name = extras.getString("s_name");
         shared = extras.getBoolean("shared");
-        update = extras.getBoolean("update", false);
-        id = extras.getInt("id");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
@@ -153,7 +150,7 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
                                                 try {
                                                     Place myPlace = places.get(0);
                                                     LatLng queried_location = myPlace.getLatLng();
-                                                    searchAdapter.add(new Address(prediction.getPrimaryText(STYLE_BOLD).toString(), queried_location.latitude, queried_location.longitude));
+                                                    searchAdapter.add(new Address(prediction.getPrimaryText(STYLE_BOLD).toString(), prediction.getSecondaryText(STYLE_BOLD).toString(), queried_location.latitude, queried_location.longitude));
                                                 } catch (IllegalStateException e) {
                                                 }
 
@@ -193,8 +190,6 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
         returnIntent.putExtra("address", address);
         returnIntent.putExtra("s_name", s_name);
         returnIntent.putExtra("shared", shared);
-        returnIntent.putExtra("id", id);
-        returnIntent.putExtra("update", update);
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }

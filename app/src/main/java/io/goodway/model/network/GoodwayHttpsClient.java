@@ -97,7 +97,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 String lng = jsonObject.optString("st_x");
                 boolean shared = jsonObject.optBoolean("shared");
                 try{
-                    return new UserLocation(id, s_name, a_name, Double.parseDouble(lat), Double.parseDouble(lng), shared);
+                    return new UserLocation(id, s_name, a_name, fname, Double.parseDouble(lat), Double.parseDouble(lng), shared);
                 }
                 catch (NumberFormatException e){
                     return null;
@@ -115,13 +115,13 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 String lat = jsonObject.optString("st_y");
                 String lng = jsonObject.optString("st_x");
                 try{
-                    return new UserLocation(s_name+" ("+fname+")", a_name, Double.parseDouble(lat), Double.parseDouble(lng), true);
+                    return new UserLocation(s_name, a_name, fname, Double.parseDouble(lat), Double.parseDouble(lng), true);
                 }
                 catch (NumberFormatException e){
                     return null;
                 }
             }
-        }, action, error, finish, "https://api.goodway.io/user_locations.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("uid", Integer.toString(id)));
+        }, action, error, finish, "https://api.goodway.io/user_locations.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("id", Integer.toString(id)));
     }
 
     public static AsyncTask addLocation(final Context c, Action<Boolean> action, ErrorAction error, String mail, String password, UserLocation address){

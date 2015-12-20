@@ -105,14 +105,24 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         newAddressFragment = new NewAddressFragment();
         addressFragment.setArguments(bundle);
         newAddressFragment.setArguments(bundle);
-        switchAddressFragment(addressFragment, bundle);
+
+        addressFragment.setArguments(bundle);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction ft1 = fragmentManager.beginTransaction();
+        ft1.addToBackStack(addressFragment.getTag());
+        ft1.replace(R.id.addressContainer, addressFragment);
+        ft1.commitAllowingStateLoss();
 
         activityFragment = new ActivityFragment();
         activityFragment.setArguments(bundle);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.activityContainer, activityFragment);
-        fragmentTransaction.commitAllowingStateLoss();
+        FragmentTransaction ft2 = fragmentManager.beginTransaction();
+        ft2.replace(R.id.activityContainer, activityFragment);
+        ft2.commitAllowingStateLoss();
+    }
+
+    private void popStackBack(){
+        getSupportFragmentManager().popBackStack();
+        current = addressFragment;
     }
 
     @Override
@@ -125,51 +135,8 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if(current==addressFragment){
-                    this.finish();
-                }
-                else if (current==newAddressFragment){
-                    if(!addressFragment.item.equals(newAddressFragment.location)) {
-                        new AlertDialog.Builder(this)
-                                .setTitle(R.string.confirm)
-                                .setMessage(R.string.apply_modifications)
-                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // continue with delete
-                                        newAddressFragment.location.setName(newAddressFragment.name.getText().toString());
-                                        newAddressFragment.location.setShared(newAddressFragment.shared.isChecked());
-                                        final ProgressDialog pd = new ProgressDialog(ProfileActivity.this);
-                                        pd.setMessage(getString(R.string.add_address));
-                                        pd.setProgressStyle(pd.STYLE_SPINNER);
-                                        pd.show();
-                                        currentAsyncTask = GoodwayHttpsClient.updateLocation(ProfileActivity.this, new Action<Boolean>() {
-                                            @Override
-                                            public void action(Boolean e) {
-                                                pd.dismiss();
-                                                switchAddressFragment(addressFragment, bundle);
-                                            }
-                                        }, new ErrorAction() {
-                                            @Override
-                                            public void action(int length) {
-                                                pd.dismiss();
-                                                Toast.makeText(ProfileActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
-                                            }
-                                        }, mail, password, newAddressFragment.location);
-
-                                    }
-                                })
-                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        switchAddressFragment(addressFragment, bundle);
-                                    }
-                                })
-                                .show();
-                    }
-                    else{
-                        switchAddressFragment(addressFragment, bundle);
-                    }
-                }
-
+                checkBeforeLeaving();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -184,8 +151,15 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         if (resultCode == RESULT_OK) {
             switch (requestCode){
                 case SET_ADDRESS:
+                    newAddressFragment.getArguments().remove("location");
                     Address address = data.getParcelableExtra("address");
-                    newAddressFragment.location.setName(address.getName());
+                    String name = data.getStringExtra("s_name");
+                    boolean shared = data.getBooleanExtra("shared", false);
+                    newAddressFragment.name.setText(name);
+                    newAddressFragment.shared.setChecked(shared);
+                    newAddressFragment.location.setName(name);
+                    newAddressFragment.location.setA_name(address.getName());
+                    newAddressFragment.location.setShared(shared);
                     newAddressFragment.location.setLatitude(address.getLatitude());
                     newAddressFragment.location.setLongitude(address.getLongitude());
             }
@@ -195,14 +169,66 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
     @Override
     public void onBackPressed(){
-        if(self){
-            Intent returnIntent = new Intent();
-            returnIntent.putExtra("USER", user);
-            setResult(Activity.RESULT_OK, returnIntent);
-            finish();
+        if(current==newAddressFragment){
+            checkBeforeLeaving();
         }
         else{
-            finish();
+            if(self){
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("USER", user);
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }
+            else{
+                finish();
+            }
+        }
+    }
+
+    private void checkBeforeLeaving(){
+        if(current==addressFragment){
+            this.finish();
+        }
+        else if (current==newAddressFragment){
+            if(addressFragment.item != null && newAddressFragment.location != null && !addressFragment.item.equals(newAddressFragment.location)) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.confirm)
+                        .setMessage(R.string.apply_modifications)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                                newAddressFragment.location.setName(newAddressFragment.name.getText().toString());
+                                newAddressFragment.location.setShared(newAddressFragment.shared.isChecked());
+                                final ProgressDialog pd = new ProgressDialog(ProfileActivity.this);
+                                pd.setMessage(getString(R.string.add_address));
+                                pd.setProgressStyle(pd.STYLE_SPINNER);
+                                pd.show();
+                                currentAsyncTask = GoodwayHttpsClient.updateLocation(ProfileActivity.this, new Action<Boolean>() {
+                                    @Override
+                                    public void action(Boolean e) {
+                                        pd.dismiss();
+                                        popStackBack();
+                                    }
+                                }, new ErrorAction() {
+                                    @Override
+                                    public void action(int length) {
+                                        pd.dismiss();
+                                        Toast.makeText(ProfileActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
+                                    }
+                                }, mail, password, newAddressFragment.location);
+
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                popStackBack();
+                            }
+                        })
+                        .show();
+            }
+            else{
+                popStackBack();
+            }
         }
     }
 
@@ -213,17 +239,15 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
     public void addAddress(View v){
         bundle.remove("location");
-        switchAddressFragment(newAddressFragment, bundle);
+        newAddressFragment.location = null;
+        addressFragment.item=null;
+        switchToNewAdress(bundle);
     }
     public void setAddress(View v){
         if(newAddressFragment.name.getText().toString().trim().length() > 0) {
             Intent i = new Intent(this, SetLocationActivity.class);
             i.putExtra("s_name", newAddressFragment.name.getText().toString());
             i.putExtra("shared", newAddressFragment.shared.isChecked());
-            if(newAddressFragment.location!=null){
-                i.putExtra("update", true);
-                i.putExtra("id", newAddressFragment.location.getId());
-            }
             startActivityForResult(i, SET_ADDRESS);
         }
         else{
@@ -231,18 +255,15 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         }
     }
 
-    private void switchAddressFragment(Fragment fragment, Bundle bundle)
-    {
-        fragment.setArguments(bundle);
+    public void switchToNewAdress(Bundle bundle){
+        newAddressFragment.setArguments(bundle);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.addressContainer, fragment);
+        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+        fragmentTransaction.addToBackStack(newAddressFragment.getTag());
+        fragmentTransaction.replace(R.id.addressContainer, newAddressFragment);
         fragmentTransaction.commitAllowingStateLoss();
-        current = fragment;
-    }
-
-    public void switchToNewAdress(Bundle bundle){
-        switchAddressFragment(newAddressFragment, bundle);
+        current = newAddressFragment;
     }
 
     public static class AddressFragment extends Fragment{
@@ -297,7 +318,22 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 }, mail, password, user.getFirstName());
             }
             else if(user.isFriend()){
-
+                GoodwayHttpsClient.getUserLocations(getActivity(), new Action<UserLocation>() {
+                    @Override
+                    public void action(UserLocation e) {
+                        Log.d("adding address", "adding address:" + e.toString());
+                        addUserLocation(e).setOnClickListener(null);
+                    }
+                }, new ErrorAction() {
+                    @Override
+                    public void action(int length) {
+                        if (length <0) {
+                            View notFound = getLayoutInflater(null).inflate(R.layout.view_way_not_found, null);
+                            ((TextView) notFound.findViewById(R.id.message)).setText(R.string.not_available);
+                            locations.addView(notFound);
+                        }
+                    }
+                }, null, mail, password, user.getFirstName(), user.getId());
             }
             else{
                 rootView.findViewById(R.id.not_friend).setVisibility(View.VISIBLE);
@@ -305,7 +341,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             return rootView;
         }
 
-        private void addUserLocation(final UserLocation userLocation){
+        private View addUserLocation(final UserLocation userLocation){
             View location = getActivity().getLayoutInflater().inflate(R.layout.view_location, null);
             location.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -319,6 +355,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             ((TextView)location.findViewById(R.id.s_name)).setText(userLocation.getName());
             ((TextView)location.findViewById(R.id.name)).setText(userLocation.getA_name());
             locations.addView(location);
+            return location;
         }
     }
 
@@ -351,9 +388,6 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             set = (Button) rootView.findViewById(R.id.set);
             toolbar.setTitle("");
 
-            shared.setOnCheckedChangeListener(this);
-            name.addTextChangedListener(this);
-
             ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
             ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -371,8 +405,19 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 name.setText(location.getName());
                 shared.setChecked(location.shared());
                 set.setText(R.string.change_address);
+                shared.setOnCheckedChangeListener(this);
+                name.addTextChangedListener(this);
+            }
+            else if(location!=null){
+                name.setText(location.getName());
+                shared.setChecked(location.shared());
+                set.setText(R.string.change_address);
+                shared.setOnCheckedChangeListener(this);
+                name.addTextChangedListener(this);
             }
             else{
+                shared.setOnCheckedChangeListener(null);
+                name.removeTextChangedListener(this);
                 name.setText("");
                 shared.setChecked(true);
                 set.setText(R.string.add_address);
