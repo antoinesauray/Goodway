@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity{
             }
         }
         else{
+            /*
             Log.d("SETLOCATION", "SETLOCATION with request="+requestCode);
             if(resultCode == RESULT_OK){
                 Log.d("result set location", "result set location");
@@ -251,6 +252,7 @@ public class MainActivity extends AppCompatActivity{
                         break;
                 }
             }
+            */
         }
     }
 

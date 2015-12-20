@@ -3,27 +3,13 @@ package io.goodway;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,24 +18,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.style.CharacterStyle;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.location.FusedLocationProviderApi;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.AutocompletePrediction;
 import com.google.android.gms.location.places.AutocompletePredictionBuffer;
 import com.google.android.gms.location.places.Place;
@@ -57,19 +33,10 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 
-import io.goodway.model.Event;
 import io.goodway.model.User;
 import io.goodway.model.adapter.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;
-import io.goodway.model.network.GoodwayHttpsClient;
-import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
-import io.goodway.navitia_android.ErrorAction;
-import io.goodway.navitia_android.Home;
-import io.goodway.navitia_android.Work;
-import io.goodway.view.fragment.MainFragment;
-import io.goodway.view.fragment.SearchFragment;
-import io.goodway.view.fragment.SearchPlacesFragment;
 
 
 /**
@@ -103,6 +70,8 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
     private User currentUser;
     private int request, place;
     private String mail, password;
+    private String s_name;
+    private boolean shared;
 
     // ----------------------------------- Constants
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -118,6 +87,8 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
         currentUser = extras.getParcelable("USER");
         request = extras.getInt("REQUEST");
         place = extras.getInt("PLACE");
+        s_name = extras.getString("s_name");
+        shared = extras.getBoolean("shared");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
@@ -139,14 +110,7 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
         recyclerView = (RecyclerView) findViewById(R.id.list);
         autocomplete = (EditText) findViewById(R.id.autocomplete);
 
-        switch (place){
-            case ProfileActivity.HOME:
-                autocomplete.setHint(R.string.home);
-                break;
-            case ProfileActivity.WORK:
-                autocomplete.setHint(R.string.work);
-                break;
-        }
+        autocomplete.setHint(s_name);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(null);
@@ -154,11 +118,8 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
 
         searchAdapter = new AdressSearchAdapter(new AddressSelected() {
             @Override
-            public void action(final Address address) {
-                final ProgressDialog dialog = new ProgressDialog(SetLocationActivity.this);
-                dialog.setMessage(getString(R.string.updating_share_options));
-                dialog.setProgressStyle(dialog.STYLE_SPINNER);
-                dialog.show();
+            public void action(Address address) {
+                finishWithAddress(address);
             }
             });
         recyclerView.setAdapter(searchAdapter);
@@ -192,7 +153,7 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
                                                 try {
                                                     Place myPlace = places.get(0);
                                                     LatLng queried_location = myPlace.getLatLng();
-                                                    searchAdapter.add(new Address(prediction.getFullText(STYLE_BOLD).toString(), queried_location.latitude, queried_location.longitude));
+                                                    searchAdapter.add(new Address(prediction.getPrimaryText(STYLE_BOLD).toString(), queried_location.latitude, queried_location.longitude));
                                                 } catch (IllegalStateException e) {
                                                 }
 
@@ -225,12 +186,13 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
         }
     }
 
-    private void returnHome(Address address){
-        searchAdapter.clear();
+    private void finishWithAddress(Address address){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(autocomplete.getWindowToken(), InputMethodManager.RESULT_HIDDEN);
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("ADDRESS", address);
-        returnIntent.putExtra("PLACE", place);
-        returnIntent.putExtra("REQUEST", request);
+        returnIntent.putExtra("address", address);
+        returnIntent.putExtra("s_name", s_name);
+        returnIntent.putExtra("shared", shared);
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }

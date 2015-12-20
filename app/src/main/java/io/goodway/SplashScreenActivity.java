@@ -99,6 +99,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     public static void closeKeyboard(Activity context, View editText){
         if(editText!=null) {
+            editText.requestFocus();
             InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(editText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
