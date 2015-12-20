@@ -90,13 +90,14 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
         return new GoodwayHttpsClient<>(c, new ProcessJson<UserLocation>() {
             @Override
             public UserLocation processJson(JSONObject jsonObject) {
+                int id = jsonObject.optInt("id");
                 String a_name = jsonObject.optString("a_name");
                 String s_name = jsonObject.optString("s_name");
                 String lat = jsonObject.optString("st_y");
                 String lng = jsonObject.optString("st_x");
                 boolean shared = jsonObject.optBoolean("shared");
                 try{
-                    return new UserLocation(s_name, a_name, Double.parseDouble(lat), Double.parseDouble(lng), shared);
+                    return new UserLocation(id, s_name, a_name, Double.parseDouble(lat), Double.parseDouble(lng), shared);
                 }
                 catch (NumberFormatException e){
                     return null;
@@ -133,13 +134,14 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 new Pair("shared", Boolean.toString(address.shared())), new Pair("lat", Double.toString(address.getLatitude())), new Pair("lng", Double.toString(address.getLongitude())));
     }
 
-    public static AsyncTask updateLocation(final Context c, Action<Void> action, ErrorAction error, String mail, String password, Double lat, Double lon){
-        return new GoodwayHttpsClient<>(c, new ProcessJson<Void>() {
+    public static AsyncTask updateLocation(final Context c, Action<Boolean> action, ErrorAction error, String mail, String password, UserLocation address){
+        return new GoodwayHttpsClient<>(c, new ProcessJson<Boolean>() {
             @Override
-            public Void processJson(JSONObject jsonObject) {
-                return null;
+            public Boolean processJson(JSONObject jsonObject) {
+                return true;
             }
-        }, action, error, "https://api.goodway.io/update_location.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("lat", lat.toString()), new Pair("lng", lon.toString()));
+        }, action, error, "https://api.goodway.io/update_location.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("a_name", address.getA_name()), new Pair("s_name", address.getName()),
+                new Pair("loc_id", Integer.toString(address.getId())), new Pair("shared", Boolean.toString(address.shared())), new Pair("lat", Double.toString(address.getLatitude())), new Pair("lng", Double.toString(address.getLongitude())));
     }
 
     public static AsyncTask checkMailAvailability(Context c, Action<Integer> action, ErrorAction error, String mail){

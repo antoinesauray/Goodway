@@ -62,10 +62,6 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         return root;
     }
 
-    public void closeKeyboard(){
-        f2.closeKeyboard();
-    }
-
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         f1 = new SearchFriendsFragment();

@@ -68,10 +68,10 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
 
 
     private User currentUser;
-    private int request, place;
+    private int id;
     private String mail, password;
     private String s_name;
-    private boolean shared;
+    private boolean shared, update;
 
     // ----------------------------------- Constants
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -85,10 +85,10 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
 
         Bundle extras = this.getIntent().getExtras();
         currentUser = extras.getParcelable("USER");
-        request = extras.getInt("REQUEST");
-        place = extras.getInt("PLACE");
         s_name = extras.getString("s_name");
         shared = extras.getBoolean("shared");
+        update = extras.getBoolean("update", false);
+        id = extras.getInt("id");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
@@ -193,6 +193,8 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
         returnIntent.putExtra("address", address);
         returnIntent.putExtra("s_name", s_name);
         returnIntent.putExtra("shared", shared);
+        returnIntent.putExtra("id", id);
+        returnIntent.putExtra("update", update);
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }

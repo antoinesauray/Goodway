@@ -108,7 +108,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
             }
         });
         recyclerView.setAdapter(searchAdapter);
-        GoodwayHttpsClient.getSelfLocations(getActivity(), new Action<UserLocation>() {
+        selfLocations = GoodwayHttpsClient.getSelfLocations(getActivity(), new Action<UserLocation>() {
             @Override
             public void action(UserLocation e) {
                 searchAdapter.add(e);
@@ -133,35 +133,50 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
 
             @Override
             public void afterTextChanged(Editable s) {
-                selfLocations.cancel(true);
-                PendingResult<AutocompletePredictionBuffer> result =
-                        Places.GeoDataApi.getAutocompletePredictions(googleApiClient, s.toString(), null, null);
-                result.setResultCallback(new ResultCallback<AutocompletePredictionBuffer>() {
-                    @Override
-                    public void onResult(AutocompletePredictionBuffer autocompletePredictions) {
-                        searchAdapter.clear();
-                        for (int i = 0; i < autocompletePredictions.getCount(); i++) {
-                            final AutocompletePrediction prediction = autocompletePredictions.get(i);
-                            Places.GeoDataApi.getPlaceById(googleApiClient, prediction.getPlaceId())
-                                    .setResultCallback(new ResultCallback<PlaceBuffer>() {
-                                        @Override
-                                        public void onResult(PlaceBuffer places) {
-                                            if (places.getStatus().isSuccess()) {
-                                                try {
-                                                    Place myPlace = places.get(0);
-                                                    LatLng queried_location = myPlace.getLatLng();
-                                                    searchAdapter.add(new Address(prediction.getFullText(STYLE_BOLD).toString(), queried_location.latitude, queried_location.longitude));
-                                                } catch (IllegalStateException e) {
-                                                }
+                if(selfLocations!=null){selfLocations.cancel(true);}
+                searchAdapter.clear();
+                if(s.toString().length()>0) {
+                    PendingResult<AutocompletePredictionBuffer> result =
+                            Places.GeoDataApi.getAutocompletePredictions(googleApiClient, s.toString(), null, null);
+                    result.setResultCallback(new ResultCallback<AutocompletePredictionBuffer>() {
+                        @Override
+                        public void onResult(AutocompletePredictionBuffer autocompletePredictions) {
+                            for (int i = 0; i < autocompletePredictions.getCount(); i++) {
+                                final AutocompletePrediction prediction = autocompletePredictions.get(i);
+                                Places.GeoDataApi.getPlaceById(googleApiClient, prediction.getPlaceId())
+                                        .setResultCallback(new ResultCallback<PlaceBuffer>() {
+                                            @Override
+                                            public void onResult(PlaceBuffer places) {
+                                                if (places.getStatus().isSuccess()) {
+                                                    try {
+                                                        Place myPlace = places.get(0);
+                                                        LatLng queried_location = myPlace.getLatLng();
+                                                        searchAdapter.add(new Address(prediction.getPrimaryText(STYLE_BOLD).toString(), prediction.getSecondaryText(STYLE_BOLD).toString(), queried_location.latitude, queried_location.longitude));
+                                                    } catch (IllegalStateException e) {
+                                                    }
 
+                                                }
+                                                places.release();
                                             }
-                                            places.release();
-                                        }
-                                    });
+                                        });
+                            }
+                            //autocompletePredictions.release();
                         }
-                        //autocompletePredictions.release();
-                    }
-                });
+                    });
+                }
+                else{
+                    selfLocations = GoodwayHttpsClient.getSelfLocations(getActivity(), new Action<UserLocation>() {
+                        @Override
+                        public void action(UserLocation e) {
+                            searchAdapter.add(e);
+                        }
+                    }, new ErrorAction() {
+                        @Override
+                        public void action(int length) {
+
+                        }
+                    }, null, mail, password, user.getFirstName());
+                }
             }
         });
         return root;
@@ -172,9 +187,6 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
     public void onResume(){
         super.onResume();
         googleApiClient.connect();
-        if(!getArguments().getBoolean("DEMO") && isVisible()) {
-            showKeyboard();
-        }
     }
 
     @Override
@@ -183,7 +195,6 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
         if (googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
-        closeKeyboard();
     }
 
     @Override
@@ -206,31 +217,17 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
         
     }
 
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if(getActivity()!=null && autocomplete!=null) {
-            if (isVisibleToUser) {
-                showKeyboard();
-            }
-        }
-    }
+    private void finish(Address address){
 
-    public void closeKeyboard(){
+
+
         if(autocomplete!=null) {
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(autocomplete.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
-    }
 
-    public void showKeyboard(){
-        autocomplete.requestFocus();
-        InputMethodManager mgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        mgr.showSoftInput(autocomplete, InputMethodManager.SHOW_IMPLICIT);
-    }
-
-    private void finish(Address address){
         switch (request){
+
             case MainActivity.DEPARTURE:
                 mainActivity.setFrom(address);
                 Bundle b1 = new Bundle();

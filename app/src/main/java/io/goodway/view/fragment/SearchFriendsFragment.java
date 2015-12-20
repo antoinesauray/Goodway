@@ -175,14 +175,6 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
         },mail, password);
     }
 
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if(isVisibleToUser){
-            ((SearchFragment) getParentFragment()).closeKeyboard();
-        }
-    }
-
     private void finish(Address address){
         switch (request){
             case MainActivity.DEPARTURE:

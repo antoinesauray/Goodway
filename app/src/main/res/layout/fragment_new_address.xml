@@ -37,7 +37,7 @@
             android:inputType="textPostalAddress"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="Nom"/>
+            android:hint="@string/name"/>
 
             <CheckBox
                 android:id="@+id/shared"
@@ -47,7 +47,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:checked="true"
-                android:hint="Partagé"/>
+                android:hint="@string/shared"/>
         </LinearLayout>
         <Button
             android:id="@+id/set"
@@ -58,7 +58,7 @@
             android:layout_gravity="center_horizontal"
             style="?android:attr/borderlessButtonStyle"
             android:textColor="@color/primary"
-            android:text="Ajouter une adresse"
+            android:text="@string/add_address"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp"/>
 

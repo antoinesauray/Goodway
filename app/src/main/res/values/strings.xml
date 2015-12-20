@@ -148,4 +148,10 @@
     <string name="add_address">Ajouter une adresse</string>
 
     <string name="request_places">Demande des adresse</string>
+
+    <string name="name">Nom</string>
+    <string name="shared">Partagé</string>
+
+    <string name="change_address">Modifier l\'adresse</string>
+    <string name="apply_modifications">Appliquer les modifications ?</string>
 </resources>

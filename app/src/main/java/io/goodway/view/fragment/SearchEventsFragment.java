@@ -142,12 +142,4 @@ public class SearchEventsFragment extends Fragment implements SwipeRefreshLayout
             }
         }, mail, password);
     }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if(isVisibleToUser){
-            ((SearchFragment) getParentFragment()).closeKeyboard();
-        }
-    }
 }

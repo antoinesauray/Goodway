@@ -1,24 +1,19 @@
 package io.goodway.model.adapter;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.security.auth.callback.Callback;
-
 import io.goodway.R;
 import io.goodway.model.callback.AddressSelected;
 import io.goodway.navitia_android.Address;
+import io.goodway.navitia_android.UserLocation;
 
 
 /**
@@ -27,7 +22,7 @@ import io.goodway.navitia_android.Address;
  * @version 1.0
  */
 
-public class AdressSearchAdapter extends RecyclerView.Adapter<AdressSearchAdapter.ViewHolder> {
+public class AdressSearchAdapter extends RecyclerView.Adapter<AdressSearchAdapter.AddressViewHolder> {
 
     private List<Address> mDataset;
     private Context activity;
@@ -43,23 +38,37 @@ public class AdressSearchAdapter extends RecyclerView.Adapter<AdressSearchAdapte
 
     // Create new views (invoked by the layout manager)
     @Override
-    public AdressSearchAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public AddressViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_adress, parent, false);
-        // set the view's size, margins, paddings and layout parameters
-        ViewHolder vh = new ViewHolder(v);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_address, parent, false);
+        AddressViewHolder vh = new AddressViewHolder(v);
         return vh;
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(AddressViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.setItem(mDataset.get(position));
         Address a = mDataset.get(position);
-        holder.name.setText(a.getName());
-        //holder.icon.setImageDrawable(activity.getResources().getDrawable(a.getIcon(), activity.getTheme()));
+        switch (getItemViewType(position)){
+            case Address.ADDRESS:
+                holder.setItem(mDataset.get(position));
+                holder.s_name.setText(a.getName());
+                holder.a_name.setText(a.getSecondaryText());
+                break;
+            case Address.USERLOCATION:
+                holder.setItem(mDataset.get(position));
+                holder.s_name.setText(a.getName());
+                holder.a_name.setText(((UserLocation)a).getA_name());
+                break;
+        }
+
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return mDataset.get(position).getType();
     }
 
     public void add(Address item) {
@@ -82,17 +91,16 @@ public class AdressSearchAdapter extends RecyclerView.Adapter<AdressSearchAdapte
         return mDataset.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class AddressViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
-        TextView name;
-        ImageView icon;
+        TextView s_name, a_name;
         Address item;
 
-        public ViewHolder(View lyt_main) {
+        public AddressViewHolder(View lyt_main) {
             super(lyt_main);
             lyt_main.setOnClickListener(this);
-            name = (TextView) lyt_main.findViewById(R.id.name);
-            icon = (ImageView) lyt_main.findViewById(R.id.icon);
+            s_name = (TextView) lyt_main.findViewById(R.id.s_name);
+            a_name = (TextView) lyt_main.findViewById(R.id.a_name);
         }
 
         @Override
