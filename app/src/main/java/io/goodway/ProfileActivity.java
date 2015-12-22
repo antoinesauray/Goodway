@@ -2,7 +2,6 @@ package io.goodway;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,15 +19,16 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.ActionMenuView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -132,6 +132,12 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.empty_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -155,13 +161,37 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                     Address address = data.getParcelableExtra("address");
                     String name = data.getStringExtra("s_name");
                     boolean shared = data.getBooleanExtra("shared", false);
+
                     newAddressFragment.name.setText(name);
                     newAddressFragment.shared.setChecked(shared);
-                    newAddressFragment.location.setName(name);
-                    newAddressFragment.location.setA_name(address.getName());
-                    newAddressFragment.location.setShared(shared);
-                    newAddressFragment.location.setLatitude(address.getLatitude());
-                    newAddressFragment.location.setLongitude(address.getLongitude());
+                    if(newAddressFragment.location!=null) {
+                        newAddressFragment.location.setName(name);
+                        newAddressFragment.location.setA_name(address.getName());
+                        newAddressFragment.location.setShared(shared);
+                        newAddressFragment.location.setLatitude(address.getLatitude());
+                        newAddressFragment.location.setLongitude(address.getLongitude());
+                    }
+                    else{
+                        newAddressFragment.location = new UserLocation(name, address.getName(), user.getFirstName(), address.getLatitude(), address.getLongitude(), shared);
+                    }
+                    if(data.getBooleanExtra("insert", false)){
+                        final ProgressDialog pd = new ProgressDialog(ProfileActivity.this);
+                        pd.setMessage(getString(R.string.add_address));
+                        pd.setProgressStyle(pd.STYLE_SPINNER);
+                        pd.show();
+                        GoodwayHttpsClient.addLocation(this, new Action<Boolean>() {
+                            @Override
+                            public void action(Boolean e) {
+                                pd.dismiss();
+                            }
+                        }, new ErrorAction() {
+                            @Override
+                            public void action(int length) {
+                                pd.dismiss();
+                                Toast.makeText(ProfileActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
+                            }
+                        }, mail, password, newAddressFragment.location);
+                    }
             }
         }
 
@@ -248,6 +278,9 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             Intent i = new Intent(this, SetLocationActivity.class);
             i.putExtra("s_name", newAddressFragment.name.getText().toString());
             i.putExtra("shared", newAddressFragment.shared.isChecked());
+            if(newAddressFragment.location == null ) {
+                i.putExtra("insert", true);
+            }
             startActivityForResult(i, SET_ADDRESS);
         }
         else{
@@ -305,7 +338,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                         }
                         else{
                             View notFound = getLayoutInflater(null).inflate(R.layout.view_way_not_found, null);
-                            ((TextView)notFound.findViewById(R.id.message)).setText(R.string.not_available);
+                            ((TextView)notFound.findViewById(R.id.message)).setText(R.string.unavailable);
                             locations.addView(notFound);
                         }
                     }
@@ -329,7 +362,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                     public void action(int length) {
                         if (length <0) {
                             View notFound = getLayoutInflater(null).inflate(R.layout.view_way_not_found, null);
-                            ((TextView) notFound.findViewById(R.id.message)).setText(R.string.not_available);
+                            ((TextView) notFound.findViewById(R.id.message)).setText(R.string.unavailable);
                             locations.addView(notFound);
                         }
                     }
@@ -391,8 +424,55 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
             ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
             actionBar.setDisplayHomeAsUpEnabled(true);
+            setHasOptionsMenu(true);
+
             actionBar.setHomeButtonEnabled(true);
             return rootView;
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            inflater.inflate(R.menu.user_location, menu);
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            switch (id) {
+                case R.id.action_delete:
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle(R.string.confirm)
+                            .setMessage(R.string.confirm_delete)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    final ProgressDialog pd = new ProgressDialog(getActivity());
+                                    pd.setMessage(getString(R.string.deleting));
+                                    pd.setProgressStyle(pd.STYLE_SPINNER);
+                                    pd.show();
+                                    GoodwayHttpsClient.deleteLocation(getActivity(), new Action<Boolean>() {
+                                        @Override
+                                        public void action(Boolean e) {
+                                            pd.dismiss();
+                                            ((ProfileActivity) getActivity()).popStackBack();
+                                        }
+                                    }, new ErrorAction() {
+                                        @Override
+                                        public void action(int length) {
+                                            pd.dismiss();
+                                            Toast.makeText(getActivity(), R.string.failure, Toast.LENGTH_SHORT).show();
+                                        }
+                                    }, ((ProfileActivity)getActivity()).mail, ((ProfileActivity)getActivity()).password, location);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                }
+                            })
+                            .show();
+                    return true;
+            }
+
+            return false;
         }
 
         @Override
@@ -400,6 +480,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             super.onResume();
             Bundle extras = getArguments();
             UserLocation tmp = extras.getParcelable("location");
+
             if(tmp!=null){
                 location = new UserLocation(tmp);
                 name.setText(location.getName());
@@ -462,7 +543,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             recent_activity = (LinearLayout) rootView.findViewById(R.id.recent_activity);
             View location = getActivity().getLayoutInflater().inflate(R.layout.view_way_not_found, null);
 
-            ((TextView)location.findViewById(R.id.message)).setText(R.string.not_available);
+            ((TextView)location.findViewById(R.id.message)).setText(R.string.unavailable);
             recent_activity.addView(location);
             return rootView;
         }

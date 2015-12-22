@@ -17,7 +17,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -358,7 +357,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                         Toast.makeText(getActivity(), R.string.enter_bday, Toast.LENGTH_SHORT).show();
                     }
                     else if(!mailAvailable){
-                        Toast.makeText(getActivity(), "Mail "+getString(R.string.not_available), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Mail "+getString(R.string.unavailable), Toast.LENGTH_SHORT).show();
                     }
                     else{
                         final ProgressDialog dialog = new ProgressDialog(getActivity());

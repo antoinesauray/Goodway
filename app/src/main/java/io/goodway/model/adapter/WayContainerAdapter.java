@@ -14,7 +14,6 @@ import java.util.List;
 
 import io.goodway.R;
 import io.goodway.model.ContainerType;
-import io.goodway.model.Event;
 import io.goodway.model.callback.WayCallback;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
@@ -109,7 +108,7 @@ public class WayContainerAdapter extends RecyclerView.Adapter<WayContainerAdapte
                                 break;
                             case -1:
                                 View notAvailable = activity.getLayoutInflater().inflate(R.layout.view_way_not_found, null);
-                                ((TextView)notAvailable.findViewById(R.id.message)).setText(R.string.not_available);
+                                ((TextView)notAvailable.findViewById(R.id.message)).setText(R.string.unavailable);
                                 holder.ways.addView(notAvailable);
                                 break;
                         }

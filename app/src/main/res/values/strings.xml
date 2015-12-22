@@ -14,6 +14,7 @@
     <string name="next">Suivant</string>
     <string name="back">Retour</string>
     <string name="confirm">Confirmer</string>
+    <string name="confirm_delete">Etes vous sur de vouloir supprimer cette adresse ?</string>
     <string name="passwordFirst">Entrez votre mot de passe</string>
     <string name="passwordSecond">Confirmez</string>
     <string name="passwordsDiffer">Les mots de passe sont différents</string>
@@ -24,6 +25,7 @@
 
     <string name="no_ways_found">Oups nous n\'avons pas trouvé de trajet</string>
     <string name="no_events">Pas d\'évènements disponibles</string>
+    <string name="no_groups">Vous n\'avez aucun groupes</string>
 
     <!-- drawer -->
     <string name="social">Social</string>
@@ -46,6 +48,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="action_delete">Supprimer</string>
 
     <string name="action_search">Search</string>
 
@@ -70,7 +73,7 @@
     <!-- ErrorAction message -->
     <string name="no_from">Pas de position de départ</string>
     <string name="no_to">Pas de destination</string>
-    <string name="not_available">non disponible</string>
+    <string name="unavailable">Indisponible</string>
     <string name="your_location_not_available">Position non disponible</string>
 
     <string name="today">Aujourd\'hui</string>
@@ -154,4 +157,11 @@
 
     <string name="change_address">Modifier l\'adresse</string>
     <string name="apply_modifications">Appliquer les modifications ?</string>
+
+    <string name="online_paiement">Paiement en ligne</string>
+    <string name="irl_paiement">Paiement IRL</string>
+
+    <string name="featured">Promotion</string>
+
+    <string name="deleting">Suppression en cours</string>
 </resources>

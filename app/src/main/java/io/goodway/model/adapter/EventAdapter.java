@@ -60,14 +60,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         holder.setItem(mDataset.get(position));
         Event a = mDataset.get(position);
         holder.name.setText(a.getName());
+        holder.featured.setText(R.string.featured);
         Picasso.with(activity).load(a.BASEURL + a.getId()+".png")
         .error(R.mipmap.ic_event_black_36dp).into(holder.eventImage, new Callback() {
             @Override
             public void onSuccess() {
                 holder.progressBar.setVisibility(View.INVISIBLE);
-
             }
-
             @Override
             public void onError() {
                 holder.progressBar.setVisibility(View.INVISIBLE);
@@ -101,7 +100,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
-        TextView name;
+        TextView name, featured;
         ImageView eventImage;
         ProgressBar progressBar;
         Event item;
@@ -114,6 +113,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             name = (TextView) lyt_main.findViewById(R.id.name);
             eventImage = (ImageView) lyt_main.findViewById(R.id.eventImage);
             progressBar = (ProgressBar) lyt_main.findViewById(R.id.progressBar);
+            featured = (TextView) lyt_main.findViewById(R.id.featured);
         }
 
         @Override

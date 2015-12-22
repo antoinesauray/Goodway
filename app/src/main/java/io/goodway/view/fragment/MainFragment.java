@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -202,11 +201,11 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
     public void onConnectionFailed(ConnectionResult connectionResult) {
         if(from != null){
             TextView from = (TextView) (root.findViewById(R.id.from));
-            from.setText(getString(R.string.your_location) + " (" + getString(R.string.not_available) + ")");
+            from.setText(getString(R.string.your_location) + " (" + getString(R.string.unavailable) + ")");
         }
         else if (to != null){
             TextView to = (TextView) (root.findViewById(R.id.to));
-            to.setText(getString(R.string.your_location)+" ("+getString(R.string.not_available)+")");
+            to.setText(getString(R.string.your_location)+" ("+getString(R.string.unavailable)+")");
         }
     }
 

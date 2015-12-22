@@ -36,7 +36,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
 
     private SearchPlacesFragment f2;
     private SearchFriendsFragment f1;
-    private SearchEventsFragment f3;
+    private SearchGroupsFragment f3;
 
     private User user;
 
@@ -68,7 +68,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         f1.setArguments(getArguments());
         f2 = new SearchPlacesFragment();
         f2.setArguments(getArguments());
-        f3 = new SearchEventsFragment();
+        f3 = new SearchGroupsFragment();
         f3.setArguments(getArguments());
         adapter.addFragment(f1);
         adapter.addFragment(f2);

@@ -70,7 +70,8 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
     private User currentUser;
     private String mail, password;
     private String s_name;
-    private boolean shared;
+    private int id;
+    private boolean shared, insert;
 
     // ----------------------------------- Constants
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -86,6 +87,8 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
         currentUser = extras.getParcelable("USER");
         s_name = extras.getString("s_name");
         shared = extras.getBoolean("shared");
+        insert = extras.getBoolean("insert");
+        id = extras.getInt("id");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
@@ -190,6 +193,8 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
         returnIntent.putExtra("address", address);
         returnIntent.putExtra("s_name", s_name);
         returnIntent.putExtra("shared", shared);
+        returnIntent.putExtra("insert", insert);
+        returnIntent.putExtra("id", id);
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }

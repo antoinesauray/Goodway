@@ -10,35 +10,42 @@
     card_view:cardCornerRadius="2dp"
     card_view:cardUseCompatPadding="true"
     android:background="?attr/selectableItemBackground">
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <ProgressBar
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/progressBar"
-            android:layout_centerInParent="true" />
-
-    <ImageView
-        android:id="@+id/eventImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:transitionName="@string/transition_event_image"/>
-
-
-        <TextView
-            android:id="@+id/name"
-            android:layout_alignParentBottom="true"
-            android:padding="8dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
-            android:background="@color/semitransparent_grey"/>
+            android:layout_height="match_parent">
 
-    </RelativeLayout>
+            <ProgressBar
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/progressBar"
+                android:layout_centerInParent="true" />
 
+        <ImageView
+            android:id="@+id/eventImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:transitionName="@string/transition_event_image"/>
+
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_alignParentBottom="true"
+                android:padding="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:background="@color/semitransparent_grey"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/featured"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     </android.support.v7.widget.CardView>

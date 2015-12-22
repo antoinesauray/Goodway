@@ -1,38 +1,25 @@
 package io.goodway;
 
-import android.annotation.TargetApi;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
-import java.util.Arrays;
 
 import io.goodway.model.adapter.WayPartAdapter;
-import io.goodway.model.network.GoodwayHttpsClient;
-import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.Way;
 import io.goodway.navitia_android.WayPart;
@@ -53,7 +40,7 @@ public class DetailedWayActivity extends AppCompatActivity{
     private LinearLayoutManager layoutManager;
     private WayPartAdapter adapter;
 
-    private CardView card;
+    private LinearLayout cardLayout;
 
     // Model
     private Way way;
@@ -76,19 +63,20 @@ public class DetailedWayActivity extends AppCompatActivity{
         recyclerView = (RecyclerView) findViewById(R.id.list);
         appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
 
-        card = (CardView) findViewById(R.id.card);
+        cardLayout = (LinearLayout) findViewById(R.id.cardLayout);
 
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        View v = getLayoutInflater().inflate(R.layout.view_way, null);
-        ((TextView)v.findViewById(R.id.description)).setText(way.getFrom().toString() + " - " + way.getTo().toString());
+
+        View viewWay = findViewById(R.id.view_way);
+        ((TextView)viewWay.findViewById(R.id.description)).setText(way.getFrom().toString() + " - " + way.getTo().toString());
         String[] departureTime = Address.splitIso8601(way.getDepartureDateTime());
         String[] arrivalTime = Address.splitIso8601(way.getArrivalDateTime());
-        ((TextView) v.findViewById(R.id.departure)).setText(departureTime[3] + ":" + departureTime[4]);
-        ((TextView)v.findViewById(R.id.arrival)).setText(arrivalTime[3] + ":" + arrivalTime[4]);
-        ((TextView) v.findViewById(R.id.duration)).setText(Address.secondToStr(this, way.getDuration()));
-        card.addView(v);
+        ((TextView) viewWay.findViewById(R.id.departure)).setText(departureTime[3] + ":" + departureTime[4]);
+        ((TextView)viewWay.findViewById(R.id.arrival)).setText(arrivalTime[3] + ":" + arrivalTime[4]);
+        ((TextView) viewWay.findViewById(R.id.duration)).setText(Address.secondToStr(this, way.getDuration()));
+
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -131,7 +119,11 @@ public class DetailedWayActivity extends AppCompatActivity{
         }
     }
 
-    public void fabClick(View v){
+    public void onlinePaiement(View v){
+
+    }
+
+    public void irlPaiement(View v){
 
     }
 

@@ -35,11 +35,13 @@ import javax.net.ssl.TrustManagerFactory;
 
 import io.goodway.R;
 import io.goodway.model.Event;
+import io.goodway.model.Group;
 import io.goodway.model.User;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
+import io.goodway.navitia_android.GroupLocation;
 import io.goodway.navitia_android.Pair;
 import io.goodway.navitia_android.UserLocation;
 import io.goodway.navitia_android.Way;
@@ -110,12 +112,13 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
         return new GoodwayHttpsClient<>(c, new ProcessJson<UserLocation>() {
             @Override
             public UserLocation processJson(JSONObject jsonObject) {
+                int id = jsonObject.optInt("id");
                 String a_name = jsonObject.optString("a_name");
                 String s_name = jsonObject.optString("s_name");
                 String lat = jsonObject.optString("st_y");
                 String lng = jsonObject.optString("st_x");
                 try{
-                    return new UserLocation(s_name, a_name, fname, Double.parseDouble(lat), Double.parseDouble(lng), true);
+                    return new UserLocation(id, s_name, a_name, fname, Double.parseDouble(lat), Double.parseDouble(lng), true);
                 }
                 catch (NumberFormatException e){
                     return null;
@@ -124,13 +127,32 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
         }, action, error, finish, "https://api.goodway.io/user_locations.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("id", Integer.toString(id)));
     }
 
+    public static AsyncTask getGroupLocations(final Context c, Action<GroupLocation> action, ErrorAction error, FinishCallback finish, String mail, String password, final String name, final int id){
+        return new GoodwayHttpsClient<>(c, new ProcessJson<GroupLocation>() {
+            @Override
+            public GroupLocation processJson(JSONObject jsonObject) {
+                String a_name = jsonObject.optString("a_name");
+                String s_name = jsonObject.optString("s_name");
+                String lat = jsonObject.optString("st_y");
+                String lng = jsonObject.optString("st_x");
+                try{
+                    return new GroupLocation(id, s_name, a_name, name, Double.parseDouble(lat), Double.parseDouble(lng));
+                }
+                catch (NumberFormatException e){
+                    return null;
+                }
+            }
+        }, action, error, finish, "https://api.goodway.io/group_locations.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("id", Integer.toString(id)));
+    }
+
+
     public static AsyncTask addLocation(final Context c, Action<Boolean> action, ErrorAction error, String mail, String password, UserLocation address){
         return new GoodwayHttpsClient<>(c, new ProcessJson<Boolean>() {
             @Override
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "https://api.goodway.io/add_location.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("a_name", address.getA_name()), new Pair("s_name", address.getName()),
+        }, action, error, "https://api.goodway.io/add_user_location.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("a_name", address.getA_name()), new Pair("s_name", address.getName()),
                 new Pair("shared", Boolean.toString(address.shared())), new Pair("lat", Double.toString(address.getLatitude())), new Pair("lng", Double.toString(address.getLongitude())));
     }
 
@@ -140,8 +162,17 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "https://api.goodway.io/update_location.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("a_name", address.getA_name()), new Pair("s_name", address.getName()),
+        }, action, error, "https://api.goodway.io/update_user_location.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("a_name", address.getA_name()), new Pair("s_name", address.getName()),
                 new Pair("loc_id", Integer.toString(address.getId())), new Pair("shared", Boolean.toString(address.shared())), new Pair("lat", Double.toString(address.getLatitude())), new Pair("lng", Double.toString(address.getLongitude())));
+    }
+
+    public static AsyncTask deleteLocation(final Context c, Action<Boolean> action, ErrorAction error, String mail, String password, UserLocation address){
+        return new GoodwayHttpsClient<>(c, new ProcessJson<Boolean>() {
+            @Override
+            public Boolean processJson(JSONObject jsonObject) {
+                return true;
+            }
+        }, action, error, "https://api.goodway.io/delete_user_location.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("loc", Integer.toString(address.getId())));
     }
 
     public static AsyncTask checkMailAvailability(Context c, Action<Integer> action, ErrorAction error, String mail){
@@ -207,7 +238,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
             }
         }, action, error, "https://api.goodway.io/friends_request.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
-    public static AsyncTask getEvents(Context c, Action<Event> action, ErrorAction error, String mail, String password){
+    public static AsyncTask getEvents(Context c, Action<Event> action, ErrorAction error, FinishCallback finish, String mail, String password){
         return new GoodwayHttpsClient<>(c, new ProcessJson<Event>() {
             @Override
             public Event processJson(JSONObject jsonObject) {
@@ -220,7 +251,19 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 String html = jsonObject.optString("html");
                 return new Event(id, name, html, s_time, e_time, lat, lng);
             }
-        }, action, error, "https://api.goodway.io/event.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("city", "1"));
+        }, action, error,finish, "https://api.goodway.io/event.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("city", "1"));
+    }
+
+    public static AsyncTask getGroups(Context c, Action<Group> action, ErrorAction error, String mail, String password){
+        return new GoodwayHttpsClient<>(c, new ProcessJson<Group>() {
+            @Override
+            public Group processJson(JSONObject jsonObject) {
+                Integer id = jsonObject.optInt("id");
+                String name = jsonObject.optString("name");
+                String description = jsonObject.optString("description");
+                return new Group(id, name, description);
+            }
+        }, action, error, "https://api.goodway.io/user_group.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
 
     public static AsyncTask acceptFriend(Context c, Action<Integer> action, ErrorAction error, String mail, String password, int id){
