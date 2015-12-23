@@ -131,6 +131,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             int id = shared_preferences.getInt("id", -1);
             String fname = shared_preferences.getString("fname", null);
             String lname = shared_preferences.getString("lname", null);
+            int title = shared_preferences.getInt("title", 2);
 
             logo = (ImageView) root.findViewById(R.id.logo);
             if (mail != null && password != null && id != -1 && fname != null && lname != null) {
@@ -149,7 +150,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                         }
                     }, mail, password);
                 } else {
-                    start(new User(id, fname, lname, mail, false));
+                    start(new User(id, fname, lname, mail, title, false));
                     connectedAs.setText(mail);
                 }
 
@@ -228,6 +229,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                         editor.putInt("id", u.getId());
                         editor.putString("fname", u.getFirstName());
                         editor.putString("lname", u.getLastName());
+                        editor.putInt("title", u.getTitle());
                         editor.commit();
                         Intent i = new Intent(getActivity(), MainActivity.class);
                         i.putExtra("USER", u);

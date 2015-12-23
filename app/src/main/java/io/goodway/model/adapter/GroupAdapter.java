@@ -65,7 +65,8 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.AddressViewH
         holder.description.setText(g.getDescription());
 
         Picasso.with(context)
-                .load("http://www.sauray.com/img/group/" + g.getId() + ".png")
+                .load(g.getAvatar())
+                .error(R.mipmap.ic_event_black_36dp)
                 .resize(100, 100)
                 .transform(new ImageTrans_CircleTransform())
                 .into(holder.avatar);
