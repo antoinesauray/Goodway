@@ -9,6 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +22,7 @@ import io.goodway.model.User;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.ErrorAction;
+import io.goodway.view.ImageTrans_CircleTransform;
 
 
 /**
@@ -62,8 +66,14 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
         // - replace the contents of the view with that element
         holder.setItem(mDataset.get(position));
         User a = mDataset.get(position);
-        holder.name.setText(a.getFirstName()+" "+a.getLastName());
-        //holder.icon.setImageDrawable(activity.getResources().getDrawable(a.getIcon(), activity.getTheme()));
+        holder.name.setText(a.getFirstName() + " " + a.getLastName());
+        holder.title.setText(a.getTitle(activity));
+        Picasso.with(activity)
+                .load(a.getAvatar())
+                .error(R.mipmap.ic_person_black_36dp)
+                .resize(100, 100)
+                .transform(new ImageTrans_CircleTransform())
+                .into(holder.avatar);
     }
 
     public void add(User item) {
@@ -88,8 +98,8 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
-        TextView name;
-        ImageView icon;
+        TextView name, title;
+        ImageView avatar;
         User item;
         Activity activity;
 
@@ -104,7 +114,10 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
             }
             this.activity = activity;
             name = (TextView) lyt_main.findViewById(R.id.name);
-            icon = (ImageView) lyt_main.findViewById(R.id.profileImage);
+            title = (TextView) lyt_main.findViewById(R.id.title);
+            avatar = (ImageView) lyt_main.findViewById(R.id.avatar);
+
+            Log.d("title", "title" + title.toString());
         }
 
         @Override
@@ -120,20 +133,6 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
                             notifyItemRemoved(pos);
                         }
                     }, null, mail, password, item.getId());
-                    break;
-                case R.id.request_friend:
-                    Log.d("requesting", "requesting friend with id="+item.getId());
-                    GoodwayHttpsClient.requestFriend(activity, new Action<Boolean>() {
-                        @Override
-                        public void action(Boolean e) {
-                            clear();
-                        }
-                    }, new ErrorAction() {
-                        @Override
-                        public void action(int length) {
-                            clear();
-                        }
-                    }, mail, password, item.getId());
                     break;
                 default:
                     Intent intent = new Intent(activity, ProfileActivity.class);

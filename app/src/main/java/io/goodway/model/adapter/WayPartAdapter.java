@@ -1,14 +1,18 @@
 package io.goodway.model.adapter;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Outline;
+import android.os.Build;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +23,9 @@ import java.util.List;
 import io.goodway.R;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.BusTrip;
+import io.goodway.navitia_android.Walking;
 import io.goodway.navitia_android.WayPart;
+import io.goodway.navitia_android.WayPartType;
 
 
 /**
@@ -28,7 +34,7 @@ import io.goodway.navitia_android.WayPart;
  * @version 1.0
  */
 
-public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHolder> {
+public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ItemHolder> {
 
     private List<WayPart> mDataset;
     private Activity activity;
@@ -43,51 +49,74 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
 
     // Create new views (invoked by the layout manager)
     @Override
-    public WayPartAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_waypart, parent, false);
-        // set the view's size, margins, paddings and layout parameters
-        ViewHolder vh = new ViewHolder(activity, v);
-        return vh;
+        WayPartType type = WayPartType.values()[viewType];
+        View view=null;
+        switch (type){
+            case BusTrip:
+                view = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.view_bustrip, parent, false);
+                return new BusHolder(view);
+            case Transfer:
+                view = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.view_transfer, parent, false);
+                return new TransferHolder(view);
+            case Waiting:
+                view = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.view_waiting, parent, false);
+                return new WaitingHolder(view);
+            case Walking:
+                view = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.view_walking, parent, false);
+                return new WalkingHolder(view);
+            default:
+                return null;
+        }
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
+    public void onBindViewHolder(ItemHolder holder, int position) {
         WayPart wayPart = mDataset.get(position);
-        holder.setItem(wayPart);
         switch (wayPart.getWayPartType()){
             case BusTrip:
+                BusHolder busHolder = (BusHolder) holder;
                 BusTrip trip = (BusTrip)wayPart;
-                holder.action.setText(trip.getRoute().getLine().getName());
-                holder.time.setText(Address.secondToStr(activity, wayPart.getDuration()));
-                holder.destination.setText(wayPart.getTo().toString());
+                busHolder.line.setText(trip.getRoute().getLine().getName());
+                String[] splitDeparture = Address.splitIso8601(wayPart.getDepartureDateTime());
+                String[] splitArrival = Address.splitIso8601(wayPart.getArrivalDateTime());
+                busHolder.departureTime.setText(splitDeparture[3]+":"+splitDeparture[4]);
+                busHolder.arrivalTime.setText(splitArrival[3]+":"+splitArrival[4]);
+                busHolder.departure.setText(wayPart.getFrom().toString());
+                busHolder.destination.setText(wayPart.getTo().toString());
                 try{
-                    holder.destination.setBackgroundColor(Color.parseColor(trip.getRoute().getLine().getColor()));
+                    busHolder.line.setBackgroundColor(Color.parseColor("#"+trip.getRoute().getLine().getColor()));
+                    busHolder.line.setTextColor(Color.WHITE);
                 }
                 catch(IllegalArgumentException e){
-                    holder.destination.setTextColor(activity.getResources().getColor(android.R.color.primary_text_light));
+                    busHolder.destination.setTextColor(activity.getResources().getColor(android.R.color.primary_text_light));
                 }
                 break;
             case Walking:
-                holder.action.setText(wayPart.getAction(activity));
-                holder.time.setText(Address.secondToStr(activity, wayPart.getDuration()));
-                holder.destination.setText(wayPart.getTo().toString());
+                WalkingHolder walkingHolder = (WalkingHolder) holder;
+                walkingHolder.action.setText(wayPart.getAction(activity));
+                walkingHolder.destination.setText(activity.getString(R.string.to)+" "+wayPart.getTo().getName());
                 break;
             case Waiting:
-                holder.action.setText(wayPart.getAction(activity));
-                holder.time.setText(Address.secondToStr(activity, wayPart.getDuration()));
-                holder.destination.setVisibility(View.INVISIBLE);
+                WaitingHolder waitingHolder = (WaitingHolder) holder;
+                waitingHolder.action.setText(wayPart.getAction(activity));
+                waitingHolder.time.setText(Address.secondToStr(activity, wayPart.getDuration()));
                 break;
             case Transfer:
-                holder.action.setText(wayPart.getAction(activity));
-                holder.time.setText(Address.secondToStr(activity, wayPart.getDuration()));
-                holder.destination.setVisibility(View.INVISIBLE);
                 break;
         }
-        Log.d("wayPart.getLocaleType()", wayPart.getType());
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        // Just as an example, return 0 or 2 depending on position
+        // Note that unlike in ListView adapters, types don't have to be contiguous
+        return mDataset.get(position).getWayPartType().ordinal();
     }
 
     public void add(WayPart item) {
@@ -109,21 +138,67 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ViewHold
         return mDataset.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
-        // each data item is just a string in this case
-        TextView time, action, destination;
-        WayPart item;
-        Activity activity;
+    public class ItemHolder<T> extends RecyclerView.ViewHolder{
 
-        public ViewHolder(Activity activity, View lyt_main) {
+        private T item;
+
+        public ItemHolder(View itemView) {
+            super(itemView);
+        }
+        public void setItem(T t){
+            this.item = t;
+        }
+    }
+
+    public class BusHolder extends ItemHolder{
+        // each data item is just a string in this case
+        TextView departure, departureTime, arrivalTime, line, destination;
+
+        public BusHolder(View lyt_main) {
             super(lyt_main);
-            this.activity = activity;
+            departure = (TextView) lyt_main.findViewById(R.id.departure);
+            departureTime = (TextView) lyt_main.findViewById(R.id.departureTime);
+            arrivalTime = (TextView) lyt_main.findViewById(R.id.arrivalTime);
+            line = (TextView) lyt_main.findViewById(R.id.line);
+            destination = (TextView) lyt_main.findViewById(R.id.destination);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                line.setOutlineProvider(new ViewOutlineProvider() {
+                    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                    @Override
+                    public void getOutline(View view, Outline outline) {
+                        outline.setOval(view.getWidth(), view.getWidth(), view.getWidth(), view.getHeight());
+                    }
+                });
+            }
+        }
+    }
+    public class TransferHolder extends ItemHolder{
+        // each data item is just a string in this case
+        public TransferHolder(View lyt_main) {
+            super(lyt_main);
+        }
+    }
+
+    public class WaitingHolder extends ItemHolder{
+        // each data item is just a string in this case
+        TextView time, action;
+
+        public WaitingHolder(View lyt_main) {
+            super(lyt_main);
             time = (TextView) lyt_main.findViewById(R.id.time);
             action = (TextView) lyt_main.findViewById(R.id.action);
-            destination = (TextView) lyt_main.findViewById(R.id.destination);
         }
-        public void setItem(WayPart item) {
-            this.item = item;
+    }
+
+    public class WalkingHolder extends ItemHolder{
+        // each data item is just a string in this case
+        TextView action, destination;
+
+        public WalkingHolder(View lyt_main) {
+            super(lyt_main);
+            action = (TextView) lyt_main.findViewById(R.id.action);
+            destination = (TextView) lyt_main.findViewById(R.id.destination);
         }
     }
 }

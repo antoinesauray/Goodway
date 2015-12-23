@@ -81,8 +81,8 @@
     <string name="minutes">minutes</string>
     <string name="at">à</string>
 
-    <string name="from">Depuis</string>
-    <string name="to">Vers</string>
+    <string name="from">depuis</string>
+    <string name="to">vers</string>
 
     <string name="trip">Voyage</string>
     <string name="store_pass">)qiJ7Y^BrX2nEGX2Tte2</string>
@@ -92,15 +92,18 @@
     <string name="transition_way_card">transition_way_card</string>
 
     <string name="bustrip">Bus</string>
-    <string name="waiting">Attendre</string>
-    <string name="transfer">Correspondance</string>
-    <string name="walking">Marcher</string>
+    <string name="waiting">attendre</string>
+    <string name="transfer">changement</string>
+    <string name="walking">marcher</string>
     <string name="unknown">Tapis volant</string>
 
     <string name="during">pendant</string>
 
     <string name="departure">Départ</string>
     <string name="arrival">Destination</string>
+
+    <string name="departure_at">Départ à</string>
+    <string name="arrival_at">Arrivée à</string>
 
     <string name="preferences">Préférences (non disponible)</string>
 
@@ -164,4 +167,14 @@
     <string name="featured">Promotion</string>
 
     <string name="deleting">Suppression en cours</string>
+    <string name="duration">Durée</string>
+
+    <string name="reserved_to_friends">Contenu réservé aux amis</string>
+
+    <string name="choose_picture">Choisissez une photo</string>
+    <string name="install_explorer">Nous n\'avons trouvé aucun explorateur de fichier sur votre téléphone</string>
+
+    <string name="early_adopter">Précurseur</string>
+    <string name="cofounder">Cofondateur</string>
+    <string name="newcomer">Nouveau venu</string>
 </resources>
