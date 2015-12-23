@@ -75,7 +75,7 @@ public class DetailedWayActivity extends AppCompatActivity{
         String[] arrivalTime = Address.splitIso8601(way.getArrivalDateTime());
         ((TextView) viewWay.findViewById(R.id.departure)).setText(departureTime[3] + ":" + departureTime[4]);
         ((TextView)viewWay.findViewById(R.id.arrival)).setText(arrivalTime[3] + ":" + arrivalTime[4]);
-        ((TextView) viewWay.findViewById(R.id.duration)).setText(Address.secondToStr(this, way.getDuration()));
+        ((TextView) viewWay.findViewById(R.id.duration)).setText(getString(R.string.duration)+" "+Address.secondToStr(this, way.getDuration()));
 
 
         recyclerView.setHasFixedSize(true);

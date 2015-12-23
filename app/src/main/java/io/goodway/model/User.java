@@ -13,9 +13,8 @@ import io.goodway.navitia_android.Address;
  */
 public class User implements Parcelable {
 
-    private String fname, lname, mail;
-    private int id, image;
-    private Double homeLat, homeLon, workLat, workLon;
+    private String fname, lname, mail, avatar;
+    private int id;
     private boolean friend;
 
     public static final Creator CREATOR =
@@ -29,46 +28,23 @@ public class User implements Parcelable {
                 }
             };
 
-    public User(String fname, String lname, boolean friend){
-        this.id = -1;
-        this.fname = fname;
-        this.lname = lname;
-        homeLat=null;
-        homeLon=null;
-        workLat=null;
-        workLon=null;
-        this.friend=friend;
-    }
-    public User(int id, String fname, String lname, boolean friend){
+
+    public User(int id, String fname, String lname, String avatar, boolean friend){
         this.id = id;
         this.fname = fname;
         this.lname = lname;
-        homeLat=null;
-        homeLon=null;
-        workLat=null;
-        workLon=null;
         this.friend=friend;
+        this.avatar = avatar;
     }
 
-    public User(String fname, String lname, String mail, boolean friend){
-        this.id = -1;
-        this.fname = fname;
-        this.lname = lname;
-        this.mail = mail;
-        homeLat=null;
-        homeLon=null;
-        workLat=null;
-        workLon=null;
-        this.friend=friend;
-    }
 
-    public User(int id, String fname, String lname, String mail, boolean friend){
+    public User(int id, String fname, String lname, String avatar, String mail, boolean friend){
         this.id = id;
         this.fname = fname;
         this.lname = lname;
+        this.avatar = avatar;
         this.mail = mail;
         this.friend=friend;
-        Log.d("this.homeLat" + this.homeLat, "this.homeLon=" + this.homeLon);
     }
 
     public User(Parcel in){
@@ -83,25 +59,15 @@ public class User implements Parcelable {
 
     public String getLastName(){return lname;}
 
-    public String getName(){
-        return fname+" "+lname;
-    }
+    public String getName(){return fname+" "+lname;}
 
-    public void setHome(Address addr){
-        this.homeLat = addr.getLatitude();
-        this.homeLon = addr.getLongitude();
-    }
-
-    public void setWork(Address addr){
-        this.workLon = addr.getLatitude();
-        this.workLon = addr.getLongitude();
-    }
+    public String getAvatar(){return avatar;}
 
     public boolean isFriend(){return friend;}
 
     @Override
     public int describeContents() {
-        return 3;
+        return 0;
     }
 
     @Override
@@ -109,26 +75,16 @@ public class User implements Parcelable {
         dest.writeInt(id);
         dest.writeString(fname);
         dest.writeString(lname);
-        dest.writeString(mail);
-        dest.writeInt(image);
+        dest.writeString(avatar);
         dest.writeByte((byte) (friend ? 1 : 0));
-        if(homeLat!=null && homeLon!=null && workLat!=null && workLon!=null) {
-            dest.writeDouble(homeLat);
-            dest.writeDouble(homeLon);
-            dest.writeDouble(workLat);
-            dest.writeDouble(workLon);
-        }
+        dest.writeString(mail);
     }
     private void readFromParcel(Parcel in) {
         id = in.readInt();
         fname = in.readString();
         lname = in.readString();
-        mail = in.readString();
-        image = in.readInt();
+        avatar = in.readString();
         friend = in.readByte() != 0;
-        homeLat = in.readDouble();
-        homeLon = in.readDouble();
-        workLat = in.readDouble();
-        workLon = in.readDouble();
+        mail = in.readString();
     }
 }

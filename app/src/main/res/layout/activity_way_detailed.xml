@@ -31,7 +31,6 @@
             android:layout_height="match_parent"
             app:layout_anchor="@id/appBar"
             app:layout_anchorGravity="bottom|center"
-            android:transitionName="@string/transition_way_card"
             android:orientation="vertical">
 
             <android.support.v7.widget.CardView
@@ -51,16 +50,14 @@
                         android:id="@+id/view_way"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:transitionName="@string/transition_way_card"
                         layout="@layout/view_way" />
 
                     <include
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         layout="@layout/view_book_online" />
-                    <include
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        layout="@layout/view_book_irl" />
+
                 </LinearLayout>
 
                 </android.support.v7.widget.CardView>

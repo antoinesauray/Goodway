@@ -24,6 +24,7 @@ import android.widget.TextView;
 import io.goodway.model.User;
 import io.goodway.model.adapter.FriendAdapter;
 import io.goodway.model.adapter.UserAdapter;
+import io.goodway.model.callback.FinishCallback;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.ErrorAction;
@@ -134,7 +135,7 @@ public class FriendsActivity extends AppCompatActivity {
                 case 0:
                     return getString(R.string.friends);
                 case 1:
-                    return getString(R.string.pending);
+                    return getString(R.string.pending)+" "+f2.nbRequests;
                 default:
                     return null;
             }
@@ -239,6 +240,7 @@ public class FriendsActivity extends AppCompatActivity {
         TextView error;
         FriendAdapter adapter;
         String mail, password;
+        String nbRequests="";
         @Override
         public View onCreateView(LayoutInflater inflater,
                                  ViewGroup container, Bundle savedInstanceState) {
@@ -269,7 +271,7 @@ public class FriendsActivity extends AppCompatActivity {
             }, new ErrorAction() {
                 @Override
                 public void action(int length) {
-                    switch (length){
+                    switch (length) {
                         case 0:
                             error.setText(R.string.no_friend_requests);
                             break;
@@ -279,6 +281,12 @@ public class FriendsActivity extends AppCompatActivity {
                     }
                     swipeLayout.setRefreshing(false);
                     error.setVisibility(View.VISIBLE);
+                }
+            }, new FinishCallback() {
+                @Override
+                public void action(int length) {
+                    nbRequests=Integer.toString(length);
+                    ((FriendsActivity)getActivity()).pagerAdapter.notifyDataSetChanged();
                 }
             },mail, password);
 
@@ -315,6 +323,12 @@ public class FriendsActivity extends AppCompatActivity {
                     }
                     swipeLayout.setRefreshing(false);
                     error.setVisibility(View.VISIBLE);
+                }
+            }, new FinishCallback() {
+                @Override
+                public void action(int length) {
+                    nbRequests=Integer.toString(length);
+                    ((FriendsActivity)getActivity()).pagerAdapter.notifyDataSetChanged();
                 }
             }, mail, password);
         }

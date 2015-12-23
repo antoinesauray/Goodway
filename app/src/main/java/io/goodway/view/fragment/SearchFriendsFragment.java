@@ -71,7 +71,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         error = (TextView) root.findViewById(R.id.error);
-        adapter = new UserAdapter(new UserCallback() {
+        adapter = new UserAdapter(getActivity(), new UserCallback() {
             @Override
             public void action(final User u) {
                 final BottomSheet.Builder sheet = new BottomSheet.Builder(getActivity()).title(getString(R.string.places)+ " "+getString(R.string.linked_to)+" "+u.getFirstName()).listener(new DialogInterface.OnClickListener() {
@@ -99,7 +99,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                     }
                 }, new FinishCallback() {
                     @Override
-                    public void action() {
+                    public void action(int length) {
                         dialog.dismiss();
                         sheet.show();
                     }

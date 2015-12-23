@@ -10,8 +10,9 @@
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
-        android:layout_height="192dp"
-        android:layout_width="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:paddingBottom="16dp">
         <android.support.v7.widget.Toolbar
             android:id="@+id/mapToolbar"
             android:layout_height="wrap_content"
@@ -20,20 +21,12 @@
             android:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
         <ImageView
-            android:layout_height="match_parent"
+            android:id="@+id/avatar"
+            android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:layout_gravity="center_horizontal|bottom"
-            android:src="@mipmap/ic_person_white_48dp"
             />
     </android.support.design.widget.AppBarLayout>
-
-    <TextView
-        android:id="@+id/not_friend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:layout_centerInParent="true"
-        android:text="@string/content_hidden"/>
 
     <ScrollView
         android:layout_width="match_parent"

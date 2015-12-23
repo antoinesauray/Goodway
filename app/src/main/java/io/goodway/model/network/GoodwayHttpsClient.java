@@ -80,10 +80,12 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
         return new GoodwayHttpsClient<>(c, new ProcessJson<User>() {
             @Override
             public User processJson(JSONObject jsonObject) {
+                int id = jsonObject.optInt("id");
                 String fname = jsonObject.optString("fname");
                 String lname = jsonObject.optString("lname");
+                String avatar = jsonObject.optString("avatar");
                 Log.d(fname+" "+lname, "found someone");
-                return new User(fname, lname, false);
+                return new User(id, fname, lname, avatar, false);
             }
         }, action, null, "https://api.goodway.io/users.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
@@ -191,7 +193,8 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 int id = jsonObject.optInt("id");
                 String firstName = jsonObject.optString("fname");
                 String lastName = jsonObject.optString("lname");
-                return new User(id, firstName, lastName, mail, false);
+                String avatar = jsonObject.optString("avatar");
+                return new User(id, firstName, lastName, avatar, mail, false);
             }
         }, action, error, "https://api.goodway.io/login.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
@@ -212,31 +215,23 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 Integer id = jsonObject.optInt("id");
                 String fname = jsonObject.optString("fname");
                 String lname = jsonObject.optString("lname");
-                return new User(id, fname, lname, true);
+                String avatar = jsonObject.optString("avatar");
+                return new User(id, fname, lname, avatar, true);
             }
         }, action, error, "https://api.goodway.io/friends.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("pending", "false"));
     }
-    public static AsyncTask getFriendsPending(Context c, Action<User> action, String mail, String password){
+
+    public static AsyncTask getFriendsRequest(Context c, Action<User> action, ErrorAction error, FinishCallback finish, String mail, String password){
         return new GoodwayHttpsClient<>(c, new ProcessJson<User>() {
             @Override
             public User processJson(JSONObject jsonObject) {
                 Integer id = jsonObject.optInt("id");
                 String fname = jsonObject.optString("fname");
                 String lname = jsonObject.optString("lname");
-                return new User(id, fname, lname, false);
+                String avatar = jsonObject.optString("avatar");
+                return new User(id, fname, lname, avatar, false);
             }
-        }, action, null, "https://api.goodway.io/friends_pending.php").execute(new Pair("mail", mail), new Pair("pass", password));
-    }
-    public static AsyncTask getFriendsRequest(Context c, Action<User> action, ErrorAction error, String mail, String password){
-        return new GoodwayHttpsClient<>(c, new ProcessJson<User>() {
-            @Override
-            public User processJson(JSONObject jsonObject) {
-                Integer id = jsonObject.optInt("id");
-                String fname = jsonObject.optString("fname");
-                String lname = jsonObject.optString("lname");
-                return new User(id, fname, lname, false);
-            }
-        }, action, error, "https://api.goodway.io/friends_request.php").execute(new Pair("mail", mail), new Pair("pass", password));
+        }, action, error, finish, "https://api.goodway.io/friends_request.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
     public static AsyncTask getEvents(Context c, Action<Event> action, ErrorAction error, FinishCallback finish, String mail, String password){
         return new GoodwayHttpsClient<>(c, new ProcessJson<Event>() {
@@ -261,7 +256,8 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 Integer id = jsonObject.optInt("id");
                 String name = jsonObject.optString("name");
                 String description = jsonObject.optString("description");
-                return new Group(id, name, description);
+                String avatar = jsonObject.optString("avatar");
+                return new Group(id, name, description, avatar);
             }
         }, action, error, "https://api.goodway.io/user_group.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
@@ -308,7 +304,8 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                         Integer id = jsonObject.optInt("id");
                         String fname = jsonObject.optString("fname");
                         String lname = jsonObject.optString("lname");
-                        return new User(id, fname, lname, false);
+                        String avatar = jsonObject.optString("avatar");
+                        return new User(id, fname, lname, avatar, false);
                     }
                 }, action, error, "https://api.goodway.io/users.php").execute(
                         new Pair("u1", fname), new Pair("u2", lname),
@@ -321,7 +318,8 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                         Integer id = jsonObject.optInt("id");
                         String fname = jsonObject.optString("fname");
                         String lname = jsonObject.optString("lname");
-                        return new User(id, fname, lname, false);
+                        String avatar = jsonObject.optString("avatar");
+                        return new User(id, fname, lname, avatar, false);
                     }
                 }, action, error, "https://api.goodway.io/users.php").execute(
                         new Pair("u1", fname),
@@ -478,7 +476,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
             error.action(length);
         }
         else if(finish!=null){
-            finish.action();
+            finish.action(length);
         }
     }
 

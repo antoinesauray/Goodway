@@ -107,7 +107,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                     }
                 }, new FinishCallback() {
                     @Override
-                    public void action() {
+                    public void action(int length) {
                         dialog.dismiss();
                         sheet.show();
                     }
