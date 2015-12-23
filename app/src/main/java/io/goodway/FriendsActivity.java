@@ -22,9 +22,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import io.goodway.model.User;
-import io.goodway.model.adapter.FriendAdapter;
 import io.goodway.model.adapter.UserAdapter;
 import io.goodway.model.callback.FinishCallback;
+import io.goodway.model.callback.UserCallback;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.ErrorAction;
@@ -150,7 +150,7 @@ public class FriendsActivity extends AppCompatActivity {
         SwipeRefreshLayout swipeLayout;
         LinearLayoutManager layoutManager;
         TextView error;
-        FriendAdapter adapter;
+        UserAdapter adapter;
         String mail, password;
         @Override
         public View onCreateView(LayoutInflater inflater,
@@ -165,7 +165,17 @@ public class FriendsActivity extends AppCompatActivity {
             recyclerView.setItemAnimator(new DefaultItemAnimator());
             error = (TextView) rootView.findViewById(R.id.error);
             layoutManager = new LinearLayoutManager(getActivity());
-            adapter = new FriendAdapter(getActivity(), R.layout.view_user, mail, password);
+            adapter = new UserAdapter(getActivity(), new UserCallback() {
+                @Override
+                public void action(User u) {
+                    Intent i = new Intent(getActivity(), ProfileActivity.class);
+                    i.putExtra("user", u);
+                    i.putExtra("mail", mail);
+                    i.putExtra("password", password);
+                    i.putExtra("self", false);
+                    startActivity(i);
+                }
+            }, mail, password);
 
             Bundle extras = getArguments();
             mail = extras.getString("mail");
@@ -238,7 +248,7 @@ public class FriendsActivity extends AppCompatActivity {
         SwipeRefreshLayout swipeLayout;
         LinearLayoutManager layoutManager;
         TextView error;
-        FriendAdapter adapter;
+        UserAdapter adapter;
         String mail, password;
         String nbRequests="";
         @Override
@@ -261,7 +271,17 @@ public class FriendsActivity extends AppCompatActivity {
             mail = extras.getString("mail");
             password = extras.getString("password");
 
-            adapter = new FriendAdapter(getActivity(), R.layout.view_friend_request, mail, password);
+            adapter = new UserAdapter(getActivity(), new UserCallback() {
+                @Override
+                public void action(User u) {
+                    Intent i = new Intent(getActivity(), ProfileActivity.class);
+                    i.putExtra("user", u);
+                    i.putExtra("mail", mail);
+                    i.putExtra("password", password);
+                    i.putExtra("self", false);
+                    startActivity(i);
+                }
+            }, mail, password);
 
             GoodwayHttpsClient.getFriendsRequest(getActivity(), new Action<User>() {
                 @Override

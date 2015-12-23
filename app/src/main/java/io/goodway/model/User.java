@@ -1,11 +1,13 @@
 package io.goodway.model;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import io.goodway.R;
 import io.goodway.navitia_android.Address;
 
 /**
@@ -14,7 +16,7 @@ import io.goodway.navitia_android.Address;
 public class User implements Parcelable {
 
     private String fname, lname, mail, avatar;
-    private int id;
+    private int id, title;
     private boolean friend;
 
     public static final Creator CREATOR =
@@ -29,21 +31,23 @@ public class User implements Parcelable {
             };
 
 
-    public User(int id, String fname, String lname, String avatar, boolean friend){
+    public User(int id, String fname, String lname, String avatar, int title, boolean friend){
         this.id = id;
         this.fname = fname;
         this.lname = lname;
         this.friend=friend;
+        this.title = title;
         this.avatar = avatar;
     }
 
 
-    public User(int id, String fname, String lname, String avatar, String mail, boolean friend){
+    public User(int id, String fname, String lname, String avatar, String mail, int title, boolean friend){
         this.id = id;
         this.fname = fname;
         this.lname = lname;
         this.avatar = avatar;
         this.mail = mail;
+        this.title = title;
         this.friend=friend;
     }
 
@@ -61,6 +65,24 @@ public class User implements Parcelable {
 
     public String getName(){return fname+" "+lname;}
 
+    public int getTitle(){return title;}
+
+    public String getTitle(Context context){
+        switch (title){
+            case 0:
+                // Précurseur
+                return context.getString(R.string.early_adopter);
+            case 1:
+                // Cofondateur
+                return context.getString(R.string.cofounder);
+            case 2:
+                // Nouveau venu
+                return context.getString(R.string.newcomer);
+            default:
+                return context.getString(R.string.newcomer);
+        }
+    }
+
     public String getAvatar(){return avatar;}
 
     public boolean isFriend(){return friend;}
@@ -77,6 +99,7 @@ public class User implements Parcelable {
         dest.writeString(lname);
         dest.writeString(avatar);
         dest.writeByte((byte) (friend ? 1 : 0));
+        dest.writeInt(title);
         dest.writeString(mail);
     }
     private void readFromParcel(Parcel in) {
@@ -85,6 +108,7 @@ public class User implements Parcelable {
         lname = in.readString();
         avatar = in.readString();
         friend = in.readByte() != 0;
+        title = in.readInt();
         mail = in.readString();
     }
 }

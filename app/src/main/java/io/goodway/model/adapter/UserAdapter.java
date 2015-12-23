@@ -62,9 +62,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         holder.setItem(mDataset.get(position));
         User a = mDataset.get(position);
         holder.name.setText(a.getFirstName()+" "+a.getLastName());
+        holder.title.setText(a.getTitle(context));
         Picasso.with(context)
                 .load(a.getAvatar())
-                .error(R.mipmap.ic_person_black_24dp)
+                .error(R.mipmap.ic_person_black_36dp)
                 .resize(100, 100)
                 .transform(new ImageTrans_CircleTransform())
                 .into(holder.avatar);
@@ -92,7 +93,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
-        TextView name;
+        TextView name, title;
         ImageView avatar;
         User item;
 
@@ -100,6 +101,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             super(lyt_main);
             lyt_main.setOnClickListener(this);
             name = (TextView) lyt_main.findViewById(R.id.name);
+            title = (TextView) lyt_main.findViewById(R.id.title);
             avatar = (ImageView) lyt_main.findViewById(R.id.avatar);
         }
 

@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity{
         Picasso.with(this)
                 .load(currentUser.getAvatar())
                 .error(R.mipmap.ic_person_white_48dp)
-                .resize(100, 100)
+                .resize(150, 150)
                 .transform(new ImageTrans_CircleTransform())
                 .into(((ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar)));
 
@@ -289,8 +289,8 @@ public class MainActivity extends AppCompatActivity{
 
     public void drawerHeaderClick(View v){
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        intent.putExtra("USER", currentUser);
-        intent.putExtra("SELF", true);
+        intent.putExtra("user", currentUser);
+        intent.putExtra("self", true);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
             startActivityForResult(intent, PROFILE);

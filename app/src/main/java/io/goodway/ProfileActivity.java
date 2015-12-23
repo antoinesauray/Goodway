@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -83,16 +84,19 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
     private AsyncTask currentAsyncTask;
 
     private static final int FILE_SELECT_CODE = 2;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         Bundle extras = this.getIntent().getExtras();
-        user = extras.getParcelable("USER");
-        self = extras.getBoolean("SELF", false);
+        user = extras.getParcelable("user");
+        self = extras.getBoolean("self", false);
         toolbar = (Toolbar) findViewById(R.id.mapToolbar);
         toolbar.setTitle(user.getName());
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
         ImageView avatar = (ImageView) findViewById(R.id.avatar);
         Picasso.with(this)
@@ -124,6 +128,10 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         addressFragment.setArguments(bundle);
         newAddressFragment.setArguments(bundle);
 
+        if(!self && !user.isFriend()){
+            fab.setVisibility(View.VISIBLE);
+        }
+
         addressFragment.setArguments(bundle);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft1 = fragmentManager.beginTransaction();
@@ -136,6 +144,23 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         FragmentTransaction ft2 = fragmentManager.beginTransaction();
         ft2.replace(R.id.activityContainer, activityFragment);
         ft2.commitAllowingStateLoss();
+
+        current = addressFragment;
+    }
+
+    public void fabClick(View v){
+        Log.d("requesting", "requesting friend with id="+user.getId());
+        GoodwayHttpsClient.requestFriend(this, new Action<Boolean>() {
+            @Override
+            public void action(Boolean e) {
+                fab.setVisibility(View.INVISIBLE);
+            }
+        }, new ErrorAction() {
+            @Override
+            public void action(int length) {
+                Toast.makeText(ProfileActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
+            }
+        }, mail, password, user.getId());
     }
 
     private void popStackBack(){

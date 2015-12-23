@@ -172,5 +172,9 @@
     <string name="reserved_to_friends">Contenu réservé aux amis</string>
 
     <string name="choose_picture">Choisissez une photo</string>
-    <string name="install_explorer">Nous n'avons trouvé aucun explorateur de fichier sur votre téléphone</string>
+    <string name="install_explorer">Nous n\'avons trouvé aucun explorateur de fichier sur votre téléphone</string>
+
+    <string name="early_adopter">Précurseur</string>
+    <string name="cofounder">Cofondateur</string>
+    <string name="newcomer">Nouveau venu</string>
 </resources>
