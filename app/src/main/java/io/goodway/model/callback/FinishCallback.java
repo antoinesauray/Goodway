@@ -5,5 +5,5 @@ package io.goodway.model.callback;
  */
 public interface FinishCallback {
 
-    public void action();
+    public void action(int length);
 }

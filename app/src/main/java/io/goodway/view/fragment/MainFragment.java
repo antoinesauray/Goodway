@@ -1,13 +1,17 @@
 package io.goodway.view.fragment;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,16 +57,45 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
 
     private Address from, to;
 
+    private static final int ACCESS_FINE_LOCATION=1;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_map, container, false);
 
-        googleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(getActivity(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
 
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                        Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                    // Show an expanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+
+                } else {
+
+                    // No explanation needed, we can request the permission.
+
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            ACCESS_FINE_LOCATION);
+
+                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                    // app-defined int constant. The callback method gets the
+                    // result of the request.
+                }
+            }
+        }
+        else{
+            googleApiClient = new GoogleApiClient.Builder(getActivity())
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+        }
 
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -93,6 +126,34 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    googleApiClient = new GoogleApiClient.Builder(getActivity())
+                            .addApi(LocationServices.API)
+                            .addConnectionCallbacks(this)
+                            .addOnConnectionFailedListener(this)
+                            .build();
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    @Override
     public String toString() {
         return "Bottom Sheet";
     }
@@ -101,7 +162,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
         googleMap.setPadding(0, 0, 0, bottom.getHeight());
-        googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         googleMap.setOnMyLocationChangeListener(this);
@@ -166,13 +226,13 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
     @Override
     public void onResume() {
         super.onResume();
-        googleApiClient.connect();
+        if(googleApiClient!=null){googleApiClient.connect();}
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (googleApiClient.isConnected()) {
+        if (googleApiClient!=null && googleApiClient.isConnected()) {
             googleApiClient.disconnect();
         }
     }

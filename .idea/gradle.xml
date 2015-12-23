@@ -10,8 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/../Navitia-Android" />
-            <option value="$PROJECT_DIR$/../Navitia-Android/navitia-android" />
+            <option value="$PROJECT_DIR$/navitia-android" />
           </set>
         </option>
       </GradleProjectSettings>

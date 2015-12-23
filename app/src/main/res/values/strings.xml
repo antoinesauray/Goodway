@@ -178,6 +178,7 @@
     <string name="early_adopter">Précurseur</string>
     <string name="cofounder">Cofondateur</string>
     <string name="newcomer">Nouveau venu</string>
+<<<<<<< HEAD
 
 
     <!-- navitia -->
@@ -198,4 +199,6 @@
     <string name="navitia_hours">Heures</string>
     <string name="navitia_minutes">minutes</string>
     <string name="navitia_seconds">secondes</string>
+=======
+>>>>>>> develop
 </resources>

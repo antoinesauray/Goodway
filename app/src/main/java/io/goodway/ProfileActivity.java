@@ -5,8 +5,10 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -29,9 +31,12 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import io.goodway.model.User;
 import io.goodway.model.callback.AddressSelected;
@@ -41,6 +46,7 @@ import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
 import io.goodway.navitia_android.UserLocation;
+import io.goodway.view.ImageTrans_CircleTransform;
 
 
 /**
@@ -48,7 +54,7 @@ import io.goodway.navitia_android.UserLocation;
  * @author Antoine Sauray
  * @version 2.0
  */
-public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, AddressSelected{
+public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, AddressSelected, View.OnClickListener {
 
     // ----------------------------------- Model
     /**
@@ -77,15 +83,31 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
     private Bundle bundle;
     private AsyncTask currentAsyncTask;
 
+    private static final int FILE_SELECT_CODE = 2;
+    private FloatingActionButton fab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         Bundle extras = this.getIntent().getExtras();
-        user = extras.getParcelable("USER");
-        self = extras.getBoolean("SELF", false);
+        user = extras.getParcelable("user");
+        self = extras.getBoolean("self", false);
         toolbar = (Toolbar) findViewById(R.id.mapToolbar);
         toolbar.setTitle(user.getName());
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        ImageView avatar = (ImageView) findViewById(R.id.avatar);
+        Picasso.with(this)
+                .load(user.getAvatar())
+                .error(R.mipmap.ic_person_white_48dp)
+                .resize(200, 200)
+                .transform(new ImageTrans_CircleTransform())
+                .into(avatar);
+
+        if(self){avatar.setOnClickListener(this);}
+
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -106,6 +128,10 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         addressFragment.setArguments(bundle);
         newAddressFragment.setArguments(bundle);
 
+        if(!self && !user.isFriend()){
+            fab.setVisibility(View.VISIBLE);
+        }
+
         addressFragment.setArguments(bundle);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction ft1 = fragmentManager.beginTransaction();
@@ -118,6 +144,23 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         FragmentTransaction ft2 = fragmentManager.beginTransaction();
         ft2.replace(R.id.activityContainer, activityFragment);
         ft2.commitAllowingStateLoss();
+
+        current = addressFragment;
+    }
+
+    public void fabClick(View v){
+        Log.d("requesting", "requesting friend with id="+user.getId());
+        GoodwayHttpsClient.requestFriend(this, new Action<Boolean>() {
+            @Override
+            public void action(Boolean e) {
+                fab.setVisibility(View.INVISIBLE);
+            }
+        }, new ErrorAction() {
+            @Override
+            public void action(int length) {
+                Toast.makeText(ProfileActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
+            }
+        }, mail, password, user.getId());
     }
 
     private void popStackBack(){
@@ -191,6 +234,14 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                             }
                         }, mail, password, newAddressFragment.location);
                     }
+                case FILE_SELECT_CODE:
+                    if (resultCode == RESULT_OK) {
+                        // Get the Uri of the selected file
+                        Uri uri = data.getData();
+
+                        Log.d(TAG, "File Uri: " + uri.toString());
+                    }
+                    break;
             }
         }
 
@@ -298,6 +349,23 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         current = newAddressFragment;
     }
 
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        try {
+            startActivityForResult(
+                    Intent.createChooser(intent, getString(R.string.choose_picture)),
+                    FILE_SELECT_CODE);
+        } catch (android.content.ActivityNotFoundException ex) {
+            // Potentially direct the user to the Market with a Dialog
+            Toast.makeText(this, R.string.install_explorer,
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public static class AddressFragment extends Fragment{
         public static final String TAG = "address";
         String mail, password;
@@ -343,7 +411,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                     }
                 }, new FinishCallback() {
                     @Override
-                    public void action() {
+                    public void action(int length) {
                         View addAddress = getLayoutInflater(null).inflate(R.layout.view_add_address, null);
                         locations.addView(addAddress);
                     }
@@ -368,7 +436,8 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 }, null, mail, password, user.getFirstName(), user.getId());
             }
             else{
-                rootView.findViewById(R.id.not_friend).setVisibility(View.VISIBLE);
+                View notFound = getLayoutInflater(null).inflate(R.layout.view_not_friend, null);
+                locations.addView(notFound);
             }
             return rootView;
         }
@@ -540,10 +609,17 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             View rootView = inflater.inflate(
                     R.layout.fragment_activity_container, container, false);
             recent_activity = (LinearLayout) rootView.findViewById(R.id.recent_activity);
-            View location = getActivity().getLayoutInflater().inflate(R.layout.view_way_not_found, null);
-
-            ((TextView)location.findViewById(R.id.message)).setText(R.string.unavailable);
-            recent_activity.addView(location);
+            self = getArguments().getBoolean("self");
+            user = getArguments().getParcelable("user");
+            if(self || user.isFriend()){
+                View location = getActivity().getLayoutInflater().inflate(R.layout.view_way_not_found, null);
+                ((TextView)location.findViewById(R.id.message)).setText(R.string.unavailable);
+                recent_activity.addView(location);
+            }
+            else{
+                View notFound = getLayoutInflater(null).inflate(R.layout.view_not_friend, null);
+                recent_activity.addView(notFound);
+            }
             return rootView;
         }
     }

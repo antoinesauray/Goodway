@@ -26,18 +26,18 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.FusedLocationProviderApi;
-import com.google.android.gms.location.LocationServices;
+import com.squareup.picasso.Picasso;
 
 import io.goodway.model.Event;
 import io.goodway.model.User;
 import io.goodway.navitia_android.Address;
+import io.goodway.view.ImageTrans_CircleTransform;
 import io.goodway.view.fragment.MainFragment;
 import io.goodway.view.fragment.SearchFragment;
 
@@ -81,8 +81,6 @@ public class MainActivity extends AppCompatActivity{
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private TabLayout tabLayout;
 
-    private FusedLocationProviderApi fusedLocationProviderApi;
-
     // ----------------------------------- Model
     /**
      * Provides markers on a marker. The key is the marker title attribute
@@ -98,6 +96,7 @@ public class MainActivity extends AppCompatActivity{
     private MainFragment main;
     private static final int MAIN=1, SEARCH=2;
 
+
     // ----------------------------------- Constants
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -106,9 +105,8 @@ public class MainActivity extends AppCompatActivity{
         checkGooglePlayServices();
         setContentView(R.layout.activity_main);
 
-        //from = new Address(R.string.your_location, R.mipmap.ic_home_black_24dp, AddressType.POSITION);
 
-        fusedLocationProviderApi = LocationServices.FusedLocationApi;
+        //from = new Address(R.string.your_location, R.mipmap.ic_home_black_24dp, AddressType.POSITION);
 
         Bundle extras = this.getIntent().getExtras();
         currentUser = extras.getParcelable("USER");
@@ -150,6 +148,14 @@ public class MainActivity extends AppCompatActivity{
         ((TextView)navigationView.getHeaderView(0).findViewById(R.id.name)).setText(currentUser.getName());
         ((TextView)navigationView.getHeaderView(0).findViewById(R.id.version)).setText(getString(R.string.version) + " " + getVersionInfo());
 
+        Log.d("avatar", "avatar" + currentUser.getAvatar());
+
+        Picasso.with(this)
+                .load(currentUser.getAvatar())
+                .error(R.mipmap.ic_person_white_48dp)
+                .resize(150, 150)
+                .transform(new ImageTrans_CircleTransform())
+                .into(((ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar)));
 
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -233,27 +239,6 @@ public class MainActivity extends AppCompatActivity{
                 currentUser = data.getExtras().getParcelable("USER");
             }
         }
-        else{
-            /*
-            Log.d("SETLOCATION", "SETLOCATION with request="+requestCode);
-            if(resultCode == RESULT_OK){
-                Log.d("result set location", "result set location");
-                Address address = data.getParcelableExtra("ADDRESS");
-                int place = data.getIntExtra("PLACE", ProfileActivity.HOME);
-                switchAfterResult(data, address);
-                switch(place){
-                    case ProfileActivity.HOME:
-                        // set home online
-                        Toast.makeText(this, "setting home online", Toast.LENGTH_SHORT).show();
-                        Log.d("setting home online", "setting home online");
-                        break;
-                    case ProfileActivity.WORK:
-                        // set work online
-                        break;
-                }
-            }
-            */
-        }
     }
 
     private void switchAfterResult(Intent data, Address addr){
@@ -298,8 +283,8 @@ public class MainActivity extends AppCompatActivity{
 
     public void drawerHeaderClick(View v){
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        intent.putExtra("USER", currentUser);
-        intent.putExtra("SELF", true);
+        intent.putExtra("user", currentUser);
+        intent.putExtra("self", true);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
             startActivityForResult(intent, PROFILE);

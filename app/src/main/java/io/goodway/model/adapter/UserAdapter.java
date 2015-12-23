@@ -1,6 +1,7 @@
 package io.goodway.model.adapter;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,12 +9,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.model.callback.UserCallback;
+import io.goodway.view.ImageTrans_CircleTransform;
 
 
 /**
@@ -27,15 +31,17 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private List<User> mDataset;
     private UserCallback callback;
     private String mail, password;
+    private Context context;
 
     private static final String TAG="LINE_ADAPTER";
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public UserAdapter(UserCallback callback, String mail, String password) {
+    public UserAdapter(Context context, UserCallback callback, String mail, String password) {
         this.callback = callback;
         mDataset = new ArrayList<User>();
         this.mail = mail;
         this.password = password;
+        this.context = context;
     }
 
     // Create new views (invoked by the layout manager)
@@ -56,7 +62,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         holder.setItem(mDataset.get(position));
         User a = mDataset.get(position);
         holder.name.setText(a.getFirstName()+" "+a.getLastName());
-        //holder.icon.setImageDrawable(activity.getResources().getDrawable(a.getIcon(), activity.getTheme()));
+        holder.title.setText(a.getTitle(context));
+        Picasso.with(context)
+                .load(a.getAvatar())
+                .error(R.mipmap.ic_person_black_36dp)
+                .resize(100, 100)
+                .transform(new ImageTrans_CircleTransform())
+                .into(holder.avatar);
     }
 
     public void add(User item) {
@@ -81,15 +93,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
-        TextView name;
-        ImageView icon;
+        TextView name, title;
+        ImageView avatar;
         User item;
 
         public ViewHolder(View lyt_main) {
             super(lyt_main);
             lyt_main.setOnClickListener(this);
             name = (TextView) lyt_main.findViewById(R.id.name);
-            icon = (ImageView) lyt_main.findViewById(R.id.profileImage);
+            title = (TextView) lyt_main.findViewById(R.id.title);
+            avatar = (ImageView) lyt_main.findViewById(R.id.avatar);
         }
 
         @Override

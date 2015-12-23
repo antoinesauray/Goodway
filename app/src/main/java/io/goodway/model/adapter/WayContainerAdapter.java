@@ -86,7 +86,7 @@ public class WayContainerAdapter extends RecyclerView.Adapter<WayContainerAdapte
                         String[] arrivalTime = Address.splitIso8601(e.getArrivalDateTime());
                         ((TextView) v.findViewById(R.id.departure)).setText(departureTime[3]+":"+departureTime[4]);
                         ((TextView)v.findViewById(R.id.arrival)).setText(arrivalTime[3]+":"+arrivalTime[4]);
-                        ((TextView) v.findViewById(R.id.duration)).setText(Address.secondToStr(activity, e.getDuration()));
+                        ((TextView) v.findViewById(R.id.duration)).setText(activity.getString(R.string.duration)+" "+Address.secondToStr(activity, e.getDuration()));
                         holder.ways.addView(v);
                         //notifyItemChanged(0);
                         v.setOnClickListener(new View.OnClickListener() {
