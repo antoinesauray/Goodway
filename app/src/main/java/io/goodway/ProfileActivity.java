@@ -161,7 +161,6 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                     Address address = data.getParcelableExtra("address");
                     String name = data.getStringExtra("s_name");
                     boolean shared = data.getBooleanExtra("shared", false);
-
                     newAddressFragment.name.setText(name);
                     newAddressFragment.shared.setChecked(shared);
                     if(newAddressFragment.location!=null) {
