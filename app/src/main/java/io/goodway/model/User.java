@@ -3,12 +3,8 @@ package io.goodway.model;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-
-import com.google.android.gms.maps.model.LatLng;
 
 import io.goodway.R;
-import io.goodway.navitia_android.Address;
 
 /**
  * Created by root on 6/13/15.
