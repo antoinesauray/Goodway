@@ -94,10 +94,10 @@ public class MainActivity extends AppCompatActivity{
     private Fragment current;
     private SearchFragment search;
     private MainFragment main;
-    private static final int MAIN=1, SEARCH=2;
-
 
     // ----------------------------------- Constants
+    private static final int MAIN=1, SEARCH=2;
+    
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
