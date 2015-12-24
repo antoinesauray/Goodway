@@ -1,17 +1,25 @@
 package io.goodway;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -26,7 +34,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ActionMenuView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -38,10 +45,13 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.FileNotFoundException;
+
 import io.goodway.model.User;
 import io.goodway.model.callback.AddressSelected;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.UploadDocument;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
@@ -83,8 +93,9 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
     private Bundle bundle;
     private AsyncTask currentAsyncTask;
 
-    private static final int FILE_SELECT_CODE = 2;
+    private static final int FILE_SELECT_CODE = 2, READ_EXTERNAL_STORAGE=3;
     private FloatingActionButton fab;
+    private ImageView avatar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +109,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        ImageView avatar = (ImageView) findViewById(R.id.avatar);
+        avatar = (ImageView) findViewById(R.id.avatar);
         Picasso.with(this)
                 .load(user.getAvatar())
                 .error(R.mipmap.ic_person_white_48dp)
@@ -235,16 +246,36 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                         }, mail, password, newAddressFragment.location);
                     }
                 case FILE_SELECT_CODE:
-                    if (resultCode == RESULT_OK) {
-                        // Get the Uri of the selected file
-                        Uri uri = data.getData();
-
-                        Log.d(TAG, "File Uri: " + uri.toString());
+                    Uri selectedImage = data.getData();
+                    try {
+                        new UploadDocument(this, decodeUri(this, selectedImage, 100),  ProfileActivity.this.avatar, selectedImage.getLastPathSegment(), mail, password).execute();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
                     }
-                    break;
             }
         }
+    }
+    public static Bitmap decodeUri(Context c, Uri uri, final int requiredSize)
+            throws FileNotFoundException {
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uri), null, o);
 
+        int width_tmp = o.outWidth
+                , height_tmp = o.outHeight;
+        int scale = 1;
+
+        while(true) {
+            if(width_tmp / 2 < requiredSize || height_tmp / 2 < requiredSize)
+                break;
+            width_tmp /= 2;
+            height_tmp /= 2;
+            scale *= 2;
+        }
+
+        BitmapFactory.Options o2 = new BitmapFactory.Options();
+        o2.inSampleSize = scale;
+        return BitmapFactory.decodeStream(c.getContentResolver().openInputStream(uri), null, o2);
     }
 
     @Override
@@ -351,18 +382,52 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
-        try {
-            startActivityForResult(
-                    Intent.createChooser(intent, getString(R.string.choose_picture)),
-                    FILE_SELECT_CODE);
-        } catch (android.content.ActivityNotFoundException ex) {
-            // Potentially direct the user to the Market with a Dialog
-            Toast.makeText(this, R.string.install_explorer,
-                    Toast.LENGTH_SHORT).show();
+                } else {
+
+                    // No explanation needed, we can request the permission.
+
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            READ_EXTERNAL_STORAGE);
+                }
+            }
+            else{
+                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                photoPickerIntent.setType("image/*");
+                startActivityForResult(photoPickerIntent, ProfileActivity.FILE_SELECT_CODE);
+            }
+        }
+        else {
+            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+            photoPickerIntent.setType("image/*");
+            startActivityForResult(photoPickerIntent, ProfileActivity.FILE_SELECT_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case READ_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+                    photoPickerIntent.setType("image/*");
+                    startActivityForResult(photoPickerIntent, ProfileActivity.FILE_SELECT_CODE);
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
         }
     }
 

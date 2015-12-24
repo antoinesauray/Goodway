@@ -179,6 +179,7 @@
     <string name="cofounder">Cofondateur</string>
     <string name="newcomer">Nouveau venu</string>
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
     <!-- navitia -->
@@ -200,5 +201,9 @@
     <string name="navitia_minutes">minutes</string>
     <string name="navitia_seconds">secondes</string>
 =======
+>>>>>>> develop
+=======
+
+    <string name="could_not_send">Nous n\'avons pas réussi à mettre à jour votre photo</string>
 >>>>>>> develop
 </resources>

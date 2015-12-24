@@ -94,10 +94,10 @@ public class MainActivity extends AppCompatActivity{
     private Fragment current;
     private SearchFragment search;
     private MainFragment main;
-    private static final int MAIN=1, SEARCH=2;
-
 
     // ----------------------------------- Constants
+    private static final int MAIN=1, SEARCH=2;
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,13 +149,6 @@ public class MainActivity extends AppCompatActivity{
         ((TextView)navigationView.getHeaderView(0).findViewById(R.id.version)).setText(getString(R.string.version) + " " + getVersionInfo());
 
         Log.d("avatar", "avatar" + currentUser.getAvatar());
-
-        Picasso.with(this)
-                .load(currentUser.getAvatar())
-                .error(R.mipmap.ic_person_white_48dp)
-                .resize(150, 150)
-                .transform(new ImageTrans_CircleTransform())
-                .into(((ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar)));
 
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -218,6 +211,18 @@ public class MainActivity extends AppCompatActivity{
         b.putInt("REQUEST", request);
         b.putParcelable("USER", currentUser);
         switchToSearch(b);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Picasso.with(this)
+                .load(currentUser.getAvatar())
+                .error(R.mipmap.ic_person_white_48dp)
+                .resize(150, 150)
+                .transform(new ImageTrans_CircleTransform())
+                .into(((ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar)));
+
     }
 
     @Override

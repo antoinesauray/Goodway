@@ -88,6 +88,13 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
                     // result of the request.
                 }
             }
+            else{
+                googleApiClient = new GoogleApiClient.Builder(getActivity())
+                        .addApi(LocationServices.API)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .build();
+            }
         }
         else{
             googleApiClient = new GoogleApiClient.Builder(getActivity())
