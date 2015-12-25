@@ -288,7 +288,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         else{
             if(self){
                 Intent returnIntent = new Intent();
-                returnIntent.putExtra("USER", user);
+                returnIntent.putExtra("user", user);
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }

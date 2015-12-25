@@ -183,4 +183,7 @@
     <string name="add_group">Ajouter un groupe</string>
     <string name="find_groups">Rechercher des groupes</string>
     <string name="groups">Groupes</string>
+
+    <string name="organised_by">organisé par</string>
+    <string name="the">le</string>
 </resources>

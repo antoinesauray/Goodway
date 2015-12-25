@@ -1,12 +1,10 @@
 package io.goodway.model.adapter;
 
 import android.content.Context;
-import android.graphics.Outline;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewOutlineProvider;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,12 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.goodway.R;
-import io.goodway.model.Event;
 import io.goodway.model.Group;
-import io.goodway.model.callback.AddressSelected;
 import io.goodway.model.callback.GroupCallback;
-import io.goodway.navitia_android.Address;
-import io.goodway.navitia_android.UserLocation;
 import io.goodway.view.ImageTrans_CircleTransform;
 
 
