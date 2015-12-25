@@ -60,7 +60,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         holder.setItem(mDataset.get(position));
         Event a = mDataset.get(position);
         holder.name.setText(a.getName());
-        holder.featured.setText(R.string.featured);
+        holder.description.setText(R.string.featured);
         Picasso.with(activity).load(a.BASEURL + a.getId()+".png")
         .error(R.mipmap.ic_event_black_36dp).into(holder.eventImage, new Callback() {
             @Override
@@ -100,7 +100,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
-        TextView name, featured;
+        TextView name, description;
         ImageView eventImage;
         ProgressBar progressBar;
         Event item;
@@ -111,9 +111,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             lyt_main.setOnClickListener(this);
             this.activity = activity;
             name = (TextView) lyt_main.findViewById(R.id.name);
-            eventImage = (ImageView) lyt_main.findViewById(R.id.eventImage);
+            eventImage = (ImageView) lyt_main.findViewById(R.id.avatar);
             progressBar = (ProgressBar) lyt_main.findViewById(R.id.progressBar);
-            featured = (TextView) lyt_main.findViewById(R.id.featured);
+            description = (TextView) lyt_main.findViewById(R.id.description);
         }
 
         @Override

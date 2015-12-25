@@ -336,7 +336,23 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
         return null;
     }
 
-
+    public static AsyncTask getGroups(Context c, Action<Group> action, ErrorAction error, String mail, String password, String name) {
+        if (name != null) {
+            return new GoodwayHttpsClient<>(c, new ProcessJson<Group>() {
+                @Override
+                public Group processJson(JSONObject jsonObject) {
+                    Integer id = jsonObject.optInt("id");
+                    String name = jsonObject.optString("name");
+                    String description = jsonObject.optString("description");
+                    String avatar = jsonObject.optString("avatar");
+                    return new Group(id, name, description, avatar);
+                }
+            }, action, error, "https://api.goodway.io/groups.php").execute(
+                    new Pair("name", name),
+                    new Pair("mail", mail), new Pair("pass", password));
+        }
+        return null;
+    }
 
     public static String convertStreamToString(InputStream is) {
 

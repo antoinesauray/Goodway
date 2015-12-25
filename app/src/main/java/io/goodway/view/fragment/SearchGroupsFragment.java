@@ -190,6 +190,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                 b2.putParcelable("DESTINATION", address);
                 mainActivity.switchToMain(b2, request);
                 break;
+            default:
 
         }
     }

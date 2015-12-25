@@ -72,6 +72,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
                 .load(a.getAvatar())
                 .error(R.mipmap.ic_person_black_36dp)
                 .resize(100, 100)
+                .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(holder.avatar);
     }

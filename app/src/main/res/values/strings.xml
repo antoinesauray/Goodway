@@ -179,4 +179,8 @@
     <string name="newcomer">Nouveau venu</string>
 
     <string name="could_not_send">Nous n\'avons pas réussi à mettre à jour votre photo</string>
+
+    <string name="add_group">Ajouter un groupe</string>
+    <string name="find_groups">Rechercher des groupes</string>
+    <string name="groups">Groupes</string>
 </resources>

@@ -68,6 +68,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.AddressViewH
                 .load(g.getAvatar())
                 .error(R.mipmap.ic_event_black_36dp)
                 .resize(100, 100)
+                .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(holder.avatar);
     }

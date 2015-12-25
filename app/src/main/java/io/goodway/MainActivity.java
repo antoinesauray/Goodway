@@ -160,6 +160,11 @@ public class MainActivity extends AppCompatActivity{
                         i.putExtra("USER", currentUser);
                         startActivity(i);
                         break;
+                    case R.id.groups:
+                        Intent i2 = new Intent(MainActivity.this, UserGroupsActivity.class);
+                        i2.putExtra("user", currentUser);
+                        startActivity(i2);
+                        break;
                 }
                 return false;
             }
@@ -220,6 +225,7 @@ public class MainActivity extends AppCompatActivity{
                 .load(currentUser.getAvatar())
                 .error(R.mipmap.ic_person_white_48dp)
                 .resize(150, 150)
+                .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(((ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar)));
 

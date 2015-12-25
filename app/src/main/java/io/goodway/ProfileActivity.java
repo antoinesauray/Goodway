@@ -114,6 +114,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 .load(user.getAvatar())
                 .error(R.mipmap.ic_person_white_48dp)
                 .resize(200, 200)
+                .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(avatar);
 
