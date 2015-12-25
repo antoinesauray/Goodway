@@ -114,6 +114,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 .load(user.getAvatar())
                 .error(R.mipmap.ic_person_white_48dp)
                 .resize(200, 200)
+                .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(avatar);
 
@@ -287,7 +288,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         else{
             if(self){
                 Intent returnIntent = new Intent();
-                returnIntent.putExtra("USER", user);
+                returnIntent.putExtra("user", user);
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }

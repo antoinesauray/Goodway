@@ -45,7 +45,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         root = inflater.inflate(R.layout.fragment_search, container, false);
         int item = getArguments().getInt("ITEM", 1);
         request = getArguments().getInt("REQUEST");
-        user = getArguments().getParcelable("USER");
+        user = getArguments().getParcelable("user");
         mainActivity = (MainActivity) getActivity();
 
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);

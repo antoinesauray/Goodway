@@ -26,25 +26,21 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
 import io.goodway.R;
-import io.goodway.model.Event;
+import io.goodway.model.GroupEvent;
 import io.goodway.model.Group;
 import io.goodway.model.User;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.navitia_android.Action;
-import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
 import io.goodway.navitia_android.GroupLocation;
 import io.goodway.navitia_android.Pair;
 import io.goodway.navitia_android.UserLocation;
-import io.goodway.navitia_android.Way;
 
 /**
  * Created by antoine on 10/25/15.
@@ -238,18 +234,19 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
             }
         }, action, error, finish, "https://api.goodway.io/friends_request.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
-    public static AsyncTask getEvents(Context c, Action<Event> action, ErrorAction error, FinishCallback finish, String mail, String password){
-        return new GoodwayHttpsClient<>(c, new ProcessJson<Event>() {
+    public static AsyncTask getEvents(Context c, Action<GroupEvent> action, ErrorAction error, FinishCallback finish, String mail, String password){
+        return new GoodwayHttpsClient<>(c, new ProcessJson<GroupEvent>() {
             @Override
-            public Event processJson(JSONObject jsonObject) {
+            public GroupEvent processJson(JSONObject jsonObject) {
                 Integer id = jsonObject.optInt("id");
                 String name = jsonObject.optString("name");
+                String avatar = jsonObject.optString("avatar");
                 String s_time = jsonObject.optString("s_time");
                 String e_time = jsonObject.optString("e_time");
                 double lat = jsonObject.optDouble("st_x");
                 double lng = jsonObject.optDouble("st_y");
                 String html = jsonObject.optString("html");
-                return new Event(id, name, html, s_time, e_time, lat, lng);
+                return new GroupEvent(id, name, html, avatar, s_time, e_time, lat, lng);
             }
         }, action, error,finish, "https://api.goodway.io/event.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("city", "1"));
     }
@@ -336,7 +333,52 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
         return null;
     }
 
+    public static AsyncTask getGroups(Context c, Action<Group> action, ErrorAction error, String mail, String password, String name) {
+        if (name != null) {
+            return new GoodwayHttpsClient<>(c, new ProcessJson<Group>() {
+                @Override
+                public Group processJson(JSONObject jsonObject) {
+                    Integer id = jsonObject.optInt("id");
+                    String name = jsonObject.optString("name");
+                    String description = jsonObject.optString("description");
+                    String avatar = jsonObject.optString("avatar");
+                    return new Group(id, name, description, avatar);
+                }
+            }, action, error, "https://api.goodway.io/groups.php").execute(
+                    new Pair("name", name),
+                    new Pair("mail", mail), new Pair("pass", password));
+        }
+        return null;
+    }
+    public static AsyncTask joinGroup(Context c, Action<Void> action, ErrorAction error, String mail, String password, Group group) {
+            return new GoodwayHttpsClient<>(c, new ProcessJson<Void>() {
+                @Override
+                public Void processJson(JSONObject jsonObject) {
+                    return null;
+                }
+            }, action, error, "https://api.goodway.io/join_group.php").execute(
+                    new Pair("group", Integer.toString(group.getId())),
+                    new Pair("mail", mail), new Pair("pass", password));
+    }
 
+    public static AsyncTask getUpcomingEvents(Context c, Action<GroupEvent> action, ErrorAction error, String mail, String password, Group group) {
+        return new GoodwayHttpsClient<>(c, new ProcessJson<GroupEvent>() {
+            @Override
+            public GroupEvent processJson(JSONObject jsonObject) {
+                Integer id = jsonObject.optInt("id");
+                String name = jsonObject.optString("name");
+                String avatar = jsonObject.optString("avatar");
+                String s_time = jsonObject.optString("s_time");
+                String e_time = jsonObject.optString("e_time");
+                double lat = jsonObject.optDouble("st_x");
+                double lng = jsonObject.optDouble("st_y");
+                String html = jsonObject.optString("html");
+                return new GroupEvent(id, name, html, avatar, s_time, e_time, lat, lng);
+            }
+        }, action, error, "https://api.goodway.io/upcoming_events.php").execute(
+                new Pair("group", Integer.toString(group.getId())),
+                new Pair("mail", mail), new Pair("pass", password));
+    }
 
     public static String convertStreamToString(InputStream is) {
 

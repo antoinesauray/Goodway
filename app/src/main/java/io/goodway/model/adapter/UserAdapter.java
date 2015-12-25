@@ -67,6 +67,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 .load(a.getAvatar())
                 .error(R.mipmap.ic_person_black_36dp)
                 .resize(100, 100)
+                .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(holder.avatar);
     }

@@ -69,7 +69,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_google_places, container, false);
         request = getArguments().getInt("REQUEST");
-        user = getArguments().getParcelable("USER");
+        user = getArguments().getParcelable("user");
 
         SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
                 getActivity().MODE_PRIVATE);

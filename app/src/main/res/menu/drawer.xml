@@ -8,6 +8,9 @@
             <item
                 android:id="@+id/friends"
                 android:title="@string/friends"/>
+            <item
+                android:id="@+id/groups"
+                android:title="@string/groups"/>
         </menu>
     </item>
 

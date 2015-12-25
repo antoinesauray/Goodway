@@ -34,7 +34,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.picasso.Picasso;
 
-import io.goodway.model.Event;
+import io.goodway.model.GroupEvent;
 import io.goodway.model.User;
 import io.goodway.navitia_android.Address;
 import io.goodway.view.ImageTrans_CircleTransform;
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity{
      */
     private Address from, to;
 
-    private User currentUser;
+    private User user;
 
     public static final int DEPARTURE=1, DESTINATION=2;
 
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity{
         //from = new Address(R.string.your_location, R.mipmap.ic_home_black_24dp, AddressType.POSITION);
 
         Bundle extras = this.getIntent().getExtras();
-        currentUser = extras.getParcelable("USER");
+        user = extras.getParcelable("user");
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -143,12 +143,24 @@ public class MainActivity extends AppCompatActivity{
         main = new MainFragment();
         search = new SearchFragment();
 
-        switchToMain(new Bundle(), -1);
+        Address departure = extras.getParcelable("departure");
+        Address destination = extras.getParcelable("destination");
+        Bundle b = new Bundle();
+        if(departure!=null){
+            setFrom(departure);
+            b.putParcelable("DEPARTURE", departure);
+        }
+        if(destination!=null){
+            setTo(destination);
+            b.putParcelable("DESTINATION", departure);
+        }
+
+        switchToMain(b, -1);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        ((TextView)navigationView.getHeaderView(0).findViewById(R.id.name)).setText(currentUser.getName());
+        ((TextView)navigationView.getHeaderView(0).findViewById(R.id.name)).setText(user.getName());
         ((TextView)navigationView.getHeaderView(0).findViewById(R.id.version)).setText(getString(R.string.version) + " " + getVersionInfo());
 
-        Log.d("avatar", "avatar" + currentUser.getAvatar());
+        Log.d("avatar", "avatar" + user.getAvatar());
 
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -157,13 +169,19 @@ public class MainActivity extends AppCompatActivity{
                 switch (menuItem.getItemId()) {
                     case R.id.friends:
                         Intent i = new Intent(MainActivity.this, FriendsActivity.class);
-                        i.putExtra("USER", currentUser);
+                        i.putExtra("user", user);
                         startActivity(i);
+                        break;
+                    case R.id.groups:
+                        Intent i2 = new Intent(MainActivity.this, UserGroupsActivity.class);
+                        i2.putExtra("user", user);
+                        startActivity(i2);
                         break;
                 }
                 return false;
             }
         });
+
     }
 
     @Override
@@ -209,7 +227,7 @@ public class MainActivity extends AppCompatActivity{
     public void changeLocation(int request){
         Bundle b = new Bundle();
         b.putInt("REQUEST", request);
-        b.putParcelable("USER", currentUser);
+        b.putParcelable("user", user);
         switchToSearch(b);
     }
 
@@ -217,9 +235,10 @@ public class MainActivity extends AppCompatActivity{
     public void onResume(){
         super.onResume();
         Picasso.with(this)
-                .load(currentUser.getAvatar())
+                .load(user.getAvatar())
                 .error(R.mipmap.ic_person_white_48dp)
                 .resize(150, 150)
+                .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(((ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar)));
 
@@ -231,8 +250,8 @@ public class MainActivity extends AppCompatActivity{
         if (requestCode == MainActivity.EVENT_REQUEST){
             if(resultCode == RESULT_OK){
                 Log.d("EVENT_REQUEST", "request code");
-                Event event = data.getExtras().getParcelable("EVENT");
-                Address eventAddr = new Address(event.getName(), event.getLatitude(), event.getLongitude());
+                GroupEvent groupEvent = data.getExtras().getParcelable("GROUPEVENT");
+                Address eventAddr = new Address(groupEvent.getName(), groupEvent.getLatitude(), groupEvent.getLongitude());
                 switchAfterResult(data, eventAddr);
             } else{
                 search.setCurrentItem(2);
@@ -241,7 +260,7 @@ public class MainActivity extends AppCompatActivity{
         else if(requestCode==MainActivity.PROFILE){
             if(resultCode == RESULT_OK) {
                 Log.d("EVENT_REQUEST", "request code");
-                currentUser = data.getExtras().getParcelable("USER");
+                user = data.getExtras().getParcelable("user");
             }
         }
     }
@@ -288,7 +307,7 @@ public class MainActivity extends AppCompatActivity{
 
     public void drawerHeaderClick(View v){
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        intent.putExtra("user", currentUser);
+        intent.putExtra("user", user);
         intent.putExtra("self", true);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
