@@ -126,7 +126,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
         }, action, error, finish, "https://api.goodway.io/user_locations.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("id", Integer.toString(id)));
     }
 
-    public static AsyncTask getGroupLocations(final Context c, Action<GroupLocation> action, ErrorAction error, FinishCallback finish, String mail, String password, final String name, final int id){
+    public static AsyncTask getGroupLocations(final Context c, Action<GroupLocation> action, ErrorAction error, FinishCallback finish, String mail, String password, final int id){
         return new GoodwayHttpsClient<>(c, new ProcessJson<GroupLocation>() {
             @Override
             public GroupLocation processJson(JSONObject jsonObject) {
@@ -135,7 +135,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 String lat = jsonObject.optString("st_y");
                 String lng = jsonObject.optString("st_x");
                 try{
-                    return new GroupLocation(id, s_name, a_name, name, Double.parseDouble(lat), Double.parseDouble(lng));
+                    return new GroupLocation(id, s_name, a_name, Double.parseDouble(lat), Double.parseDouble(lng));
                 }
                 catch (NumberFormatException e){
                     return null;

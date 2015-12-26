@@ -12,14 +12,12 @@ public class GroupLocation extends Address implements Parcelable{
     private int id;
     private boolean shared;
     private String a_name, fname;
-    private String groupName;
     // a_name is the name given by the user to the address
     // name is the name of the address itself
-    public GroupLocation(int id, String s_name, String a_name, String groupName, double lat, double lon){
+    public GroupLocation(int id, String s_name, String a_name, double lat, double lon){
         this.id = id;
         this.name = s_name;
         this.a_name = a_name;
-        this.groupName = groupName;
         this.lat = lat;
         this.lon = lon;
     }
@@ -31,13 +29,12 @@ public class GroupLocation extends Address implements Parcelable{
     public void setA_name(String a_name){this.a_name=a_name;}
 
     public String toString(){
-        return name+" ("+fname+")";
+        return name;
     }
 
     public GroupLocation(Parcel in){
         super(in);
         id = in.readInt();
-        groupName = in.readString();
     }
 
     @Override
@@ -57,7 +54,6 @@ public class GroupLocation extends Address implements Parcelable{
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
         dest.writeInt(id);
-        dest.writeString(groupName);
     }
 
     public static final Creator CREATOR =

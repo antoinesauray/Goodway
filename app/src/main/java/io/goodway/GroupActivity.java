@@ -106,7 +106,7 @@ public class GroupActivity extends AppCompatActivity{
             public void action(int length) {
 
             }
-        }, mail, password, group.getName(), group.getId());
+        }, mail, password, group.getId());
 
         GoodwayHttpsClient.getUpcomingEvents(this, new Action<GroupEvent>() {
             @Override

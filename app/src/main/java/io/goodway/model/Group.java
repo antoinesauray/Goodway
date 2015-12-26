@@ -47,6 +47,8 @@ public class Group implements Parcelable {
 
     public String getAvatar(){return avatar;}
 
+    public String toString(){return name;}
+
     @Override
     public int describeContents() {
         return 0;

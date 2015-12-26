@@ -105,7 +105,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                         dialog.dismiss();
                         sheet.show();
                     }
-                }, mail, password, e.getName(), e.getId());
+                }, mail, password, e.getId());
             }
         });
 
