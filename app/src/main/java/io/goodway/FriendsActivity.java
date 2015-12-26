@@ -1,8 +1,10 @@
 package io.goodway;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +17,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,16 +54,21 @@ public class FriendsActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
+    private TabLayout tabLayout;
 
     private User user;
     private String password;
+    private int nbFriendRequests;
+
+    public static final int FRIENDACCEPTANCE=1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
         Bundle extras = this.getIntent().getExtras();
-        user = extras.getParcelable("USER");
+        user = extras.getParcelable("user");
+        nbFriendRequests = extras.getInt("nbFriendRequests");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.friends);
         setSupportActionBar(toolbar);
@@ -75,7 +83,7 @@ public class FriendsActivity extends AppCompatActivity {
         pagerAdapter = new PagerAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         viewPager.setAdapter(pagerAdapter);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
     }
 
@@ -88,8 +96,27 @@ public class FriendsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed(){
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("nbFriendRequests", nbFriendRequests);
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
+    }
+
     public void fabClick(View v){
         startActivity(new Intent(FriendsActivity.this, AddFriendActivity.class));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("onActivityResult=", "onActivityResult");
+        if (resultCode == RESULT_OK) {
+            nbFriendRequests--;
+            Log.d("nbFriendRequests=", "nbFriendRequests="+nbFriendRequests);
+            pagerAdapter.notifyDataSetChanged();
+            tabLayout.setupWithViewPager(viewPager);
+        }
     }
 
     // Since this is an object collection, use a FragmentStatePagerAdapter,
@@ -125,6 +152,9 @@ public class FriendsActivity extends AppCompatActivity {
         }
 
         @Override
+        public void restoreState(Parcelable state, ClassLoader loader) {}
+
+        @Override
         public int getCount() {
             return 2;
         }
@@ -135,7 +165,12 @@ public class FriendsActivity extends AppCompatActivity {
                 case 0:
                     return getString(R.string.friends);
                 case 1:
-                    return getString(R.string.pending)+" "+f2.nbRequests;
+                    if(nbFriendRequests!=0) {
+                        return getString(R.string.pending) + " (" +nbFriendRequests+")";
+                    }
+                    else{
+                        return getString(R.string.pending);
+                    }
                 default:
                     return null;
             }
@@ -180,37 +215,20 @@ public class FriendsActivity extends AppCompatActivity {
             Bundle extras = getArguments();
             mail = extras.getString("mail");
             password = extras.getString("password");
-            GoodwayHttpsClient.getFriends(getActivity(), new Action<User>() {
-                @Override
-                public void action(User e) {
-                    swipeLayout.setRefreshing(false);
-                    adapter.add(e);
-                }
-            }, new ErrorAction() {
-                @Override
-                public void action(int length) {
-                    switch (length){
-                        case 0:
-                            swipeLayout.setRefreshing(false);
-                            error.setText(R.string.no_friends);
-                            error.setVisibility(View.VISIBLE);
-                            break;
-                        case -1:
-                            swipeLayout.setRefreshing(false);
-                            error.setText(R.string.connexion_error);
-                            error.setVisibility(View.VISIBLE);
-                            break;
-                    }
-                }
-            }, mail, password);
 
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(adapter);
             swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
             swipeLayout.setOnRefreshListener(this);
             swipeLayout.setColorSchemeColors(R.color.accent);
-            swipeLayout.setRefreshing(true);
+
             return rootView;
+        }
+
+        @Override
+        public void onResume(){
+            super.onResume();
+            onRefresh();
         }
 
         @Override
@@ -279,13 +297,34 @@ public class FriendsActivity extends AppCompatActivity {
                     i.putExtra("mail", mail);
                     i.putExtra("password", password);
                     i.putExtra("self", false);
-                    startActivity(i);
+                    startActivityForResult(i, FRIENDACCEPTANCE);
                 }
             }, mail, password);
 
-            GoodwayHttpsClient.getFriendsRequest(getActivity(), new Action<User>() {
+
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(adapter);
+            swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
+            swipeLayout.setOnRefreshListener(this);
+            swipeLayout.setColorSchemeColors(R.color.accent);
+            return rootView;
+        }
+
+        @Override
+        public void onResume(){
+            super.onResume();
+            onRefresh();
+        }
+
+        @Override
+        public void onRefresh() {
+            swipeLayout.setRefreshing(true);
+            adapter.clear();
+            error.setVisibility(View.INVISIBLE);
+            GoodwayHttpsClient.getFriendRequests(getActivity(), new Action<User>() {
                 @Override
                 public void action(User e) {
+                    swipeLayout.setRefreshing(false);
                     adapter.add(e);
                 }
             }, new ErrorAction() {
@@ -305,50 +344,7 @@ public class FriendsActivity extends AppCompatActivity {
             }, new FinishCallback() {
                 @Override
                 public void action(int length) {
-                    nbRequests=Integer.toString(length);
-                    ((FriendsActivity)getActivity()).pagerAdapter.notifyDataSetChanged();
-                }
-            },mail, password);
 
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setAdapter(adapter);
-            swipeLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeRefreshLayout);
-            swipeLayout.setOnRefreshListener(this);
-            swipeLayout.setColorSchemeColors(R.color.accent);
-            swipeLayout.setRefreshing(true);
-            return rootView;
-        }
-
-        @Override
-        public void onRefresh() {
-            swipeLayout.setRefreshing(true);
-            adapter.clear();
-            error.setVisibility(View.INVISIBLE);
-            GoodwayHttpsClient.getFriendsRequest(getActivity(), new Action<User>() {
-                @Override
-                public void action(User e) {
-                    swipeLayout.setRefreshing(false);
-                    adapter.add(e);
-                }
-            }, new ErrorAction() {
-                @Override
-                public void action(int length) {
-                    switch (length){
-                        case 0:
-                            error.setText(R.string.no_friend_requests);
-                            break;
-                        case -1:
-                            error.setText(R.string.connexion_error);
-                            break;
-                    }
-                    swipeLayout.setRefreshing(false);
-                    error.setVisibility(View.VISIBLE);
-                }
-            }, new FinishCallback() {
-                @Override
-                public void action(int length) {
-                    nbRequests=Integer.toString(length);
-                    ((FriendsActivity)getActivity()).pagerAdapter.notifyDataSetChanged();
                 }
             }, mail, password);
         }

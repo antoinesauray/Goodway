@@ -110,10 +110,12 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
         avatar = (ImageView) findViewById(R.id.avatar);
+        ((TextView)findViewById(R.id.title)).setText(user.getTitle(this));
         Picasso.with(this)
                 .load(user.getAvatar())
                 .error(R.mipmap.ic_person_white_48dp)
                 .resize(200, 200)
+                .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(avatar);
 
@@ -164,7 +166,9 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         GoodwayHttpsClient.requestFriend(this, new Action<Boolean>() {
             @Override
             public void action(Boolean e) {
-                fab.setVisibility(View.INVISIBLE);
+                Intent returnIntent = new Intent();
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
             }
         }, new ErrorAction() {
             @Override
@@ -287,7 +291,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         else{
             if(self){
                 Intent returnIntent = new Intent();
-                returnIntent.putExtra("USER", user);
+                returnIntent.putExtra("user", user);
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }

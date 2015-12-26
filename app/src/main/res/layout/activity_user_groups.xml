@@ -21,68 +21,42 @@
         android:animateLayoutChanges="true"
         android:paddingBottom="16dp">
         <android.support.v7.widget.Toolbar
-            android:id="@+id/mapToolbar"
+            android:id="@+id/toolbar"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:animateLayoutChanges="true"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             android:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/avatar"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|bottom"
+            android:layout_width="wrap_content"
             android:animateLayoutChanges="true"
-            android:orientation="vertical">
-            <ImageView
-                android:id="@+id/avatar"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:animateLayoutChanges="true"
-                />
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="8dp"
-                android:textColor="@android:color/white"/>
-        </LinearLayout>
+            android:layout_gravity="center_horizontal|bottom"
+            />
     </android.support.design.widget.AppBarLayout>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:animateLayoutChanges="true"
-        android:layout_marginTop="4dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:orientation="vertical">
-
-        <FrameLayout
-            android:id="@+id/addressContainer"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <FrameLayout
-            android:id="@+id/activityContainer"
+            android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:divider="@android:color/white"
+            android:dividerHeight="0dp">
+        </android.support.v7.widget.RecyclerView>
+        </android.support.v4.widget.SwipeRefreshLayout>
 
     </LinearLayout>
-    </ScrollView>
-
-</LinearLayout>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:onClick="fabClick"
-        android:visibility="invisible"
-        android:src="@mipmap/ic_person_add_white_48dp"
+        android:src="@mipmap/ic_action_add_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
@@ -90,7 +64,7 @@
         app:borderWidth="0dp"
         app:rippleColor="@android:color/white"
         app:backgroundTint="@color/accent"
-        app:layout_anchor="@id/appbar"
+        app:layout_anchor="@id/coordinatorLayout"
         app:layout_anchorGravity="bottom|right|end"
         />
     </android.support.design.widget.CoordinatorLayout>

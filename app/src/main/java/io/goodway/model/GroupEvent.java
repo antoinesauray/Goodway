@@ -3,39 +3,44 @@ package io.goodway.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+import io.goodway.navitia_android.Address;
+
 /**
  * Created by root on 6/13/15.
  */
-public class Event implements Parcelable {
+public class GroupEvent implements Parcelable {
 
     private int id;
-    private String name, s_time, e_time, url;
+    private String name, avatar, s_time, e_time, url;
     private double latitude, longitude;
 
-    public final static String BASEURL="http://gorilla.goodway.io/event_";
 
     public static final Creator CREATOR =
             new Creator() {
-                public Event createFromParcel(Parcel in) {
-                    return new Event(in);
+                public GroupEvent createFromParcel(Parcel in) {
+                    return new GroupEvent(in);
                 }
 
-                public Event[] newArray(int size) {
-                    return new Event[size];
+                public GroupEvent[] newArray(int size) {
+                    return new GroupEvent[size];
                 }
             };
 
-    public Event(int id, String name, String url, String s_time, String e_time, double latitude, double longitude){
+    public GroupEvent(int id, String name, String url, String avatar, String s_time, String e_time, double latitude, double longitude){
         this.id = id;
         this.name = name;
         this.url = url;
+        this.avatar = avatar;
         this.s_time = s_time;
         this.e_time = e_time;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public Event(Parcel in){
+    public GroupEvent(Parcel in){
         readFromParcel(in);
     }
 
@@ -50,6 +55,8 @@ public class Event implements Parcelable {
     public String getS_time(){return s_time;}
 
     public String getE_time(){return e_time;}
+
+    public String getAvatar(){return avatar;}
 
     public int getId(){return id;}
 
@@ -80,4 +87,17 @@ public class Event implements Parcelable {
         latitude = in.readDouble();
         longitude = in.readDouble();
     }
+
+    public static String formatMonth(String month) {
+        SimpleDateFormat monthParse = new SimpleDateFormat("MM");
+        SimpleDateFormat monthDisplay = new SimpleDateFormat("MMMM");
+        try {
+            return monthDisplay.format(monthParse.parse(month));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return month;
+        }
+
+    }
+
 }

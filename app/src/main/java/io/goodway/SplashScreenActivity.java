@@ -34,6 +34,7 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.goodway.model.GroupEvent;
 import io.goodway.model.User;
 import io.goodway.model.network.GoodwayHttpsClient;
 import io.goodway.navitia_android.Action;
@@ -150,7 +151,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                         }
                     }, mail, password);
                 } else {
-                    start(new User(id, fname, lname, mail, title, false));
+                    start(new User(id, fname, lname, mail, title, null, false));
                     connectedAs.setText(mail);
                 }
 
@@ -173,7 +174,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     Intent i = new Intent(getActivity(), MainActivity.class);
-                    i.putExtra("USER", u);
+                    i.putExtra("user", u);
                     startActivity(i);
                 }
 
@@ -232,7 +233,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                         editor.putInt("title", u.getTitle());
                         editor.commit();
                         Intent i = new Intent(getActivity(), MainActivity.class);
-                        i.putExtra("USER", u);
+                        i.putExtra("user", u);
                         startActivity(i);
                     }
                 }, new ErrorAction() {
@@ -335,7 +336,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                             date = Calendar.getInstance();
                             date.set(year, monthOfYear, dayOfMonth);
-                            birthday.setText(dayOfMonth+" "+ EventActivity.formatMonth(Integer.toString(monthOfYear+1))+" "+year);
+                            birthday.setText(dayOfMonth+" "+ GroupEvent.formatMonth(Integer.toString(monthOfYear + 1))+" "+year);
                         }
                     }, 2000, 1, 1).show();
                     break;
@@ -379,7 +380,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                                 editor.putString("lname", u.getLastName());
                                 editor.commit();
                                 Intent i = new Intent(getActivity(), MainActivity.class);
-                                i.putExtra("USER", u);
+                                i.putExtra("user", u);
                                 dialog.dismiss();
                                 startActivity(i);
                             }

@@ -62,11 +62,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         holder.setItem(mDataset.get(position));
         User a = mDataset.get(position);
         holder.name.setText(a.getFirstName()+" "+a.getLastName());
-        holder.title.setText(a.getTitle(context));
+        if(a.getCity()!=null){holder.title.setText(a.getCity());}
+        else{holder.title.setText(a.getTitle(context));}
         Picasso.with(context)
                 .load(a.getAvatar())
                 .error(R.mipmap.ic_person_black_36dp)
                 .resize(100, 100)
+                .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(holder.avatar);
     }

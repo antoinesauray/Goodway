@@ -45,7 +45,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         root = inflater.inflate(R.layout.fragment_search, container, false);
         int item = getArguments().getInt("ITEM", 1);
         request = getArguments().getInt("REQUEST");
-        user = getArguments().getParcelable("USER");
+        user = getArguments().getParcelable("user");
         mainActivity = (MainActivity) getActivity();
 
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);
@@ -53,7 +53,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
 
         tabLayout = (TabLayout) mainActivity.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        int[] icons = new int[]{R.mipmap.ic_person_white, R.mipmap.ic_action_search, R.mipmap.ic_event_available};
+        int[] icons = new int[]{R.mipmap.ic_person_white, R.mipmap.ic_action_search, R.mipmap.ic_group_search};
         for (int i = 0; i < tabLayout.getTabCount(); i++) {
             tabLayout.getTabAt(i).setIcon(icons[i]);
         }

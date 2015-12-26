@@ -2,7 +2,9 @@ package io.goodway.view.fragment;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,9 +33,15 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import io.goodway.MainActivity;
 import io.goodway.R;
 import io.goodway.WayActivity;
+import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 
 
@@ -56,6 +64,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
     private TextView fromText, toText;
 
     private Address from, to;
+    private String mail, password;
 
     private static final int ACCESS_FINE_LOCATION=1;
     @Override
@@ -103,6 +112,10 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
                     .addOnConnectionFailedListener(this)
                     .build();
         }
+        SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
+                getActivity().MODE_PRIVATE);
+        mail = shared_preferences.getString("mail", null);
+        password = shared_preferences.getString("password", null);
 
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -254,6 +267,21 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
     public void onConnected(Bundle bundle) {
         userLocation = LocationServices.FusedLocationApi.getLastLocation(
                 googleApiClient);
+        Geocoder gcd = new Geocoder(getActivity(), Locale.getDefault());
+        List<android.location.Address> addresses = null;
+        try {
+            addresses = gcd.getFromLocation(userLocation.getLatitude(), userLocation.getLongitude(), 1);
+            if (addresses.size() > 0){
+                GoodwayHttpsClient.updateUserCity(getActivity(), new Action<Boolean>() {
+                    @Override
+                    public void action(Boolean e) {
+
+                    }
+                }, null, mail, password, addresses.get(0).getLocality());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if(googleMap!=null){
             positionMap();
         }

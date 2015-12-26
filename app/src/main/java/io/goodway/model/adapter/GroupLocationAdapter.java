@@ -7,18 +7,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.goodway.R;
-import io.goodway.model.Event;
-import io.goodway.model.callback.EventCallback;
+import io.goodway.model.GroupEvent;
+import io.goodway.model.callback.GroupLocationCallback;
+import io.goodway.navitia_android.Address;
+import io.goodway.navitia_android.GroupLocation;
 
 
 /**
@@ -27,29 +25,27 @@ import io.goodway.model.callback.EventCallback;
  * @version 1.0
  */
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
+public class GroupLocationAdapter extends RecyclerView.Adapter<GroupLocationAdapter.ViewHolder> {
 
-    private List<Event> mDataset;
+    private List<GroupLocation> mDataset;
     private Activity activity;
-    private EventCallback callback;
+    private GroupLocationCallback callback;
 
     private static final String TAG="LINE_ADAPTER";
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public EventAdapter(Activity activity, EventCallback callback) {
+    public GroupLocationAdapter(Activity activity, GroupLocationCallback callback) {
         this.activity = activity;
         this.callback = callback;
-        mDataset = new ArrayList<Event>();
+        mDataset = new ArrayList<GroupLocation>();
     }
 
     // Create new views (invoked by the layout manager)
     @Override
-    public EventAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public GroupLocationAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_event, parent, false);
-        // set the view's size, margins, paddings and layout parameters
-        ViewHolder vh = new ViewHolder(activity, v);
-        return vh;
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_group_location, parent, false);
+        return new ViewHolder(activity, v);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -58,23 +54,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.setItem(mDataset.get(position));
-        Event a = mDataset.get(position);
+        GroupLocation a = (GroupLocation) mDataset.get(position);
         holder.name.setText(a.getName());
-        holder.featured.setText(R.string.featured);
-        Picasso.with(activity).load(a.BASEURL + a.getId()+".png")
-        .error(R.mipmap.ic_event_black_36dp).into(holder.eventImage, new Callback() {
-            @Override
-            public void onSuccess() {
-                holder.progressBar.setVisibility(View.INVISIBLE);
-            }
-            @Override
-            public void onError() {
-                holder.progressBar.setVisibility(View.INVISIBLE);
-            }
-        });
+        holder.description.setText(a.getA_name());
     }
 
-    public void add(Event item) {
+    public void add(GroupLocation item) {
         int position = mDataset.size();
         mDataset.add(position, item);
         notifyItemInserted(position);
@@ -88,7 +73,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         notifyItemRangeRemoved(0, size);
     }
 
-    public Event get(int position){
+    public GroupLocation get(int position){
         return mDataset.get(position);
     }
 
@@ -98,22 +83,23 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         return mDataset.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return mDataset.get(position).getType();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
-        TextView name, featured;
-        ImageView eventImage;
-        ProgressBar progressBar;
-        Event item;
+        TextView name, description;
+        GroupLocation item;
         Activity activity;
 
         public ViewHolder(Activity activity, View lyt_main) {
             super(lyt_main);
             lyt_main.setOnClickListener(this);
-            this.activity = activity;
             name = (TextView) lyt_main.findViewById(R.id.name);
-            eventImage = (ImageView) lyt_main.findViewById(R.id.eventImage);
-            progressBar = (ProgressBar) lyt_main.findViewById(R.id.progressBar);
-            featured = (TextView) lyt_main.findViewById(R.id.featured);
+            description = (TextView) lyt_main.findViewById(R.id.description);
+            this.activity = activity;
         }
 
         @Override
@@ -121,7 +107,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             callback.action(item);
         }
 
-        public void setItem(Event item) {
+        public void setItem(GroupLocation item) {
             this.item = item;
         }
     }

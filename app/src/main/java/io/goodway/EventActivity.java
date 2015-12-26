@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -30,7 +31,8 @@ import com.squareup.picasso.Target;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import io.goodway.model.Event;
+import io.goodway.model.GroupEvent;
+import io.goodway.model.User;
 import io.goodway.navitia_android.Address;
 
 
@@ -53,11 +55,14 @@ public class EventActivity extends AppCompatActivity {
      * Toolbar widget
      */
     private Toolbar toolbar;
-    private Event event;
+    private GroupEvent groupEvent;
     private TextView date;
     private WebView webView;
 
+    private User user;
+
     private int request;
+    public static final int NEWACTIVITY=3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,16 +70,17 @@ public class EventActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
         Bundle extras = this.getIntent().getExtras();
-        event = extras.getParcelable("EVENT");
-        request = extras.getInt("REQUEST");
+        user = extras.getParcelable("user");
+        groupEvent = extras.getParcelable("event");
+        request = extras.getInt("request");
         final AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appBar);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(event.getName());
+        toolbar.setTitle(groupEvent.getName());
         webView = (WebView) findViewById(R.id.webView);
         webView.setBackgroundColor(Color.argb(1, 0, 0, 0));
         webView.getSettings().setAllowFileAccess(true);
 
-        Picasso.with(this).load(event.BASEURL + event.getId() + ".png")
+        Picasso.with(this).load(groupEvent.getUrl())
                     .error(R.mipmap.ic_event_black_36dp).into(new Target() {
 
                 @Override
@@ -119,8 +125,8 @@ public class EventActivity extends AppCompatActivity {
         actionBar.setHomeButtonEnabled(true);
 
         date = (TextView) findViewById(R.id.date);
-        String[] dateSplit = Address.splitIso8601(event.getS_time());
-        date.setText(dateSplit[2] + " " + formatMonth(dateSplit[1]) + " " + dateSplit[0] + " "+getString(R.string.at)+" " + dateSplit[3] + "h" + dateSplit[4]);
+        String[] dateSplit = Address.splitIso8601(groupEvent.getS_time());
+        date.setText(dateSplit[2] + " " + GroupEvent.formatMonth(dateSplit[1]) + " " + dateSplit[0] + " "+getString(R.string.at)+" " + dateSplit[3] + "h" + dateSplit[4]);
 
         webView.getSettings().setJavaScriptEnabled(true);
 
@@ -138,19 +144,7 @@ public class EventActivity extends AppCompatActivity {
             }
         });
 
-        webView.loadUrl(event.getUrl());
-
-    }
-
-    public static String formatMonth(String month) {
-        SimpleDateFormat monthParse = new SimpleDateFormat("MM");
-        SimpleDateFormat monthDisplay = new SimpleDateFormat("MMMM");
-        try {
-            return monthDisplay.format(monthParse.parse(month));
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return month;
-        }
+        webView.loadUrl(groupEvent.getUrl());
 
     }
 
@@ -158,17 +152,26 @@ public class EventActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                onBackPressed();
+                finish();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     public void fabClick(View v){
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("EVENT", event);
-        returnIntent.putExtra("REQUEST", request);
-        setResult(Activity.RESULT_OK, returnIntent);
-        webView.onPause();
-        finish();
+        if(request==NEWACTIVITY){
+            Intent i = new Intent(this, MainActivity.class);
+            i.putExtra("user", user);
+            i.putExtra("destination", new Address(groupEvent.getName(), groupEvent.getLatitude(), groupEvent.getLongitude()));
+            startActivity(i);
+        }
+        else {
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("GROUPEVENT", groupEvent);
+            returnIntent.putExtra("REQUEST", request);
+            setResult(Activity.RESULT_OK, returnIntent);
+            webView.onPause();
+            finish();
+        }
     }
 }

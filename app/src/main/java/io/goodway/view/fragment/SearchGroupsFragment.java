@@ -2,10 +2,8 @@ package io.goodway.view.fragment;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,14 +21,10 @@ import com.cocosw.bottomsheet.BottomSheet;
 
 import java.util.ArrayList;
 
-import io.goodway.EventActivity;
 import io.goodway.MainActivity;
 import io.goodway.R;
-import io.goodway.model.Event;
 import io.goodway.model.Group;
-import io.goodway.model.adapter.EventAdapter;
 import io.goodway.model.adapter.GroupAdapter;
-import io.goodway.model.callback.EventCallback;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.model.callback.GroupCallback;
 import io.goodway.model.network.GoodwayHttpsClient;
@@ -111,7 +105,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                         dialog.dismiss();
                         sheet.show();
                     }
-                }, mail, password, e.getName(), e.getId());
+                }, mail, password, e.getId());
             }
         });
 
@@ -190,6 +184,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                 b2.putParcelable("DESTINATION", address);
                 mainActivity.switchToMain(b2, request);
                 break;
+            default:
 
         }
     }
