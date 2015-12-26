@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -33,6 +34,9 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
+import java.util.Locale;
 
 import io.goodway.model.GroupEvent;
 import io.goodway.model.User;

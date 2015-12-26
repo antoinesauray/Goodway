@@ -82,7 +82,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 String avatar = jsonObject.optString("avatar");
                 int title = jsonObject.optInt("title");
                 Log.d(fname+" "+lname, "found someone");
-                return new User(id, fname, lname, avatar, title, false);
+                return new User(id, fname, lname, avatar, title, null, false);
             }
         }, action, null, "https://api.goodway.io/users.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
@@ -202,7 +202,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
             public User processJson(JSONObject jsonObject) {
                 int id = jsonObject.optInt("Id");
                 int title = jsonObject.optInt("title");
-                return new User(id, fname, lname, mail, title, false);
+                return new User(id, fname, lname, mail, title, null, false);
             }
         }, action, error, "https://api.goodway.io/register.php").execute(new Pair("mail", mail), new Pair("pass", password)
         , new Pair("fname", fname), new Pair("lname", lname), new Pair("bday", birthday));
@@ -216,9 +216,11 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 String lname = jsonObject.optString("lname");
                 String avatar = jsonObject.optString("avatar");
                 int title = jsonObject.optInt("title");
-                return new User(id, fname, lname, avatar, title, true);
+                String city = jsonObject.optString("city");
+                if(city=="null"){city=null;}
+                return new User(id, fname, lname, avatar, title, city, true);
             }
-        }, action, error, "https://api.goodway.io/friends.php").execute(new Pair("mail", mail), new Pair("pass", password), new Pair("pending", "false"));
+        }, action, error, "https://api.goodway.io/friends.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
 
     public static AsyncTask getFriendsRequest(Context c, Action<User> action, ErrorAction error, FinishCallback finish, String mail, String password){
@@ -230,7 +232,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 String lname = jsonObject.optString("lname");
                 String avatar = jsonObject.optString("avatar");
                 int title = jsonObject.optInt("title");
-                return new User(id, fname, lname, avatar, title, false);
+                return new User(id, fname, lname, avatar, title, null, false);
             }
         }, action, error, finish, "https://api.goodway.io/friends_request.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
@@ -297,6 +299,17 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 new Pair("id", Integer.toString(id)), new Pair("state", Boolean.toString(state)));
     }
 
+    public static AsyncTask updateUserCity(Context c, Action<Boolean> action, ErrorAction error, String mail, String password, String city){
+        return new GoodwayHttpsClient<>(c, new ProcessJson<Boolean>() {
+            @Override
+            public Boolean processJson(JSONObject jsonObject) {
+                return true;
+            }
+        }, action, error, "https://api.goodway.io/update_user_city.php").execute(
+                new Pair("mail", mail), new Pair("pass", password),
+                new Pair("city", city));
+    }
+
     public static AsyncTask getUsersFromName(Context c, Action<User> action, ErrorAction error, String mail, String password, String fname, String lname){
         if(fname != null ){
             if(lname!=null){
@@ -308,7 +321,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                         String lname = jsonObject.optString("lname");
                         String avatar = jsonObject.optString("avatar");
                         int title = jsonObject.optInt("title");
-                        return new User(id, fname, lname, avatar, title, false);
+                        return new User(id, fname, lname, avatar, title, null, false);
                     }
                 }, action, error, "https://api.goodway.io/users.php").execute(
                         new Pair("u1", fname), new Pair("u2", lname),
@@ -323,7 +336,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                         String lname = jsonObject.optString("lname");
                         String avatar = jsonObject.optString("avatar");
                         int title = jsonObject.optInt("title");
-                        return new User(id, fname, lname, avatar, title, false);
+                        return new User(id, fname, lname, avatar, title, null, false);
                     }
                 }, action, error, "https://api.goodway.io/users.php").execute(
                         new Pair("u1", fname),
@@ -357,7 +370,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                     return null;
                 }
             }, action, error, "https://api.goodway.io/join_group.php").execute(
-                    new Pair("group", Integer.toString(group.getId())),
+                    new Pair("g", Integer.toString(group.getId())),
                     new Pair("mail", mail), new Pair("pass", password));
     }
 

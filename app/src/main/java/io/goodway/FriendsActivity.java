@@ -60,7 +60,7 @@ public class FriendsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
         Bundle extras = this.getIntent().getExtras();
-        user = extras.getParcelable("USER");
+        user = extras.getParcelable("user");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.friends);
         setSupportActionBar(toolbar);
