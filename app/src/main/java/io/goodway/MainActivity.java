@@ -4,10 +4,10 @@ package io.goodway;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -35,12 +35,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
-import java.util.Locale;
-
 import io.goodway.model.GroupEvent;
 import io.goodway.model.User;
+import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
+import io.goodway.navitia_android.ErrorAction;
 import io.goodway.view.ImageTrans_CircleTransform;
 import io.goodway.view.fragment.MainFragment;
 import io.goodway.view.fragment.SearchFragment;
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity{
      *
      * @see
      */
-    public static final int FROM_LOCATION = 1, TO_LOCATION = 2, EVENT_REQUEST =3, SETLOCATION=4, PROFILE=5;
+    public static final int FROM_LOCATION = 1, TO_LOCATION = 2, EVENT_REQUEST =3, SETLOCATION=4, PROFILE=5, FRIENDS=6;
 
     private static final String TAG = "HOME_ACTIVITY";
     /**
@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity{
     private Fragment current;
     private SearchFragment search;
     private MainFragment main;
+    private int nbFriendRequests;
 
     // ----------------------------------- Constants
     private static final int MAIN=1, SEARCH=2;
@@ -109,6 +110,10 @@ public class MainActivity extends AppCompatActivity{
         checkGooglePlayServices();
         setContentView(R.layout.activity_main);
 
+        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
+                MODE_PRIVATE);
+        String mail = shared_preferences.getString("mail", null);
+        String password = shared_preferences.getString("password", null);
 
         //from = new Address(R.string.your_location, R.mipmap.ic_home_black_24dp, AddressType.POSITION);
 
@@ -166,6 +171,19 @@ public class MainActivity extends AppCompatActivity{
 
         Log.d("avatar", "avatar" + user.getAvatar());
 
+        GoodwayHttpsClient.getNbFriendRequests(this, new Action<Integer>() {
+            @Override
+            public void action(Integer e) {
+                nbFriendRequests=e;
+                if(e>0){navigationView.getMenu().findItem(R.id.friends).setTitle(getString(R.string.friends)+" ("+e+")");}
+            }
+        }, new ErrorAction() {
+            @Override
+            public void action(int length) {
+
+            }
+        }, mail,password);
+
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -174,7 +192,8 @@ public class MainActivity extends AppCompatActivity{
                     case R.id.friends:
                         Intent i = new Intent(MainActivity.this, FriendsActivity.class);
                         i.putExtra("user", user);
-                        startActivity(i);
+                        i.putExtra("nbFriendRequests", nbFriendRequests);
+                        startActivityForResult(i, MainActivity.FRIENDS);
                         break;
                     case R.id.groups:
                         Intent i2 = new Intent(MainActivity.this, UserGroupsActivity.class);
@@ -265,6 +284,13 @@ public class MainActivity extends AppCompatActivity{
             if(resultCode == RESULT_OK) {
                 Log.d("EVENT_REQUEST", "request code");
                 user = data.getExtras().getParcelable("user");
+            }
+        }
+        else if(requestCode==MainActivity.FRIENDS){
+            if(resultCode==RESULT_OK){
+                nbFriendRequests = data.getIntExtra("nbFriendRequests", 0);
+                if(nbFriendRequests>0){navigationView.getMenu().findItem(R.id.friends).setTitle(getString(R.string.friends)+" ("+nbFriendRequests+")");}
+                else{navigationView.getMenu().findItem(R.id.friends).setTitle(getString(R.string.friends));}
             }
         }
     }

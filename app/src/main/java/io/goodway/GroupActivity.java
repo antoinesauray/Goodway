@@ -9,6 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -167,10 +169,29 @@ public class GroupActivity extends AppCompatActivity{
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_group, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                break;
+            case R.id.action_quit:
+                GoodwayHttpsClient.quitGroup(this, new Action<Void>() {
+                    @Override
+                    public void action(Void e) {
+                        finish();
+                    }
+                }, new ErrorAction() {
+                    @Override
+                    public void action(int length) {
+                        Toast.makeText(GroupActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
+                    }
+                }, mail, password, group);
                 break;
         }
         return super.onOptionsItemSelected(item);

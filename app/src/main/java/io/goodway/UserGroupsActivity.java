@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -31,7 +32,7 @@ import io.goodway.view.ImageTrans_CircleTransform;
  * @author Antoine Sauray
  * @version 2.0
  */
-public class UserGroupsActivity extends AppCompatActivity{
+public class UserGroupsActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     // ----------------------------------- Model
     /**
@@ -54,6 +55,7 @@ public class UserGroupsActivity extends AppCompatActivity{
     private ImageView avatar;
     private GroupAdapter adapter;
     private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,7 @@ public class UserGroupsActivity extends AppCompatActivity{
         user = extras.getParcelable("user");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         toolbar.setTitle(user.getName() + " " + getString(R.string.groups));
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -99,22 +102,15 @@ public class UserGroupsActivity extends AppCompatActivity{
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeColors(R.color.accent);
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        GoodwayHttpsClient.getGroups(this, new Action<Group>() {
-            @Override
-            public void action(Group e) {
-                adapter.add(e);
-            }
-        }, new ErrorAction() {
-            @Override
-            public void action(int length) {
-
-            }
-        }, mail, password);
+        onRefresh();
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -128,5 +124,23 @@ public class UserGroupsActivity extends AppCompatActivity{
 
     public void fabClick(View v){
         startActivity(new Intent(this, SearchGroupActivity.class));
+    }
+
+    @Override
+    public void onRefresh() {
+        adapter.clear();
+        swipeRefreshLayout.setRefreshing(true);
+        GoodwayHttpsClient.getGroups(this, new Action<Group>() {
+            @Override
+            public void action(Group e) {
+                adapter.add(e);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }, new ErrorAction() {
+            @Override
+            public void action(int length) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }, mail, password);
     }
 }
