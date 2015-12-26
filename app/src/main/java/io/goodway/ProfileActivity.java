@@ -166,7 +166,9 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         GoodwayHttpsClient.requestFriend(this, new Action<Boolean>() {
             @Override
             public void action(Boolean e) {
-                fab.setVisibility(View.INVISIBLE);
+                Intent returnIntent = new Intent();
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
             }
         }, new ErrorAction() {
             @Override

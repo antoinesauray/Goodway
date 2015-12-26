@@ -223,7 +223,7 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
         }, action, error, "https://api.goodway.io/friends.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
 
-    public static AsyncTask getFriendsRequest(Context c, Action<User> action, ErrorAction error, FinishCallback finish, String mail, String password){
+    public static AsyncTask getFriendRequests(Context c, Action<User> action, ErrorAction error, FinishCallback finish, String mail, String password){
         return new GoodwayHttpsClient<>(c, new ProcessJson<User>() {
             @Override
             public User processJson(JSONObject jsonObject) {
@@ -234,7 +234,15 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 int title = jsonObject.optInt("title");
                 return new User(id, fname, lname, avatar, title, null, false);
             }
-        }, action, error, finish, "https://api.goodway.io/friends_request.php").execute(new Pair("mail", mail), new Pair("pass", password));
+        }, action, error, finish, "https://api.goodway.io/friend_requests.php").execute(new Pair("mail", mail), new Pair("pass", password));
+    }
+    public static AsyncTask getNbFriendRequests(Context c, Action<Integer> action, ErrorAction error, String mail, String password){
+        return new GoodwayHttpsClient<>(c, new ProcessJson<Integer>() {
+            @Override
+            public Integer processJson(JSONObject jsonObject) {
+                return jsonObject.optInt("count");
+            }
+        }, action, error, null, "https://api.goodway.io/nb_friend_requests.php").execute(new Pair("mail", mail), new Pair("pass", password));
     }
     public static AsyncTask getEvents(Context c, Action<GroupEvent> action, ErrorAction error, FinishCallback finish, String mail, String password){
         return new GoodwayHttpsClient<>(c, new ProcessJson<GroupEvent>() {
@@ -372,6 +380,17 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
             }, action, error, "https://api.goodway.io/join_group.php").execute(
                     new Pair("g", Integer.toString(group.getId())),
                     new Pair("mail", mail), new Pair("pass", password));
+    }
+
+    public static AsyncTask quitGroup(Context c, Action<Void> action, ErrorAction error, String mail, String password, Group group) {
+        return new GoodwayHttpsClient<>(c, new ProcessJson<Void>() {
+            @Override
+            public Void processJson(JSONObject jsonObject) {
+                return null;
+            }
+        }, action, error, "https://api.goodway.io/quit_group.php").execute(
+                new Pair("g", Integer.toString(group.getId())),
+                new Pair("mail", mail), new Pair("pass", password));
     }
 
     public static AsyncTask getUpcomingEvents(Context c, Action<GroupEvent> action, ErrorAction error, String mail, String password, Group group) {
