@@ -11,7 +11,7 @@ import io.goodway.R;
  */
 public class User implements Parcelable {
 
-    private String fname, lname, mail, avatar;
+    private String fname, lname, mail, avatar, city;
     private int id, title;
     private boolean friend;
 
@@ -27,15 +27,15 @@ public class User implements Parcelable {
             };
 
 
-    public User(int id, String fname, String lname, String avatar, int title, boolean friend){
+    public User(int id, String fname, String lname, String avatar, int title, String city, boolean friend){
         this.id = id;
         this.fname = fname;
         this.lname = lname;
         this.friend=friend;
         this.title = title;
         this.avatar = avatar;
+        this.city = city;
     }
-
 
     public User(int id, String fname, String lname, String avatar, String mail, int title, boolean friend){
         this.id = id;
@@ -62,6 +62,8 @@ public class User implements Parcelable {
     public String getName(){return fname+" "+lname;}
 
     public int getTitle(){return title;}
+
+    public String getCity(){return city;}
 
     public String getTitle(Context context){
         switch (title){
@@ -96,6 +98,7 @@ public class User implements Parcelable {
         dest.writeString(avatar);
         dest.writeByte((byte) (friend ? 1 : 0));
         dest.writeInt(title);
+        dest.writeString(city);
         dest.writeString(mail);
     }
     private void readFromParcel(Parcel in) {
@@ -105,6 +108,7 @@ public class User implements Parcelable {
         avatar = in.readString();
         friend = in.readByte() != 0;
         title = in.readInt();
+        city = in.readString();
         mail = in.readString();
     }
 }

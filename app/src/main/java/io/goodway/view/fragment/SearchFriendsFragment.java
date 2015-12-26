@@ -95,7 +95,12 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                     @Override
                     public void action(int length) {
                         dialog.dismiss();
-                        Toast.makeText(getActivity(), R.string.connexion_error, Toast.LENGTH_SHORT).show();
+                        if(length==-1) {
+                            Toast.makeText(getActivity(), R.string.connexion_error, Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            sheet.show();
+                        }
                     }
                 }, new FinishCallback() {
                     @Override

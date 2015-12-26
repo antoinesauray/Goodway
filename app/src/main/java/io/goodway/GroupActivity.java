@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -83,7 +84,10 @@ public class GroupActivity extends AppCompatActivity{
         adapter = new GroupLocationAdapter(this, new GroupLocationCallback() {
             @Override
             public void action(GroupLocation item) {
-
+                Intent i = new Intent(GroupActivity.this, MainActivity.class);
+                i.putExtra("user", user);
+                i.putExtra("destination", item);
+                startActivity(i);
             }
         });
         recyclerView.setAdapter(adapter);
@@ -121,7 +125,6 @@ public class GroupActivity extends AppCompatActivity{
                         i.putExtra("user", user);
                         i.putExtra("request", EventActivity.NEWACTIVITY);
                         startActivity(i);
-
                     }
                 });
                 Picasso.with(GroupActivity.this)
@@ -136,12 +139,16 @@ public class GroupActivity extends AppCompatActivity{
         }, new ErrorAction() {
             @Override
             public void action(int length) {
-
+                if(length==0){
+                    View error = getLayoutInflater().inflate(R.layout.view_way_not_found, null);
+                    ((TextView)error.findViewById(R.id.message)).setText(R.string.no_events);
+                    upcoming.addView(error);
+                }
             }
         }, mail, password, group);
 
         if(!joined) {
-            findViewById(R.id.fab).setVisibility(View.INVISIBLE);
+            findViewById(R.id.fab).setVisibility(View.VISIBLE);
         }
 
         avatar = (ImageView) findViewById(R.id.avatar);
@@ -157,8 +164,16 @@ public class GroupActivity extends AppCompatActivity{
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
+    }
 
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void fabClick(View v){

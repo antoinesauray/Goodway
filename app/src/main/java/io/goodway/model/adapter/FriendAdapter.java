@@ -67,7 +67,8 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
         holder.setItem(mDataset.get(position));
         User a = mDataset.get(position);
         holder.name.setText(a.getFirstName() + " " + a.getLastName());
-        holder.title.setText(a.getTitle(activity));
+        if(a.getCity()!=null){holder.title.setText(a.getCity());}
+        else{holder.title.setText(a.getTitle(activity));}
         Picasso.with(activity)
                 .load(a.getAvatar())
                 .error(R.mipmap.ic_person_black_36dp)

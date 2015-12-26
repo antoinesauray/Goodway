@@ -110,6 +110,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
         avatar = (ImageView) findViewById(R.id.avatar);
+        ((TextView)findViewById(R.id.title)).setText(user.getTitle(this));
         Picasso.with(this)
                 .load(user.getAvatar())
                 .error(R.mipmap.ic_person_white_48dp)
