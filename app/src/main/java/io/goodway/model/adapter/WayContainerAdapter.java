@@ -18,6 +18,7 @@ import io.goodway.model.callback.WayCallback;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
+import io.goodway.navitia_android.Line;
 import io.goodway.navitia_android.Pair;
 import io.goodway.navitia_android.Request;
 import io.goodway.navitia_android.Way;
@@ -74,6 +75,7 @@ public class WayContainerAdapter extends RecyclerView.Adapter<WayContainerAdapte
         pairs.add(new Pair("from", fromLongitude + ";" + fromLatitude));
         pairs.add(new Pair("to", toLongitude + ";" + toLatitude));
         pairs.add(new Pair("datetime", date));
+        holder.ways.removeAllViews();
         switch (type){
             case navitia:
                 holder.provider.setText(R.string.navitia);
