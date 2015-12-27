@@ -72,21 +72,6 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
         this.url = URL;
     }
 
-    public static AsyncTask getUsers(Context c, Action<User> action, String mail, String password){
-        return new GoodwayHttpsClient<>(c, new ProcessJson<User>() {
-            @Override
-            public User processJson(JSONObject jsonObject) {
-                int id = jsonObject.optInt("id");
-                String fname = jsonObject.optString("fname");
-                String lname = jsonObject.optString("lname");
-                String avatar = jsonObject.optString("avatar");
-                int title = jsonObject.optInt("title");
-                Log.d(fname+" "+lname, "found someone");
-                return new User(id, fname, lname, avatar, title, null, false);
-            }
-        }, action, null, "https://api.goodway.io/users.php").execute(new Pair("mail", mail), new Pair("pass", password));
-    }
-
     public static AsyncTask getSelfLocations(final Context c, Action<UserLocation> action, ErrorAction error, FinishCallback finish, String mail, String password, final String fname){
         return new GoodwayHttpsClient<>(c, new ProcessJson<UserLocation>() {
             @Override
