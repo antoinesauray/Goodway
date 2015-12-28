@@ -127,6 +127,8 @@ public class WayActivity extends AppCompatActivity implements WayCallback, Swipe
                         String dateStr = (new SimpleDateFormat("yyyyMMdd HHmm")).format(departureTime.getTime());
                         dateStr = dateStr.replaceAll("\\s+", "T");
                         adapter.setDepartureTime(dateStr);
+                        String[] split = Address.splitIso8601(dateStr);
+                        time.setText(split[3] + "h" + split[4]);
                         refresh();
                     }
                 }, departureTime.get(Calendar.HOUR_OF_DAY), departureTime.get(Calendar.MINUTE), true).show();
@@ -139,6 +141,14 @@ public class WayActivity extends AppCompatActivity implements WayCallback, Swipe
                         departureTime.set(year, monthOfYear, dayOfMonth, departureTime.get(Calendar.HOUR_OF_DAY), departureTime.get(Calendar.MINUTE));
                         String dateStr = (new SimpleDateFormat("yyyyMMdd HHmm")).format(departureTime.getTime());
                         dateStr = dateStr.replaceAll("\\s+", "T");
+                        if(departureTime.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH) && departureTime.get(Calendar.MONTH) == today.get(Calendar.MONTH) && departureTime.get(Calendar.YEAR) == today.get(Calendar.YEAR)){
+                            date.setText(getString(R.string.today));
+                        }
+                        else{
+                            date.setText(departureTime.get(Calendar.DAY_OF_MONTH)
+                                    + " "+departureTime.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+                                    + " "+departureTime.get(Calendar.YEAR));
+                        }
                         adapter.setDepartureTime(dateStr);
                         refresh();
                     }
