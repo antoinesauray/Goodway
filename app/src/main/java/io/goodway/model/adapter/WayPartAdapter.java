@@ -71,6 +71,18 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ItemHold
                 view = LayoutInflater.from(parent.getContext()).inflate(
                         R.layout.view_walking, parent, false);
                 return new WalkingHolder(view);
+            case Biking:
+                view = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.view_walking, parent, false);
+                return new WalkingHolder(view);
+            case BssRent:
+                view = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.view_walking, parent, false);
+                return new WalkingHolder(view);
+            case BssPutBack:
+                view = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.view_walking, parent, false);
+                return new WalkingHolder(view);
             default:
                 return null;
         }
@@ -124,6 +136,24 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ItemHold
                 waitingHolder.time.setText(Address.secondToStr(activity, wayPart.getDuration()));
                 break;
             case Transfer:
+                break;
+
+            case Biking:
+                WalkingHolder bikingHolder = (WalkingHolder) holder;
+                bikingHolder.action.setText(wayPart.getAction(activity));
+                bikingHolder.destination.setText(activity.getString(R.string.to_bikestation)+" "+wayPart.getTo().getName());
+                break;
+
+            case BssRent:
+                WalkingHolder bssRentHolder = (WalkingHolder) holder;
+                bssRentHolder.action.setText(wayPart.getAction(activity));
+                bssRentHolder.destination.setText(activity.getString(R.string.bikestation)+" "+wayPart.getTo().getName());
+                break;
+
+            case BssPutBack:
+                WalkingHolder bssPutBackHolder = (WalkingHolder) holder;
+                bssPutBackHolder.action.setText(wayPart.getAction(activity));
+                bssPutBackHolder.destination.setText(activity.getString(R.string.bikestation)+" "+wayPart.getFrom().getName());
                 break;
         }
     }

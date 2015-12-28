@@ -144,6 +144,12 @@ public abstract class WayPart implements Parcelable{
                             return new Walking(in);
                         case Waiting:
                             return new Waiting(in);
+                        case Biking:
+                            return new Biking(in);
+                        case BssRent:
+                            return new BssRent(in);
+                        case BssPutBack:
+                            return new BssPutBack(in);
                         default:
                             return null;
                     }

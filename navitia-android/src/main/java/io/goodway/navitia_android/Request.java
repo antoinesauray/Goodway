@@ -1,5 +1,6 @@
 package io.goodway.navitia_android;
 
+import android.graphics.drawable.AnimationDrawable;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -48,7 +49,7 @@ public class Request {
         use q= if you don't know whether the user type an address, a city a county or whatever
     */
 
-        private final String QUERY = "http://api.navitia.io/v1/journeys?";
+        private final String QUERY = "http://navitia.goodway.io/get_ways.php?";
         private Action action;
         private ErrorAction error;
         private ArrayList<Pair> pairs;
@@ -84,12 +85,6 @@ public class Request {
                     URL url = new URL(sb.toString());
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-                    Authenticator.setDefault(new Authenticator() {
-                        protected PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication("5822318f-3a97-4cd8-827e-11382099531c", "".toCharArray());
-                        }
-                    });
-
                     InputStreamReader in = new InputStreamReader(conn.getInputStream());
 
                     BufferedReader jsonReader = new BufferedReader(in);
@@ -100,33 +95,28 @@ public class Request {
 
                     try {
                         JSONObject jsonObj = new JSONObject(jsonResult.toString());
-                        JSONArray journeys = jsonObj.getJSONArray("journeys");
-                        nbJourneys = journeys.length();
+                        JSONArray ways = jsonObj.getJSONArray("ways");
+                        int nbWays = ways.length();
 
-                        for (int i = 0; i < nbJourneys; i++) {
+                        for (int i = 0; i < nbWays; i++) {
 
-                            JSONObject journey = journeys.getJSONObject(i);
-                            String arrivalDateTime = journey.optString("arrival_date_time");
-                            String departureDateTime = journey.optString("departure_date_time");
-                            double co2Emission = 0;
-                            if(journey.has("co2_emission")) {
-                                co2Emission = journey.getJSONObject("co2_emission").optDouble("value");
-                            }
+                            JSONObject way = ways.getJSONObject(i);
 
-                            String label = journey.optString("type");
-                            int duration = journey.optInt("duration");
-
-                            Log.d("duration",""+ duration);
+                            String label = way.optString("label");
+                            double co2Emission = way.optDouble("co2Emission");
+                            String arrivalDateTime = way.optString("arrivalDateTime");
+                            String departureDateTime = way.optString("departureDateTime");
+                            int duration = way.optInt("duration");
 
                             ArrayList<WayPart> parts = new ArrayList<WayPart>();
-                            JSONArray sections = journey.getJSONArray("sections");
-                            int nbSections = sections.length();
+                            JSONArray wayParts = way.getJSONArray("wayParts");
+                            int nbParts = wayParts.length();
 
                             WayPart tmpWayPart = null;
-                            for (int j = 0; j < nbSections; j++) {
+                            for (int j = 0; j < nbParts; j++) {
 
-                                JSONObject section = sections.getJSONObject(j);
-                                tmpWayPart = getWayPart(section);
+                                JSONObject wayPart = wayParts.getJSONObject(j);
+                                tmpWayPart = getWayPart(wayPart);
 
                                 if(tmpWayPart != null)
                                     parts.add(tmpWayPart);
@@ -160,92 +150,29 @@ public class Request {
             if(result==0){error.action(result);}
         }
 
-
-        private Address getSimpleAddress(JSONObject addr){
-
-            Address ret = null;
-
-            try {
-
-                JSONObject address = addr.getJSONObject("address");
-
-                String label = address.getString("label");
-                double lat = Double.parseDouble(address.getJSONObject("coord").getString("lat"));
-                double lon = Double.parseDouble(address.getJSONObject("coord").getString("lon"));
-
-                ret = new Address(label, lat, lon);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return ret;
-
-        }
-
-        private Stop getStop(JSONObject stop){
-
-            Stop ret = null;
-
-            try {
-
-                JSONObject stop_point = stop.getJSONObject("stop_point");
-
-                String label = stop_point.getString("label");
-                double lat = Double.parseDouble(stop_point.getJSONObject("coord").getString("lat"));
-                double lon = Double.parseDouble(stop_point.getJSONObject("coord").getString("lon"));
-                String id = stop_point.getString("id");
-
-                ret = new Stop(label, lat, lon, id);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return ret;
-
-        }
-
-        private TimedStop getTimedStop(JSONObject timedStop){
-            TimedStop ret = null;
-
-            try {
-
-                JSONObject stop_point = timedStop.getJSONObject("stop_point");
-
-                String label = stop_point.getString("label");
-                double lat = Double.parseDouble(stop_point.getJSONObject("coord").getString("lat"));
-                double lon = Double.parseDouble(stop_point.getJSONObject("coord").getString("lon"));
-                String id = stop_point.getString("id");
-                String arrival_date_time = timedStop.getString("arrival_date_time");
-                String departure_date_time = timedStop.getString("departure_date_time");
-
-                ret = new TimedStop(label, lat, lon, id, arrival_date_time, departure_date_time);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return ret;
-
-        }
-
-        private Address getAddress(JSONObject obj){
+        private Address getAddress(JSONObject address){
 
             Address ret = null;
-
             try {
+                String type = address.getString("type");
 
-                String type = obj.getString("embedded_type");
+                double lat  = address.getDouble("lat");
+                double lon  = address.getDouble("lon");
+                String name  = address.getString("name");
 
                 if(type.equals("address")){
-
-                    ret = getSimpleAddress(obj);
-
-                } else if(type.equals("stop_point")){
-
-                    ret = getStop(obj);
-
+                    ret = new Address(name, lat, lon);
+                } else if(type.equals("stop")){
+                    String stopId = address.getString("stopId");
+                    ret = new Stop(name, lat, lon, stopId);
+                } else if(type.equals("timed_stop")){
+                    String stopId = address.getString("stopId");
+                    String departureDateTime = address.getString("departureDateTime");
+                    String arrivalDateTime = address.getString("arrivalDateTime");
+                    ret = new TimedStop(name, lat, lon, stopId, departureDateTime, arrivalDateTime);
+                } else if(type.equals("bike_station")){
+                    String stationId = address.getString("stationId");
+                    ret = new BikeStation(name, lat, lon, stationId);
                 }
 
             } catch (JSONException e) {
@@ -263,7 +190,7 @@ public class Request {
 
                 if(obj.getString("type") == "LineString"){
 
-                    int length = obj.getJSONArray("properties").getJSONObject(0).getInt("length");
+                    int length = obj.getInt("length");
                     JSONArray coord = obj.getJSONArray("coordinates");
 
                     Coordinate[] coordinates = new Coordinate[coord.length()];
@@ -282,156 +209,68 @@ public class Request {
             return ret;
         }
 
-        private Waiting getWaiting(JSONObject section){
-
-            Waiting ret = null;
-
-            try {
-
-                String departureDateTime = section.getString("departure_date_time");
-                String arrivalDateTime = section.getString("arrival_date_time");
-                int duration = section.getInt("duration");
-
-                ret = new Waiting(0, departureDateTime, arrivalDateTime, duration);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return ret;
-
-        }
-
-        private Walking getWalking(JSONObject section){
-
-            Walking ret = null;
-
-            try {
-
-                JSONObject f = section.getJSONObject("from");
-                JSONObject t = section.getJSONObject("to");
-                JSONObject g = section.getJSONObject("geojson");
-
-                Address from = getAddress(f);
-                Address to = getAddress(t);
-                GeoJSON geoJSON = getGeoJSON(g);
-
-                String departureDateTime = section.getString("departure_date_time");
-                String arrivalDateTime = section.getString("arrival_date_time");
-                int duration = section.getInt("duration");
-
-                ret = new Walking(from, to, 0, departureDateTime, arrivalDateTime, duration, geoJSON);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return ret;
-
-        }
-
-        private Transfer getTransfer(JSONObject section){
-
-            Transfer ret = null;
-
-            try {
-
-                JSONObject f = section.getJSONObject("from");
-                JSONObject t = section.getJSONObject("to");
-                JSONObject g = section.getJSONObject("geojson");
-
-                Address from = getAddress(f);
-                Address to = getAddress(t);
-                GeoJSON geoJSON = getGeoJSON(g);
-
-                String departureDateTime = section.getString("departure_date_time");
-                String arrivalDateTime = section.getString("arrival_date_time");
-                int duration = section.getInt("duration");
-
-                ret = new Transfer(from, to, 0, departureDateTime, arrivalDateTime, duration, geoJSON);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return ret;
-
-        }
-
-        private BusTrip getBus(JSONObject section){
-
-            BusTrip ret = null;
-
-            try {
-
-                JSONObject f = section.getJSONObject("from");
-                JSONObject t = section.getJSONObject("to");
-                JSONObject g = section.getJSONObject("geojson");
-                JSONObject d = section.getJSONObject("display_informations");
-                JSONArray l = section.getJSONArray("links");
-                JSONArray s = section.getJSONArray("stop_date_times");
-
-                Address from = getAddress(f);
-                Address to = getAddress(t);
-                GeoJSON geoJSON = getGeoJSON(g);
-
-                String departureDateTime = section.getString("departure_date_time");
-                String arrivalDateTime = section.getString("arrival_date_time");
-                int duration = section.getInt("duration");
-
-                String lineId = l.getJSONObject(1).getString("id");
-                String lineName= d.getString("code");
-                String lineColor= d.getString("color");
-                String networkId= l.getJSONObject(5).getString("id");
-                Line line = new Line(lineId, lineName, lineColor, networkId);
-
-                String routeId = l.getJSONObject(2).getString("id");
-                String routeName= d.getString("headsign");
-                Route route = new Route(routeId, routeName, line);
-
-                String vehicleId = l.getJSONObject(0).getString("id");
-                String vehicleType = l.getJSONObject(4).getString("id");
-
-                ArrayList<TimedStop> stops = new ArrayList<>();
-                for(int i = 0; i < s.length(); i++) {
-                    stops.add(getTimedStop(s.getJSONObject(i)));
-                }
-
-                ret = new BusTrip(from, to, 0, departureDateTime, arrivalDateTime, duration, geoJSON, route, vehicleId, vehicleType, stops);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            Log.d("way",""+ ret.getRoute().getLine().getName());
-
-            return ret;
-
-        }
-
-        private WayPart getWayPart(JSONObject section){
+        private WayPart getWayPart(JSONObject wayPart){
 
             WayPart ret = null;
 
             try {
 
-                String type = section.getString("type");
+                String type = wayPart.getString("type");
+                Address from = getAddress(wayPart.getJSONObject("from"));
+                Address to = getAddress(wayPart.getJSONObject("to"));
+                double co2Emission = Double.parseDouble(wayPart.getString("co2Emission"));
+                String departureDateTime = wayPart.getString("departureDateTime");
+                String arrivalDateTime = wayPart.getString("arrivalDateTime");
+                int duration = wayPart.getInt("duration");
+                if(type.equals("walking")){
 
-                if(type.equals("street_network")){
-
-                    ret = getWalking(section);
+                    GeoJSON geoJson = getGeoJSON(wayPart.getJSONObject("geoJson"));
+                    ret = new Walking(from, to, co2Emission, departureDateTime, arrivalDateTime, duration, geoJson);
 
                 } else if(type.equals("public_transport")){
 
-                    ret = getBus(section);
+                    String routeId = wayPart.getJSONObject("route").getString("id");
+                    String routeName = wayPart.getJSONObject("route").getString("name");
+                    String lineId = wayPart.getJSONObject("route").getJSONObject("line").getString("id");
+                    String lineName = wayPart.getJSONObject("route").getJSONObject("line").getString("name");
+                    String lineColor = wayPart.getJSONObject("route").getJSONObject("line").getString("color");
+                    String networkId = wayPart.getJSONObject("route").getJSONObject("line").getString("networkId");
+                    Route route = new Route(routeId, routeName, new Line(lineId, lineName, lineColor, networkId));
+
+                    String vehicleId = wayPart.getString("vehicleId");
+                    String vehicleType = wayPart.getString("vehicleType");
+
+                    JSONArray s = wayPart.getJSONArray("stops");
+                    ArrayList<TimedStop> timedStops = new ArrayList<>();
+                    for(int i = 0; i < s.length(); i++) {
+                        timedStops.add((TimedStop) getAddress(s.getJSONObject(i)));
+                    }
+
+                    GeoJSON geoJson = getGeoJSON(wayPart.getJSONObject("geoJson"));
+
+                    ret = new BusTrip(from, to, co2Emission, departureDateTime, arrivalDateTime, duration, geoJson, route, vehicleId, vehicleType, timedStops);
 
                 } else if(type.equals("waiting")){
 
-                    ret = getWaiting(section);
+                    ret = new Waiting(co2Emission, departureDateTime, arrivalDateTime, duration);
 
                 } else if(type.equals("transfer")){
 
-                    ret = getTransfer(section);
+                    GeoJSON geoJson = getGeoJSON(wayPart.getJSONObject("geoJson"));
+                    ret = new Transfer(from, to, co2Emission, departureDateTime, arrivalDateTime, duration, geoJson);
+
+                } else if(type.equals("bike")){
+
+                    GeoJSON geoJson = getGeoJSON(wayPart.getJSONObject("geoJson"));
+                    ret = new Biking(from, to, co2Emission, departureDateTime, arrivalDateTime, duration, geoJson);
+
+                } else if(type.equals("bss_rent")){
+
+                    ret = new BssRent(from, to, co2Emission, departureDateTime, arrivalDateTime, duration, null);
+
+                } else if(type.equals("bss_put_back")){
+
+                    ret = new BssPutBack(from, to, co2Emission, departureDateTime, arrivalDateTime, duration, null);
 
                 }
 
