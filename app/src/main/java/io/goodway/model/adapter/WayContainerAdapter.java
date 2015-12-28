@@ -3,23 +3,26 @@ package io.goodway.model.adapter;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.goodway.R;
 import io.goodway.model.ContainerType;
+import io.goodway.model.Uber;
 import io.goodway.model.callback.WayCallback;
+import io.goodway.model.network.GoodwayHttpClientGet;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
-import io.goodway.navitia_android.Line;
 import io.goodway.navitia_android.Pair;
 import io.goodway.navitia_android.Request;
 import io.goodway.navitia_android.Way;
@@ -168,9 +171,32 @@ public class WayContainerAdapter extends RecyclerView.Adapter<WayContainerAdapte
                 break;
             case uber:
                 holder.provider.setText(R.string.uber);
-                View uber = activity.getLayoutInflater().inflate(R.layout.view_way_not_found, null);
-                ((TextView)uber.findViewById(R.id.message)).setText(R.string.noUber);
-                holder.ways.addView(uber);
+                GoodwayHttpClientGet.getUberEstimate(activity, new Action<Uber>() {
+                    @Override
+                    public void action(Uber e) {
+                        final View uber = activity.getLayoutInflater().inflate(R.layout.view_uber, null);
+                        ((TextView) uber.findViewById(R.id.display_name)).setText(e.getDisplayName());
+                        ((TextView) uber.findViewById(R.id.duration)).setText(activity.getString(R.string.duration)+" "+Address.secondToStr(activity, e.getDuration()));
+                        holder.ways.addView(uber);
+                        GoodwayHttpClientGet.getUberTimeEstimate(activity, new Action<Integer>() {
+                            @Override
+                            public void action(Integer estimate) {
+                                ((TextView)uber.findViewById(R.id.estimate)).setText(activity.getString(R.string.estimate)+" "+Address.secondToStr(activity, estimate));
+                            }
+                        }, new ErrorAction() {
+                            @Override
+                            public void action(int length) {
+
+                            }
+                        }, from.getLatitude(), from.getLongitude(), e.getProduct_id());
+                    }
+                }, new ErrorAction() {
+                    @Override
+                    public void action(int length) {
+
+                    }
+                }, from.getLatitude(), from.getLongitude(), to.getLatitude(), to.getLongitude());
+
                 break;
         }
 

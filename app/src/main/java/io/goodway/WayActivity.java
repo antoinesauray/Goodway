@@ -14,11 +14,13 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 
 import java.text.SimpleDateFormat;
@@ -26,11 +28,14 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import io.goodway.model.ContainerType;
+import io.goodway.model.Uber;
 import io.goodway.model.adapter.WayContainerAdapter;
 import io.goodway.model.callback.WayCallback;
+import io.goodway.model.network.GoodwayHttpClientGet;
+import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
+import io.goodway.navitia_android.ErrorAction;
 import io.goodway.navitia_android.Way;
-import io.goodway.view.DividerItemDecoration;
 
 /**
  * Created by antoine on 8/23/15.

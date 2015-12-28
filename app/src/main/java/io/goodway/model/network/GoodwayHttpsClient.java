@@ -397,6 +397,27 @@ public class GoodwayHttpsClient<T> extends AsyncTask<Pair, T, Integer>{
                 new Pair("mail", mail), new Pair("pass", password));
     }
 
+    public static AsyncTask getUberPrices(Context c, Action<GroupEvent> action, ErrorAction error, double start_latitude, double start_longitude, double end_latitude, double end_longitude) {
+        return new GoodwayHttpsClient<>(c, new ProcessJson<GroupEvent>() {
+            @Override
+            public GroupEvent processJson(JSONObject jsonObject) {
+                Integer id = jsonObject.optInt("id");
+                String name = jsonObject.optString("name");
+                String avatar = jsonObject.optString("avatar");
+                String s_time = jsonObject.optString("s_time");
+                String e_time = jsonObject.optString("e_time");
+                double lat = jsonObject.optDouble("st_x");
+                double lng = jsonObject.optDouble("st_y");
+                String html = jsonObject.optString("html");
+                return new GroupEvent(id, name, html, avatar, s_time, e_time, lat, lng);
+            }
+        }, action, error, "https://uber.goodway.io/prices").execute(
+                new Pair("start_latitude", Double.toString(start_latitude)),
+                new Pair("start_longitude", Double.toString(start_longitude)),
+                new Pair("end_latitude", Double.toString(end_latitude)),
+                new Pair("end_longitude", Double.toString(end_longitude)));
+    }
+
     public static String convertStreamToString(InputStream is) {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
