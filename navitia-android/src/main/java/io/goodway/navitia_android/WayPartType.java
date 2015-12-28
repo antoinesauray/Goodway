@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by antoine on 12/5/15.
  */
 public enum WayPartType implements Parcelable {
-    BusTrip, Transfer, Walking, Waiting;
+    BusTrip, Transfer, Walking, Waiting, Biking, BssRent, BssPutBack;
 
     public static final Parcelable.Creator<WayPartType> CREATOR = new Creator<WayPartType>() {
 
