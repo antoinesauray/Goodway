@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Outline;
+import android.graphics.Rect;
 import android.os.Build;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -90,10 +91,25 @@ public class WayPartAdapter extends RecyclerView.Adapter<WayPartAdapter.ItemHold
                 busHolder.departure.setText(wayPart.getFrom().toString());
                 busHolder.destination.setText(wayPart.getTo().toString());
                 try{
-                    busHolder.line.setBackgroundColor(Color.parseColor("#"+trip.getRoute().getLine().getColor()));
+                    busHolder.line.setBackgroundColor(Color.parseColor("#" + trip.getRoute().getLine().getColor()));
                     busHolder.line.setTextColor(Color.WHITE);
+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                        ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
+                            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                            @Override
+                            public void getOutline(View view, Outline outline) {
+                                // Or read size directly from the view's width/height
+                                //outline.setOval(0, 0, view.getWidth(), view.getWidth());
+                                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), (view.getWidth())/2);
+                            }
+                        };
+                        busHolder.line.setOutlineProvider(viewOutlineProvider);
+                        busHolder.line.setClipToOutline(true);
+                    }
+
                 }
-                catch(IllegalArgumentException e){
+                catch (IllegalArgumentException e){
                     busHolder.destination.setTextColor(activity.getResources().getColor(android.R.color.primary_text_light));
                 }
                 break;
