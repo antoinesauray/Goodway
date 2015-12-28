@@ -6,18 +6,12 @@
     <string name="navitia_land">et descendre à</string>
     <string name="navitia_waiting">Attendre</string>
     <string name="navitia_walking">Marcher jusqu\'à</string>
-    <string name="navitia_biking">Rouler jusqu\'à</string>
-    <string name="navitia_bss_renting">Prendre un vélo à</string>
-    <string name="navitia_bss_puting_back">Rendre le vélo à</string>
     <string name="navitia_unknown">Tapis volant</string>
 
     <string name="navitia_bus">Bus</string>
     <string name="navitia_walk">Marcher</string>
     <string name="navitia_wait">Attente</string>
     <string name="navitia_transfer">Changement</string>
-    <string name="navitia_bike">Pédaler</string>
-    <string name="navitia_bss_rent">Prendre un vélo</string>
-    <string name="navitia_bss_put_back">Rendre le vélo</string>
 
     <string name="navitia_hours">Heures</string>
     <string name="navitia_minutes">minutes</string>

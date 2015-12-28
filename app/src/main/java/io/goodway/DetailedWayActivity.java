@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -77,9 +76,6 @@ public class DetailedWayActivity extends AppCompatActivity{
         ((TextView) viewWay.findViewById(R.id.departure)).setText(departureTime[3] + ":" + departureTime[4]);
         ((TextView)viewWay.findViewById(R.id.arrival)).setText(arrivalTime[3] + ":" + arrivalTime[4]);
         ((TextView) viewWay.findViewById(R.id.duration)).setText(getString(R.string.duration)+" "+Address.secondToStr(this, way.getDuration()));
-
-        // Test public-transport or bike
-        if(way.getLabel().equals("non_pt_bss")) ((ImageView) viewWay.findViewById(R.id.icon)).setImageResource(R.mipmap.ic_direction_bike_black);
 
 
         recyclerView.setHasFixedSize(true);

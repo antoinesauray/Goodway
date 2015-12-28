@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -126,45 +125,9 @@ public class WayContainerAdapter extends RecyclerView.Adapter<WayContainerAdapte
                 break;
             case bike:
                 holder.provider.setText(R.string.bike);
-                pairs.add(new Pair("ways_type", "bike"));
-                Request.getWays(new Action<Way>() {
-                    @Override
-                    public void action(final Way e) {
-                        View v = activity.getLayoutInflater().inflate(R.layout.view_way, null);
-                        ((ImageView) v.findViewById(R.id.icon)).setImageResource(R.mipmap.ic_direction_bike_black);
-                        ((TextView) v.findViewById(R.id.description)).setText(e.getFrom().toString() + " - " + e.getTo().toString());
-                        String[] departureTime = Address.splitIso8601(e.getDepartureDateTime());
-                        String[] arrivalTime = Address.splitIso8601(e.getArrivalDateTime());
-                        ((TextView) v.findViewById(R.id.departure)).setText(departureTime[3] + ":" + departureTime[4]);
-                        ((TextView) v.findViewById(R.id.arrival)).setText(arrivalTime[3] + ":" + arrivalTime[4]);
-                        ((TextView) v.findViewById(R.id.duration)).setText(activity.getString(R.string.duration) + " " + Address.secondToStr(activity, e.getDuration()));
-                        holder.ways.addView(v);
-                        //notifyItemChanged(0);
-                        v.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                callback.action(v, e);
-                            }
-                        });
-                    }
-
-                }, pairs, from, to, new ErrorAction() {
-                    @Override
-                    public void action(int length) {
-                        switch (length) {
-                            case 0:
-                                View bike = activity.getLayoutInflater().inflate(R.layout.view_way_not_found, null);
-                                ((TextView)bike.findViewById(R.id.message)).setText(R.string.noBike);
-                                holder.ways.addView(bike);
-                                break;
-                            case -1:
-                                View notAvailable = activity.getLayoutInflater().inflate(R.layout.view_way_not_found, null);
-                                ((TextView) notAvailable.findViewById(R.id.message)).setText(R.string.unavailable);
-                                holder.ways.addView(notAvailable);
-                                break;
-                        }
-                    }
-                });
+                View bike = activity.getLayoutInflater().inflate(R.layout.view_way_not_found, null);
+                ((TextView)bike.findViewById(R.id.message)).setText(R.string.noBike);
+                holder.ways.addView(bike);
                 break;
             case uber:
                 holder.provider.setText(R.string.uber);
