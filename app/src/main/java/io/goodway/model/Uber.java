@@ -5,11 +5,11 @@ package io.goodway.model;
  */
 public class Uber {
 
-    private double distance;
-    private int low_estimate, high_estimate, minimum, duration, surge_multiplier;
-    private String localized_display_name, estimate, display_name, product_id, currency_code;
+    protected double distance, surge_multiplier;
+    protected int low_estimate, high_estimate, minimum, duration;
+    protected String localized_display_name, estimate, display_name, product_id, currency_code;
 
-    public Uber(String localized_display_name, int high_estimate, int minimum, int duration, String estimate, double distance, String display_name, String product_id, int low_estimate, int surge_multiplier, String currency_code){
+    public Uber(String localized_display_name, int high_estimate, int minimum, int duration, String estimate, double distance, String display_name, String product_id, int low_estimate, double surge_multiplier, String currency_code){
         this.localized_display_name = localized_display_name;
         this.high_estimate = high_estimate;
         this.minimum = minimum;
