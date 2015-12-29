@@ -138,18 +138,31 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<Pair, T, Integer>{
                     currency_code = innerJsonObject.optString("currency_code");
                 }
                 JSONArray trip = jsonObject.getJSONArray("trip");
-                int tripLength = prices.length();
+                int tripLength = trip.length();
                 for (int i = 0; i < tripLength; i++) {
-                    JSONObject innerJsonObject = prices.getJSONObject(i);
+                    JSONObject innerJsonObject = trip.getJSONObject(i);
                     distance_unit = innerJsonObject.optString("distance_unit");
                     duration_estimate = innerJsonObject.optInt("duration_estimate");
                     distance_estimate = innerJsonObject.optDouble("distance_estimate");
                 }
                 pickup_estimate = jsonObject.optInt("pickup_estimate");
-                return new UberProduct(uber.getProduct_id(), uber.getDisplayName(), high_estimate, minimum, low_estimate,
+                return new UberProduct(uber.getProduct_id(), surge_confirmation_href, surge_confirmation_id, uber.getDisplayName(), high_estimate, minimum, low_estimate,
                                         surge_multiplier, display, currency_code, distance_unit, distance_estimate, duration_estimate, pickup_estimate);
             }
         }, action, error, "http://uber.goodway.io/request_estimate?").execute(
+                new Pair("start_latitude", Double.toString(start_latitude)),
+                new Pair("start_longitude", Double.toString(start_longitude)),
+                new Pair("product_id", uber.getProduct_id()),
+                new Pair("end_latitude", Double.toString(end_latitude)),
+                new Pair("end_longitude", Double.toString(end_longitude)));
+    }
+    public static AsyncTask uberRequest(Context c, Action<String> action, ErrorAction error, double start_latitude, double start_longitude, double end_latitude, double end_longitude, final Uber uber) {
+        return new GoodwayHttpClientGet<>(c, new ProcessJson<String>() {
+            @Override
+            public String processJson(JSONObject jsonObject) throws JSONException {
+                return jsonObject.optString("request_id");
+            }
+        }, action, error, "http://uber.goodway.io/request?").execute(
                 new Pair("start_latitude", Double.toString(start_latitude)),
                 new Pair("start_longitude", Double.toString(start_longitude)),
                 new Pair("product_id", uber.getProduct_id()),

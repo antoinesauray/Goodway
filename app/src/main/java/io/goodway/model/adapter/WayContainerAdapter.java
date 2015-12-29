@@ -2,24 +2,23 @@ package io.goodway.model.adapter;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.goodway.R;
+import io.goodway.UberActivity;
 import io.goodway.model.ContainerType;
 import io.goodway.model.Uber;
 import io.goodway.model.callback.WayCallback;
 import io.goodway.model.network.GoodwayHttpClientGet;
-import io.goodway.model.network.UberAuthorizeUrl;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
@@ -138,14 +137,18 @@ public class WayContainerAdapter extends RecyclerView.Adapter<WayContainerAdapte
                 GoodwayHttpClientGet.getUberEstimate(activity, new Action<List<Uber>>() {
                     @Override
                     public void action(List<Uber> list) {
-                        for (Uber e : list) {
+                        for (final Uber e : list) {
                             final View uber = activity.getLayoutInflater().inflate(R.layout.view_uber, null);
                             ((TextView) uber.findViewById(R.id.display_name)).setText(e.getDisplayName());
                             ((TextView) uber.findViewById(R.id.duration)).setText(activity.getString(R.string.duration) + " " + Address.secondToStr(activity, e.getDuration()));
                             uber.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    new UberAuthorizeUrl(activity).execute();
+                                    Intent i = new Intent(activity, UberActivity.class);
+                                    i.putExtra("uber", e);
+                                    i.putExtra("from", from);
+                                    i.putExtra("to", to);
+                                    activity.startActivity(i);
                                 }
                             });
                             holder.ways.addView(uber);
