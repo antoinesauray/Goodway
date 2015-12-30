@@ -191,4 +191,6 @@
     <string name="the">le</string>
     <string name="action_quit">Quitter</string>
     <string name="estimate">environ</string>
+
+    <string name="accounts">Comptes</string>
 </resources>

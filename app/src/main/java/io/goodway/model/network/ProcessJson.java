@@ -1,6 +1,7 @@
 package io.goodway.model.network;
 
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -8,5 +9,5 @@ import org.json.JSONObject;
  */
 public interface ProcessJson<T> {
 
-    public T processJson(JSONObject jsonObject);
+    public T processJson(JSONObject jsonObject) throws JSONException;
 }

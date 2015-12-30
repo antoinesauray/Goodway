@@ -13,5 +13,13 @@
                 android:title="@string/groups"/>
         </menu>
     </item>
-
+    <item
+        android:id="@+id/accounts_subheader"
+        android:title="@string/accounts">
+        <menu>
+            <item
+                android:id="@+id/uber"
+                android:title="@string/uber"/>
+        </menu>
+    </item>
 </menu>

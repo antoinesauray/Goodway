@@ -26,6 +26,8 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -33,6 +35,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import io.goodway.R;
 import io.goodway.model.Uber;
+import io.goodway.model.UberProduct;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.ErrorAction;
@@ -50,37 +53,45 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<Pair, T, Integer>{
     private ErrorAction error;
     private FinishCallback finish;
     private ProcessJson<T> processJson;
+    private ProcessJsonArray<T> processJsonArray;
     private String url;
-    private String array_id;
+    private String[] array_ids;
 
-    private GoodwayHttpClientGet(Context c, ProcessJson<T> processJson, Action<T> action, ErrorAction error, final String URL, String array_id){
+    private GoodwayHttpClientGet(Context c, ProcessJson<T> processJson, Action<T> action, ErrorAction error, final String URL){
         this.c = c;
         this.action = action;
         this.error = error;
         this.processJson = processJson;
         this.url = URL;
-        this.array_id = array_id;
+        this.array_ids = array_ids;
     }
 
-    public static AsyncTask getUberEstimate(Context c, Action<Uber> action, ErrorAction error, double start_latitude, double start_longitude, double end_latitude, double end_longitude) {
-        return new GoodwayHttpClientGet<>(c, new ProcessJson<Uber>() {
+    public static AsyncTask getUberEstimate(Context c, Action<List<Uber>> action, ErrorAction error, double start_latitude, double start_longitude, double end_latitude, double end_longitude) {
+        return new GoodwayHttpClientGet<>(c, new ProcessJson<List<Uber>>() {
             @Override
-            public Uber processJson(JSONObject jsonObject) {
-                String localized_display_name = jsonObject.optString("localized_display_name");
-                int high_estimate = jsonObject.optInt("high_estimate");
-                int minimum = jsonObject.optInt("minimum");
-                int duration = jsonObject.optInt("duration");
-                String estimate = jsonObject.optString("estimate");
-                double distance = jsonObject.optInt("distance");
-                String display_name = jsonObject.optString("display_name");
-                String product_id = jsonObject.optString("product_id");
-                int low_estimate = jsonObject.optInt("low_estimate");
-                int surge_multiplier = jsonObject.optInt("surge_multiplier");
-                String currency_code = jsonObject.optString("currency_code");
-                return new Uber(localized_display_name, high_estimate, minimum, duration, estimate,
-                        distance, display_name, product_id, low_estimate, surge_multiplier, currency_code);
+            public List<Uber> processJson(JSONObject jsonObject) throws JSONException {
+                ArrayList<Uber> ret = new ArrayList<Uber>();
+                JSONArray jsonArray = jsonObject.getJSONArray("prices");
+                int length = jsonArray.length();
+                for (int i = 0; i < length; i++) {
+                    JSONObject innerJsonObject = jsonArray.getJSONObject(i);
+                    String localized_display_name = innerJsonObject.optString("localized_display_name");
+                    int high_estimate = innerJsonObject.optInt("high_estimate");
+                    int minimum = innerJsonObject.optInt("minimum");
+                    int duration = innerJsonObject.optInt("duration");
+                    String estimate = innerJsonObject.optString("estimate");
+                    double distance = innerJsonObject.optInt("distance");
+                    String display_name = innerJsonObject.optString("display_name");
+                    String product_id = innerJsonObject.optString("product_id");
+                    int low_estimate = innerJsonObject.optInt("low_estimate");
+                    int surge_multiplier = innerJsonObject.optInt("surge_multiplier");
+                    String currency_code = innerJsonObject.optString("currency_code");
+                    ret.add(new Uber(localized_display_name, high_estimate, minimum, duration, estimate,
+                            distance, display_name, product_id, low_estimate, surge_multiplier, currency_code));
+                }
+                return ret;
             }
-        }, action, error, "http://uber.goodway.io/estimate?", "prices").execute(
+        }, action, error, "http://uber.goodway.io/estimate?").execute(
                 new Pair("start_latitude", Double.toString(start_latitude)),
                 new Pair("start_longitude", Double.toString(start_longitude)),
                 new Pair("end_latitude", Double.toString(end_latitude)),
@@ -89,18 +100,74 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<Pair, T, Integer>{
     public static AsyncTask getUberTimeEstimate(Context c, Action<Integer> action, ErrorAction error, double start_latitude, double start_longitude, String productId) {
         return new GoodwayHttpClientGet<>(c, new ProcessJson<Integer>() {
             @Override
-            public Integer processJson(JSONObject jsonObject) {
-                try {
-                    return jsonObject.getInt("estimate");
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            public Integer processJson(JSONObject jsonObject) throws JSONException {
+                JSONArray jsonArray = jsonObject.getJSONArray("times");
+                int length = jsonArray.length();
+                if(length==1) {
+                    try {
+                        return jsonArray.getJSONObject(0).optInt("estimate");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return -1;
             }
-        }, action, error, "http://uber.goodway.io/estimate_time?", "times").execute(
+        }, action, error, "http://uber.goodway.io/estimate_time?").execute(
                 new Pair("start_latitude", Double.toString(start_latitude)),
                 new Pair("start_longitude", Double.toString(start_longitude)),
                 new Pair("product_id", productId));
+    }
+    public static AsyncTask uberRequestEstimate(Context c, Action<UberProduct> action, ErrorAction error, double start_latitude, double start_longitude, double end_latitude, double end_longitude, final Uber uber) {
+        return new GoodwayHttpClientGet<>(c, new ProcessJson<UberProduct>() {
+            @Override
+            public UberProduct processJson(JSONObject jsonObject) throws JSONException {
+                String surge_confirmation_href=null, surge_confirmation_id=null, display=null, currency_code=null, distance_unit=null;
+                int high_estimate=-1, minimum=-1, low_estimate=-1, duration_estimate=-1, pickup_estimate;
+                double surge_multiplier=-1, distance_estimate=-1;
+                JSONArray prices = jsonObject.getJSONArray("prices");
+                int pricesLength = prices.length();
+                for (int i = 0; i < pricesLength; i++) {
+                    JSONObject innerJsonObject = prices.getJSONObject(i);
+                    surge_confirmation_href = innerJsonObject.optString("surge_confirmation_href");
+                    high_estimate = innerJsonObject.optInt("high_estimate");
+                    surge_confirmation_id = innerJsonObject.optString("surge_confirmation_id");
+                    minimum = innerJsonObject.optInt("minimum");
+                    low_estimate = innerJsonObject.optInt("low_estimate");
+                    surge_multiplier = innerJsonObject.optDouble("surge_multiplier");
+                    display = innerJsonObject.optString("display");
+                    currency_code = innerJsonObject.optString("currency_code");
+                }
+                JSONArray trip = jsonObject.getJSONArray("trip");
+                int tripLength = trip.length();
+                for (int i = 0; i < tripLength; i++) {
+                    JSONObject innerJsonObject = trip.getJSONObject(i);
+                    distance_unit = innerJsonObject.optString("distance_unit");
+                    duration_estimate = innerJsonObject.optInt("duration_estimate");
+                    distance_estimate = innerJsonObject.optDouble("distance_estimate");
+                }
+                pickup_estimate = jsonObject.optInt("pickup_estimate");
+                return new UberProduct(uber.getProduct_id(), surge_confirmation_href, surge_confirmation_id, uber.getDisplayName(), high_estimate, minimum, low_estimate,
+                                        surge_multiplier, display, currency_code, distance_unit, distance_estimate, duration_estimate, pickup_estimate);
+            }
+        }, action, error, "http://uber.goodway.io/request_estimate?").execute(
+                new Pair("start_latitude", Double.toString(start_latitude)),
+                new Pair("start_longitude", Double.toString(start_longitude)),
+                new Pair("product_id", uber.getProduct_id()),
+                new Pair("end_latitude", Double.toString(end_latitude)),
+                new Pair("end_longitude", Double.toString(end_longitude)));
+    }
+    public static AsyncTask uberRequest(Context c, Action<String> action, ErrorAction error, double start_latitude, double start_longitude, double end_latitude, double end_longitude, final Uber uber) {
+        return new GoodwayHttpClientGet<>(c, new ProcessJson<String>() {
+            @Override
+            public String processJson(JSONObject jsonObject) throws JSONException {
+                return jsonObject.optString("request_id");
+            }
+        }, action, error, "http://uber.goodway.io/request?").execute(
+                new Pair("start_latitude", Double.toString(start_latitude)),
+                new Pair("start_longitude", Double.toString(start_longitude)),
+                new Pair("product_id", uber.getProduct_id()),
+                new Pair("end_latitude", Double.toString(end_latitude)),
+                new Pair("end_longitude", Double.toString(end_longitude)));
     }
 
     public static String convertStreamToString(InputStream is) {
@@ -147,12 +214,7 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<Pair, T, Integer>{
                 Log.d("response:", jsonResult.toString());
                 try {
                     JSONObject obj= new JSONObject(jsonResult.toString());
-                    JSONArray jsonArray = obj.getJSONArray(array_id);
-                    length = jsonArray.length();
-                    for (int i = 0; i < length; i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        publishProgress(processJson.processJson(jsonObject));
-                    }
+                    publishProgress(processJson.processJson(obj));
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     Log.d("error", "json exception");
