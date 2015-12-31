@@ -2,20 +2,20 @@ package io.goodway.model.adapter;
 
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.goodway.R;
-import io.goodway.UberActivity;
 import io.goodway.model.ContainerType;
 import io.goodway.model.Uber;
 import io.goodway.model.callback.WayCallback;
@@ -171,36 +171,24 @@ public class WayContainerAdapter extends RecyclerView.Adapter<WayContainerAdapte
                 break;
             case uber:
                 holder.provider.setText(R.string.uber);
-                GoodwayHttpClientGet.getUberEstimate(activity, new Action<List<Uber>>() {
+                GoodwayHttpClientGet.getUberEstimate(activity, new Action<Uber>() {
                     @Override
-                    public void action(List<Uber> list) {
-                        for (final Uber e : list) {
-                            final View uber = activity.getLayoutInflater().inflate(R.layout.view_uber, null);
-                            ((TextView) uber.findViewById(R.id.display_name)).setText(e.getDisplayName());
-                            ((TextView) uber.findViewById(R.id.duration)).setText(activity.getString(R.string.duration) + " " + Address.secondToStr(activity, e.getDuration()));
-                            uber.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    Intent i = new Intent(activity, UberActivity.class);
-                                    i.putExtra("uber", e);
-                                    i.putExtra("from", from);
-                                    i.putExtra("to", to);
-                                    activity.startActivity(i);
-                                }
-                            });
-                            holder.ways.addView(uber);
-                            GoodwayHttpClientGet.getUberTimeEstimate(activity, new Action<Integer>() {
-                                @Override
-                                public void action(Integer estimate) {
-                                    ((TextView) uber.findViewById(R.id.estimate)).setText(activity.getString(R.string.estimate) + " " + Address.secondToStr(activity, estimate));
-                                }
-                            }, new ErrorAction() {
-                                @Override
-                                public void action(int length) {
+                    public void action(Uber e) {
+                        final View uber = activity.getLayoutInflater().inflate(R.layout.view_uber, null);
+                        ((TextView) uber.findViewById(R.id.display_name)).setText(e.getDisplayName());
+                        ((TextView) uber.findViewById(R.id.duration)).setText(activity.getString(R.string.duration)+" "+Address.secondToStr(activity, e.getDuration()));
+                        holder.ways.addView(uber);
+                        GoodwayHttpClientGet.getUberTimeEstimate(activity, new Action<Integer>() {
+                            @Override
+                            public void action(Integer estimate) {
+                                ((TextView)uber.findViewById(R.id.estimate)).setText(activity.getString(R.string.estimate)+" "+Address.secondToStr(activity, estimate));
+                            }
+                        }, new ErrorAction() {
+                            @Override
+                            public void action(int length) {
 
-                                }
-                            }, from.getLatitude(), from.getLongitude(), e.getProduct_id());
-                        }
+                            }
+                        }, from.getLatitude(), from.getLongitude(), e.getProduct_id());
                     }
                 }, new ErrorAction() {
                     @Override

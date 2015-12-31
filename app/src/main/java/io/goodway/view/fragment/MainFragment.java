@@ -269,18 +269,20 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
                 googleApiClient);
         Geocoder gcd = new Geocoder(getActivity(), Locale.getDefault());
         List<android.location.Address> addresses = null;
-        try {
-            addresses = gcd.getFromLocation(userLocation.getLatitude(), userLocation.getLongitude(), 1);
-            if (addresses.size() > 0){
-                GoodwayHttpsClient.updateUserCity(getActivity(), new Action<Boolean>() {
-                    @Override
-                    public void action(Boolean e) {
+        if(userLocation!=null) {
+            try {
+                addresses = gcd.getFromLocation(userLocation.getLatitude(), userLocation.getLongitude(), 1);
+                if (addresses.size() > 0) {
+                    GoodwayHttpsClient.updateUserCity(getActivity(), new Action<Boolean>() {
+                        @Override
+                        public void action(Boolean e) {
 
-                    }
-                }, null, mail, password, addresses.get(0).getLocality());
+                        }
+                    }, null, mail, password, addresses.get(0).getLocality());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         if(googleMap!=null){
             positionMap();

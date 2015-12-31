@@ -74,6 +74,7 @@ public class Request {
             StringBuilder jsonResult = new StringBuilder();
             StringBuilder sb = new StringBuilder(QUERY);
             int nbJourneys=0;
+            int nbWays=0;
                 for(Pair p : pairs){
                     sb.append(p.first+"=" + p.second+"&");
                     Log.d("p.first="+p.first+" & o.second"+p.second, "pairs");
@@ -96,7 +97,7 @@ public class Request {
                     try {
                         JSONObject jsonObj = new JSONObject(jsonResult.toString());
                         JSONArray ways = jsonObj.getJSONArray("ways");
-                        int nbWays = ways.length();
+                        nbWays = ways.length();
 
                         for (int i = 0; i < nbWays; i++) {
 
@@ -120,7 +121,6 @@ public class Request {
 
                                 if(tmpWayPart != null)
                                     parts.add(tmpWayPart);
-
                             }
 
                             publishProgress(new Way(label, from, to, co2Emission, departureDateTime, arrivalDateTime, duration, parts));
@@ -136,7 +136,7 @@ public class Request {
                     e.printStackTrace();
                 }
 
-            return nbJourneys;
+            return nbWays;
         }
 
 

@@ -200,10 +200,6 @@ public class MainActivity extends AppCompatActivity{
                         i2.putExtra("user", user);
                         startActivity(i2);
                         break;
-                    case R.id.uber:
-                        Intent i3 = new Intent(MainActivity.this, UberLoginActivity.class);
-                        startActivity(i3);
-                        break;
                 }
                 return false;
             }
