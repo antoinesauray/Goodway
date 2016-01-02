@@ -105,6 +105,7 @@ public class SearchGroupActivity extends AppCompatActivity{
             public void action(Group g) {
                 Intent i = new Intent(SearchGroupActivity.this, GroupActivity.class);
                 i.putExtra("group", g);
+                i.putExtra("token", token);
                 i.putExtra("joined", false);
                 startActivity(i);
             }

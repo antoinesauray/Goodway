@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 import io.goodway.model.Group;
 import io.goodway.model.GroupEvent;
 import io.goodway.model.User;
@@ -87,10 +89,17 @@ public class GroupActivity extends AppCompatActivity{
             }
         });
         recyclerView.setAdapter(adapter);
-        GoodwayHttpClientPost.getGroupLocations(this, new Action<GroupLocation>() {
+        GoodwayHttpClientPost.getGroupLocations(this, new Action<List<GroupLocation>>() {
             @Override
-            public void action(GroupLocation e) {
-                adapter.add(e);
+            public void action(List<GroupLocation> e) {
+                if(e.size()!=0) {
+                    for (GroupLocation location : e) {
+                        adapter.add(location);
+                    }
+                }
+                else{
+                    // no addresses
+                }
             }
         }, new ErrorAction() {
             @Override
@@ -104,33 +113,35 @@ public class GroupActivity extends AppCompatActivity{
             }
         }, token, group);
 
-        GoodwayHttpClientPost.getUpcomingEvents(this, new Action<GroupEvent>() {
+        GoodwayHttpClientPost.getUpcomingEvents(this, new Action<List<GroupEvent>>() {
             @Override
-            public void action(final GroupEvent e) {
-                String[] split = Address.splitIso8601(e.getS_time());
-                View upcomingEvent = getLayoutInflater().inflate(R.layout.view_group_event, null);
-                ((TextView) upcomingEvent.findViewById(R.id.name)).setText(e.getName());
-                ((TextView) upcomingEvent.findViewById(R.id.description)).setText(getString(R.string.organised_by) + " " + group.getName());
-                ((TextView) upcomingEvent.findViewById(R.id.date)).setText(split[2] + " " + GroupEvent.formatMonth(split[1]));
-                ((TextView) upcomingEvent.findViewById(R.id.time)).setText(split[3] + "h" + split[4]);
-                upcomingEvent.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent i = new Intent(GroupActivity.this, EventActivity.class);
-                        i.putExtra("event", e);
-                        i.putExtra("user", user);
-                        i.putExtra("request", EventActivity.NEWACTIVITY);
-                        startActivity(i);
-                    }
-                });
-                Picasso.with(GroupActivity.this)
-                        .load(e.getAvatar())
-                        .error(R.mipmap.ic_person_white_48dp)
-                        .resize(200, 200)
-                        .centerCrop()
-                        .transform(new ImageTrans_CircleTransform())
-                        .into((ImageView) upcomingEvent.findViewById(R.id.avatar));
-                upcoming.addView(upcomingEvent);
+            public void action(final List<GroupEvent> e) {
+                for (final GroupEvent event : e) {
+                    String[] split = Address.splitIso8601(event.getS_time());
+                    View upcomingEvent = getLayoutInflater().inflate(R.layout.view_group_event, null);
+                    ((TextView) upcomingEvent.findViewById(R.id.name)).setText(event.getName());
+                    ((TextView) upcomingEvent.findViewById(R.id.description)).setText(getString(R.string.organised_by) + " " + group.getName());
+                    ((TextView) upcomingEvent.findViewById(R.id.date)).setText(split[2] + " " + GroupEvent.formatMonth(split[1]));
+                    ((TextView) upcomingEvent.findViewById(R.id.time)).setText(split[3] + "h" + split[4]);
+                    upcomingEvent.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent i = new Intent(GroupActivity.this, EventActivity.class);
+                            i.putExtra("event", event);
+                            i.putExtra("user", user);
+                            i.putExtra("request", EventActivity.NEWACTIVITY);
+                            startActivity(i);
+                        }
+                    });
+                    Picasso.with(GroupActivity.this)
+                            .load(event.getAvatar())
+                            .error(R.mipmap.ic_person_white_48dp)
+                            .resize(200, 200)
+                            .centerCrop()
+                            .transform(new ImageTrans_CircleTransform())
+                            .into((ImageView) upcomingEvent.findViewById(R.id.avatar));
+                    upcoming.addView(upcomingEvent);
+                }
             }
         }, new ErrorAction() {
             @Override
@@ -175,33 +186,25 @@ public class GroupActivity extends AppCompatActivity{
                 finish();
                 break;
             case R.id.action_quit:
-                GoodwayHttpClientPost.quitGroup(this, new Action<Void>() {
+                GoodwayHttpClientPost.quitGroup(this, new Action<Boolean>() {
                     @Override
-                    public void action(Void e) {
-                        finish();
+                    public void action(Boolean e) {
+                        if(e){finish();}
+                        else{Toast.makeText(GroupActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();}
                     }
-                }, new ErrorAction() {
-                    @Override
-                    public void action(int length) {
-                        Toast.makeText(GroupActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
-                    }
-                }, token, group);
+                }, null, token, group);
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
     public void fabClick(View v){
-        GoodwayHttpClientPost.joinGroup(this, new Action<Void>() {
+        GoodwayHttpClientPost.joinGroup(this, new Action<Boolean>() {
             @Override
-            public void action(Void e) {
-                findViewById(R.id.fab).setVisibility(View.INVISIBLE);
+            public void action(Boolean e) {
+                if(e){findViewById(R.id.fab).setVisibility(View.INVISIBLE);}
+                else{Toast.makeText(GroupActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();}
             }
-        }, new ErrorAction() {
-            @Override
-            public void action(int length) {
-                Toast.makeText(GroupActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
-            }
-        }, token, group);
+        }, null, token, group);
     }
 }

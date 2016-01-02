@@ -81,11 +81,13 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                 dialog.setProgressStyle(dialog.STYLE_SPINNER);
                 dialog.show();
                 groupLocations = new ArrayList<>();
-                GoodwayHttpClientPost.getGroupLocations(getActivity(), new Action<GroupLocation>() {
+                GoodwayHttpClientPost.getGroupLocations(getActivity(), new Action<List<GroupLocation>>() {
                     @Override
-                    public void action(GroupLocation e) {
-                        groupLocations.add(e);
-                        sheet.sheet(groupLocations.size(), e.getName());
+                    public void action(List<GroupLocation> e) {
+                        for(GroupLocation location : e) {
+                            groupLocations.add(location);
+                            sheet.sheet(groupLocations.size(), location.getName());
+                        }
                     }
                 }, new ErrorAction() {
                     @Override

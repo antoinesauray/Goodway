@@ -137,11 +137,7 @@ public class UserGroupsActivity extends AppCompatActivity implements SwipeRefres
                 if(e.size()!=0) {
                     for (Group g : e) {
                         adapter.add(g);
-                        swipeRefreshLayout.setRefreshing(false);
                     }
-                }
-                else{
-
                 }
                 swipeRefreshLayout.setRefreshing(false);
             }
