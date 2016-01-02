@@ -55,7 +55,7 @@ public class GroupActivity extends AppCompatActivity{
     private Group group;
     private User user;
 
-    private String mail, password;
+    private String token;
 
     private ImageView avatar;
     private GroupLocationAdapter adapter;
@@ -68,16 +68,12 @@ public class GroupActivity extends AppCompatActivity{
         setContentView(R.layout.activity_group);
         Bundle extras = this.getIntent().getExtras();
         group = extras.getParcelable("group");
-        user = extras.getParcelable("user");
+        token = extras.getString("token");
         boolean joined = extras.getBoolean("joined");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         upcoming = (LinearLayout) findViewById(R.id.upcoming);
         toolbar.setTitle(group.getName());
 
-        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
-                MODE_PRIVATE);
-        mail = shared_preferences.getString("mail", null);
-        password = shared_preferences.getString("password", null);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -106,7 +102,7 @@ public class GroupActivity extends AppCompatActivity{
             public void action(int length) {
 
             }
-        }, mail, password, group.getId());
+        }, token, group);
 
         GoodwayHttpClientPost.getUpcomingEvents(this, new Action<GroupEvent>() {
             @Override
@@ -145,7 +141,7 @@ public class GroupActivity extends AppCompatActivity{
                     upcoming.addView(error);
                 }
             }
-        }, mail, password, group);
+        }, token, group);
 
         if(!joined) {
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
@@ -189,7 +185,7 @@ public class GroupActivity extends AppCompatActivity{
                     public void action(int length) {
                         Toast.makeText(GroupActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
                     }
-                }, mail, password, group);
+                }, token, group);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -206,6 +202,6 @@ public class GroupActivity extends AppCompatActivity{
             public void action(int length) {
                 Toast.makeText(GroupActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
             }
-        }, mail, password, group);
+        }, token, group);
     }
 }

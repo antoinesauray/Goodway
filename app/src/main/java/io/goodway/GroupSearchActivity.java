@@ -44,7 +44,7 @@ public class GroupSearchActivity extends AppCompatActivity{
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private GroupAdapter adapter;
-    private String mail, password;
+    private String token;
     private EditText findGroups;
     private AsyncTask task;
 
@@ -53,6 +53,7 @@ public class GroupSearchActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_search);
         Bundle extras = this.getIntent().getExtras();
+        token = extras.getString("token");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.find_groups);
         setSupportActionBar(toolbar);
@@ -74,12 +75,12 @@ public class GroupSearchActivity extends AppCompatActivity{
                 }
                 adapter.clear();
                 String text = findGroups.getText().toString();
-                task = GoodwayHttpClientPost.getGroups(GroupSearchActivity.this, new Action<Group>() {
+                task = GoodwayHttpClientPost.findGroups(GroupSearchActivity.this, new Action<Group>() {
                     @Override
                     public void action(Group e) {
                         adapter.add(e);
                     }
-                }, null, mail, password, text);
+                }, null, token, text);
 
             }
 
@@ -96,18 +97,12 @@ public class GroupSearchActivity extends AppCompatActivity{
 
         layoutManager = new LinearLayoutManager(this);
 
-        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
-                MODE_PRIVATE);
-        mail = shared_preferences.getString("mail", null);
-        password = shared_preferences.getString("password", null);
-
         adapter = new GroupAdapter(this, new GroupCallback() {
             @Override
             public void action(Group g) {
                 Intent i = new Intent(GroupSearchActivity.this, UserGroupsActivity.class);
                 i.putExtra("group", g);
-                i.putExtra("mail", mail);
-                i.putExtra("password", password);
+                i.putExtra("token", token);
                 startActivity(i);
             }
         });

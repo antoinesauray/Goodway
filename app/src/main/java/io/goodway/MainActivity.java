@@ -386,6 +386,7 @@ public class MainActivity extends AppCompatActivity{
     public void onBackPressed(){
         if(current==search) {
             Bundle extras = new Bundle();
+            extras.putString("token", token);
             int request = -1;
             if (from != null) {
                 extras.putParcelable("DEPARTURE", from);

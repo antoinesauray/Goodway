@@ -49,7 +49,7 @@ public class UserGroupsActivity extends AppCompatActivity implements SwipeRefres
     private Toolbar toolbar;
     private User user;
 
-    private String mail, password;
+    private String token;
 
     private FloatingActionButton fab;
     private ImageView avatar;
@@ -63,6 +63,7 @@ public class UserGroupsActivity extends AppCompatActivity implements SwipeRefres
         setContentView(R.layout.activity_user_groups);
         Bundle extras = this.getIntent().getExtras();
         user = extras.getParcelable("user");
+        token = extras.getString("token");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
@@ -84,17 +85,13 @@ public class UserGroupsActivity extends AppCompatActivity implements SwipeRefres
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
-                MODE_PRIVATE);
-        mail = shared_preferences.getString("mail", null);
-        password = shared_preferences.getString("password", null);
-
         adapter = new GroupAdapter(this, new GroupCallback() {
             @Override
             public void action(Group g) {
                 Intent i = new Intent(UserGroupsActivity.this, GroupActivity.class);
                 i.putExtra("group", g);
                 i.putExtra("user", user);
+                i.putExtra("token", token);
                 i.putExtra("joined", true);
                 startActivity(i);
             }
@@ -130,7 +127,7 @@ public class UserGroupsActivity extends AppCompatActivity implements SwipeRefres
     public void onRefresh() {
         adapter.clear();
         swipeRefreshLayout.setRefreshing(true);
-        GoodwayHttpClientPost.getGroups(this, new Action<Group>() {
+        GoodwayHttpClientPost.getMyGroups(this, new Action<Group>() {
             @Override
             public void action(Group e) {
                 adapter.add(e);
@@ -141,6 +138,6 @@ public class UserGroupsActivity extends AppCompatActivity implements SwipeRefres
             public void action(int length) {
                 swipeRefreshLayout.setRefreshing(false);
             }
-        }, mail, password);
+        }, token);
     }
 }

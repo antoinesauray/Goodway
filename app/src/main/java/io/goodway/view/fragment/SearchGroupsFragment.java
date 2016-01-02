@@ -49,7 +49,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
     private TextView error;
 
     private int request;
-    private String mail, password;
+    private String token;
     private static final CharacterStyle STYLE_BOLD = new StyleSpan(Typeface.BOLD);
 
     private ArrayList<GroupLocation> groupLocations;
@@ -59,14 +59,11 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
         root = inflater.inflate(R.layout.fragment_search_groups, container, false);
 
         request = getArguments().getInt("REQUEST");
+        token = getArguments().getString("token");
         mainActivity = (MainActivity) getActivity();
         recyclerView = (RecyclerView) root.findViewById(R.id.list);
         error = (TextView) root.findViewById(R.id.error);
 
-        SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
-                getActivity().MODE_PRIVATE);
-        mail = shared_preferences.getString("mail", null);
-        password = shared_preferences.getString("password", null);
 
         adapter = new GroupAdapter(getActivity(), new GroupCallback() {
             @Override
@@ -104,14 +101,14 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                         dialog.dismiss();
                         sheet.show();
                     }
-                }, mail, password, e.getId());
+                }, token, e);
             }
         });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(adapter);
 
-        GoodwayHttpClientPost.getGroups(getActivity(), new Action<Group>() {
+        GoodwayHttpClientPost.getMyGroups(getActivity(), new Action<Group>() {
             @Override
             public void action(Group e) {
                 adapter.add(e);
@@ -131,7 +128,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                 error.setVisibility(View.VISIBLE);
                 swipeLayout.setRefreshing(false);
             }
-        }, mail, password);
+        }, token);
 
         swipeLayout = (SwipeRefreshLayout) root.findViewById(R.id.swipeRefreshLayout);
         swipeLayout.setOnRefreshListener(this);
@@ -146,7 +143,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
         swipeLayout.setRefreshing(true);
         adapter.clear();
         error.setVisibility(View.INVISIBLE);
-        GoodwayHttpClientPost.getGroups(getActivity(), new Action<Group>() {
+        GoodwayHttpClientPost.getMyGroups(getActivity(), new Action<Group>() {
             @Override
             public void action(Group e) {
                 adapter.add(e);
@@ -166,7 +163,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                 error.setVisibility(View.VISIBLE);
                 swipeLayout.setRefreshing(false);
             }
-        }, mail, password);
+        }, token);
     }
 
     private void finish(Address address){

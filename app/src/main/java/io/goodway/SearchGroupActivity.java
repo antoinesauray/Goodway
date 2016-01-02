@@ -44,7 +44,7 @@ public class SearchGroupActivity extends AppCompatActivity{
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private GroupAdapter adapter;
-    private String mail, password;
+    private String token;
     private EditText find_groups;
     private AsyncTask task;
 
@@ -52,17 +52,13 @@ public class SearchGroupActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_group);
+        token = getIntent().getExtras().getString("token");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.find_groups);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
-
-        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
-                MODE_PRIVATE);
-        mail = shared_preferences.getString("mail", null);
-        password = shared_preferences.getString("password", null);
 
 
         find_groups = (EditText) findViewById(R.id.find_groups);
@@ -79,12 +75,12 @@ public class SearchGroupActivity extends AppCompatActivity{
                 }
                 adapter.clear();
                 String text = find_groups.getText().toString();
-                task = GoodwayHttpClientPost.getGroups(SearchGroupActivity.this, new Action<Group>() {
+                task = GoodwayHttpClientPost.findGroups(SearchGroupActivity.this, new Action<Group>() {
                     @Override
                     public void action(Group e) {
                         adapter.add(e);
                     }
-                }, null, mail, password, text);
+                }, null, token, text);
             }
 
             @Override

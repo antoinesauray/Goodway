@@ -108,7 +108,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
         }, action, error, finish, "http://developer.goodway.io/api/v1/user/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(id)));
     }
 
-    public static AsyncTask getGroupLocations(final Context c, Action<GroupLocation> action, ErrorAction error, FinishCallback finish, String mail, String password, final int id){
+    public static AsyncTask getGroupLocations(final Context c, Action<GroupLocation> action, ErrorAction error, FinishCallback finish, String token, final Group group){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<GroupLocation>() {
             @Override
             public GroupLocation processJson(JSONObject jsonObject) {
@@ -117,13 +117,13 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 String lat = jsonObject.optString("st_y");
                 String lng = jsonObject.optString("st_x");
                 try{
-                    return new GroupLocation(id, s_name, a_name, Double.parseDouble(lat), Double.parseDouble(lng));
+                    return new GroupLocation(group.getId(), s_name, a_name, Double.parseDouble(lat), Double.parseDouble(lng));
                 }
                 catch (NumberFormatException e){
                     return null;
                 }
             }
-        }, action, error, finish, "https://api.goodway.io/group_locations.php").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(id)));
+        }, action, error, finish, "http://developer.goodway.io/api/v1/group/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())));
     }
 
     public static AsyncTask me(final Context c, Action<User> action, ErrorAction error, FinishCallback finish, String token){
@@ -242,7 +242,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             }
         }, action, error, null, "http://developer.goodway.io/api/v1/me/friends/requests/count").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
-    public static AsyncTask getEvents(Context c, Action<GroupEvent> action, ErrorAction error, FinishCallback finish, String mail, String password){
+    public static AsyncTask getEvents(Context c, Action<GroupEvent> action, ErrorAction error, FinishCallback finish, String token){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<GroupEvent>() {
             @Override
             public GroupEvent processJson(JSONObject jsonObject) {
@@ -256,20 +256,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 String html = jsonObject.optString("html");
                 return new GroupEvent(id, name, html, avatar, s_time, e_time, lat, lng);
             }
-        }, action, error,finish, "https://api.goodway.io/event.php").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password), new AbstractMap.SimpleEntry<String, String>("city", "1"));
-    }
-
-    public static AsyncTask getGroups(Context c, Action<Group> action, ErrorAction error, String mail, String password){
-        return new GoodwayHttpClientPost<>(c, new ProcessJson<Group>() {
-            @Override
-            public Group processJson(JSONObject jsonObject) {
-                Integer id = jsonObject.optInt("id");
-                String name = jsonObject.optString("name");
-                String description = jsonObject.optString("description");
-                String avatar = jsonObject.optString("avatar");
-                return new Group(id, name, description, avatar);
-            }
-        }, action, error, "https://api.goodway.io/user_group.php").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password));
+        }, action, error,finish, "http://developer.goodway.io/api/v1/me/events").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
     public static AsyncTask acceptFriend(Context c, Action<Integer> action, ErrorAction error, String mail, String password, int id){
@@ -292,17 +279,6 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             }, action, error, "https://api.goodway.io/request_friend.php").execute(
                     new AbstractMap.SimpleEntry<String, String>("uid", Integer.toString(id)),
                     new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password));
-    }
-
-    public static AsyncTask setSharing(Context c, Action<Boolean> action, ErrorAction error, String mail, String password, int id, boolean state){
-        return new GoodwayHttpClientPost<>(c, new ProcessJson<Boolean>() {
-            @Override
-            public Boolean processJson(JSONObject jsonObject) {
-                return true;
-            }
-        }, action, error, "https://api.goodway.io/update_sharing.php").execute(
-                new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("Password", password),
-                new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(id)), new AbstractMap.SimpleEntry<String, String>("state", Boolean.toString(state)));
     }
 
     public static AsyncTask updateMyCity(Context c, Action<Boolean> action, ErrorAction error, String token, String city){
@@ -352,7 +328,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
         return null;
     }
 
-    public static AsyncTask getGroups(Context c, Action<Group> action, ErrorAction error, String mail, String password, String name) {
+    public static AsyncTask findGroups(Context c, Action<Group> action, ErrorAction error, String token, String name) {
         if (name != null) {
             return new GoodwayHttpClientPost<>(c, new ProcessJson<Group>() {
                 @Override
@@ -363,35 +339,48 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                     String avatar = jsonObject.optString("avatar");
                     return new Group(id, name, description, avatar);
                 }
-            }, action, error, "https://api.goodway.io/groups.php").execute(
+            }, action, error, "http:/developer.goodway.io/api/v1/group/find").execute(
                     new AbstractMap.SimpleEntry<String, String>("name", name),
-                    new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password));
+                    new AbstractMap.SimpleEntry<String, String>("token", token));
         }
         return null;
     }
-    public static AsyncTask joinGroup(Context c, Action<Void> action, ErrorAction error, String mail, String password, Group group) {
+    public static AsyncTask getMyGroups(Context c, Action<Group> action, ErrorAction error, String token) {
+            return new GoodwayHttpClientPost<>(c, new ProcessJson<Group>() {
+                @Override
+                public Group processJson(JSONObject jsonObject) {
+                    Integer id = jsonObject.optInt("id");
+                    String name = jsonObject.optString("name");
+                    String description = jsonObject.optString("description");
+                    String avatar = jsonObject.optString("avatar");
+                    return new Group(id, name, description, avatar);
+                }
+            }, action, error, "http:/developer.goodway.io/api/v1/me/groups").execute(
+                    new AbstractMap.SimpleEntry<String, String>("token", token));
+    }
+    public static AsyncTask joinGroup(Context c, Action<Void> action, ErrorAction error, String token, Group group) {
             return new GoodwayHttpClientPost<>(c, new ProcessJson<Void>() {
                 @Override
                 public Void processJson(JSONObject jsonObject) {
                     return null;
                 }
-            }, action, error, "https:/api.goodway.io/join_group.php").execute(
-                    new AbstractMap.SimpleEntry<String, String>("g", Integer.toString(group.getId())),
-                    new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password));
+            }, action, error, "http:/developer.goodway.io/api/v1/group/join").execute(
+                    new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())),
+                    new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
-    public static AsyncTask quitGroup(Context c, Action<Void> action, ErrorAction error, String mail, String password, Group group) {
+    public static AsyncTask quitGroup(Context c, Action<Void> action, ErrorAction error, String token, Group group) {
         return new GoodwayHttpClientPost<>(c, new ProcessJson<Void>() {
             @Override
             public Void processJson(JSONObject jsonObject) {
                 return null;
             }
-        }, action, error, "https://api.goodway.io/quit_group.php").execute(
-                new AbstractMap.SimpleEntry<String, String>("g", Integer.toString(group.getId())),
-                new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password));
+        }, action, error, "http:/developer.goodway.io/api/v1/group/quit").execute(
+                new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())),
+                new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
-    public static AsyncTask getUpcomingEvents(Context c, Action<GroupEvent> action, ErrorAction error, String mail, String password, Group group) {
+    public static AsyncTask getUpcomingEvents(Context c, Action<GroupEvent> action, ErrorAction error, String token, Group group) {
         return new GoodwayHttpClientPost<>(c, new ProcessJson<GroupEvent>() {
             @Override
             public GroupEvent processJson(JSONObject jsonObject) {
@@ -405,9 +394,9 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 String html = jsonObject.optString("html");
                 return new GroupEvent(id, name, html, avatar, s_time, e_time, lat, lng);
             }
-        }, action, error, "https://api.goodway.io/upcoming_events.php").execute(
-                new AbstractMap.SimpleEntry<String, String>("group", Integer.toString(group.getId())),
-                new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password));
+        }, action, error, "http:/developer.goodway.io/api/v1/group/events/upcoming").execute(
+                new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())),
+                new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
     public static AsyncTask getUberPrices(Context c, Action<GroupEvent> action, ErrorAction error, double start_latitude, double start_longitude, double end_latitude, double end_longitude) {
