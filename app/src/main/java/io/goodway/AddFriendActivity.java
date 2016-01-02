@@ -16,10 +16,9 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import io.goodway.model.User;
-import io.goodway.model.adapter.FriendAdapter;
 import io.goodway.model.adapter.UserAdapter;
 import io.goodway.model.callback.UserCallback;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 
 
@@ -85,7 +84,7 @@ public class AddFriendActivity extends AppCompatActivity{
                                 s2 = split[1];
                             }
                         }
-                        task = GoodwayHttpsClient.getUsersFromName(AddFriendActivity.this, new Action<User>() {
+                        task = GoodwayHttpClientPost.getUsersFromName(AddFriendActivity.this, new Action<User>() {
                             @Override
                             public void action(User e) {
                                 adapter.add(e);

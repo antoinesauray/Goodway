@@ -37,7 +37,7 @@ import com.squareup.picasso.Picasso;
 
 import io.goodway.model.GroupEvent;
 import io.goodway.model.User;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity{
     private Address from, to;
 
     private User user;
+    private String token;
 
     public static final int DEPARTURE=1, DESTINATION=2;
 
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity{
 
         Bundle extras = this.getIntent().getExtras();
         user = extras.getParcelable("user");
+        token = extras.getString("token");
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -171,18 +173,20 @@ public class MainActivity extends AppCompatActivity{
 
         Log.d("avatar", "avatar" + user.getAvatar());
 
-        GoodwayHttpsClient.getNbFriendRequests(this, new Action<Integer>() {
+        GoodwayHttpClientPost.getNbFriendRequests(this, new Action<Integer>() {
             @Override
             public void action(Integer e) {
-                nbFriendRequests=e;
-                if(e>0){navigationView.getMenu().findItem(R.id.friends).setTitle(getString(R.string.friends)+" ("+e+")");}
+                nbFriendRequests = e;
+                if (e > 0) {
+                    navigationView.getMenu().findItem(R.id.friends).setTitle(getString(R.string.friends) + " (" + e + ")");
+                }
             }
         }, new ErrorAction() {
             @Override
             public void action(int length) {
 
             }
-        }, mail,password);
+        }, mail, password);
 
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -191,18 +195,19 @@ public class MainActivity extends AppCompatActivity{
                 switch (menuItem.getItemId()) {
                     case R.id.friends:
                         Intent i = new Intent(MainActivity.this, FriendsActivity.class);
-                        i.putExtra("user", user);
+                        i.putExtra("token", token);
                         i.putExtra("nbFriendRequests", nbFriendRequests);
                         startActivityForResult(i, MainActivity.FRIENDS);
                         break;
                     case R.id.groups:
                         Intent i2 = new Intent(MainActivity.this, UserGroupsActivity.class);
-                        i2.putExtra("user", user);
+                        i2.putExtra("token", token);
                         startActivity(i2);
                         break;
                     case R.id.uber:
+                        /*
                         Intent i3 = new Intent(MainActivity.this, UberLoginActivity.class);
-                        startActivity(i3);
+                        startActivity(i3);*/
                         break;
                 }
                 return false;
@@ -254,7 +259,7 @@ public class MainActivity extends AppCompatActivity{
     public void changeLocation(int request){
         Bundle b = new Bundle();
         b.putInt("REQUEST", request);
-        b.putParcelable("user", user);
+        b.putString("token", token);
         switchToSearch(b);
     }
 
@@ -287,7 +292,7 @@ public class MainActivity extends AppCompatActivity{
         else if(requestCode==MainActivity.PROFILE){
             if(resultCode == RESULT_OK) {
                 Log.d("EVENT_REQUEST", "request code");
-                user = data.getExtras().getParcelable("user");
+                //user = data.getExtras().getParcelable("user");
             }
         }
         else if(requestCode==MainActivity.FRIENDS){
@@ -341,7 +346,7 @@ public class MainActivity extends AppCompatActivity{
 
     public void drawerHeaderClick(View v){
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        intent.putExtra("user", user);
+        intent.putExtra("token", token);
         intent.putExtra("self", true);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);

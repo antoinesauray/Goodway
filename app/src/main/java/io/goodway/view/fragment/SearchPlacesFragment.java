@@ -36,7 +36,7 @@ import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.model.adapter.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
@@ -108,7 +108,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
             }
         });
         recyclerView.setAdapter(searchAdapter);
-        selfLocations = GoodwayHttpsClient.getSelfLocations(getActivity(), new Action<UserLocation>() {
+        selfLocations = GoodwayHttpClientPost.getSelfLocations(getActivity(), new Action<UserLocation>() {
             @Override
             public void action(UserLocation e) {
                 searchAdapter.add(e);
@@ -165,7 +165,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
                     });
                 }
                 else{
-                    selfLocations = GoodwayHttpsClient.getSelfLocations(getActivity(), new Action<UserLocation>() {
+                    selfLocations = GoodwayHttpClientPost.getSelfLocations(getActivity(), new Action<UserLocation>() {
                         @Override
                         public void action(UserLocation e) {
                             searchAdapter.add(e);

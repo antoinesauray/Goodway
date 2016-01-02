@@ -27,7 +27,7 @@ import io.goodway.model.Group;
 import io.goodway.model.adapter.GroupAdapter;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.model.callback.GroupCallback;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
@@ -82,7 +82,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                 dialog.setProgressStyle(dialog.STYLE_SPINNER);
                 dialog.show();
                 groupLocations = new ArrayList<>();
-                GoodwayHttpsClient.getGroupLocations(getActivity(), new Action<GroupLocation>() {
+                GoodwayHttpClientPost.getGroupLocations(getActivity(), new Action<GroupLocation>() {
                     @Override
                     public void action(GroupLocation e) {
                         groupLocations.add(e);
@@ -92,10 +92,9 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                     @Override
                     public void action(int length) {
                         dialog.dismiss();
-                        if(length==0){
+                        if (length == 0) {
                             sheet.show();
-                        }
-                        else {
+                        } else {
                             Toast.makeText(getActivity(), R.string.connexion_error, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -112,7 +111,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(adapter);
 
-        GoodwayHttpsClient.getGroups(getActivity(), new Action<Group>() {
+        GoodwayHttpClientPost.getGroups(getActivity(), new Action<Group>() {
             @Override
             public void action(Group e) {
                 adapter.add(e);
@@ -147,7 +146,7 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
         swipeLayout.setRefreshing(true);
         adapter.clear();
         error.setVisibility(View.INVISIBLE);
-        GoodwayHttpsClient.getGroups(getActivity(), new Action<Group>() {
+        GoodwayHttpClientPost.getGroups(getActivity(), new Action<Group>() {
             @Override
             public void action(Group e) {
                 adapter.add(e);

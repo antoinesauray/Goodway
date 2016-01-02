@@ -18,7 +18,7 @@ import android.widget.EditText;
 import io.goodway.model.Group;
 import io.goodway.model.adapter.GroupAdapter;
 import io.goodway.model.callback.GroupCallback;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 
 
@@ -74,12 +74,12 @@ public class GroupSearchActivity extends AppCompatActivity{
                 }
                 adapter.clear();
                 String text = findGroups.getText().toString();
-                task = GoodwayHttpsClient.getGroups(GroupSearchActivity.this, new Action<Group>() {
-                            @Override
-                            public void action(Group e) {
-                                adapter.add(e);
-                            }
-                        }, null, mail, password, text);
+                task = GoodwayHttpClientPost.getGroups(GroupSearchActivity.this, new Action<Group>() {
+                    @Override
+                    public void action(Group e) {
+                        adapter.add(e);
+                    }
+                }, null, mail, password, text);
 
             }
 

@@ -21,7 +21,7 @@ import io.goodway.model.Group;
 import io.goodway.model.User;
 import io.goodway.model.adapter.GroupAdapter;
 import io.goodway.model.callback.GroupCallback;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.ErrorAction;
 import io.goodway.view.ImageTrans_CircleTransform;
@@ -130,7 +130,7 @@ public class UserGroupsActivity extends AppCompatActivity implements SwipeRefres
     public void onRefresh() {
         adapter.clear();
         swipeRefreshLayout.setRefreshing(true);
-        GoodwayHttpsClient.getGroups(this, new Action<Group>() {
+        GoodwayHttpClientPost.getGroups(this, new Action<Group>() {
             @Override
             public void action(Group e) {
                 adapter.add(e);

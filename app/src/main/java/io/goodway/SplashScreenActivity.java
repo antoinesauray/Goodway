@@ -36,7 +36,9 @@ import java.util.regex.Pattern;
 
 import io.goodway.model.GroupEvent;
 import io.goodway.model.User;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientGet;
+import io.goodway.model.network.GoodwayHttpClientPost;
+import io.goodway.model.network.GoodwayProtocol;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.ErrorAction;
 
@@ -137,12 +139,12 @@ public class SplashScreenActivity extends AppCompatActivity {
             logo = (ImageView) root.findViewById(R.id.logo);
             if (mail != null && password != null && id != -1 && fname != null && lname != null) {
 
-                if (GoodwayHttpsClient.isConnected(getActivity())) {
-                    GoodwayHttpsClient.authenticate(getActivity(), new Action<User>() {
+                if (GoodwayProtocol.isConnected(getActivity())) {
+                    GoodwayHttpClientPost.authenticate(getActivity(), new Action<String>() {
                         @Override
-                        public void action(User e) {
-                            start(e);
-                            connectedAs.setText(e.getMail());
+                        public void action(String token) {
+                            start(token);
+                            //connectedAs.setText(e.getMail());
                         }
                     }, new ErrorAction() {
                         @Override
@@ -151,8 +153,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                         }
                     }, mail, password);
                 } else {
-                    start(new User(id, fname, lname, mail, title, null, false));
-                    connectedAs.setText(mail);
+                    //start(new User(id, fname, lname, mail, title, null, false));
+                    //connectedAs.setText(mail);
                 }
 
 
@@ -161,7 +163,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             }
             return root;
         }
-        private void start(final User u){
+        private void start(final String token){
             ObjectAnimator alpha = ObjectAnimator.ofFloat(connectedAs, "alpha", 0f, 1f);
             alpha.setStartDelay(400);
             alpha.setDuration(600);
@@ -174,7 +176,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     Intent i = new Intent(getActivity(), MainActivity.class);
-                    i.putExtra("user", u);
+                    i.putExtra("token", token);
                     startActivity(i);
                 }
 
@@ -217,23 +219,19 @@ public class SplashScreenActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             closeKeyboard(getActivity(), root.findFocus());
-            if(GoodwayHttpsClient.isConnected(getActivity())) {
+            if(GoodwayProtocol.isConnected(getActivity())) {
                 progressBar.setVisibility(View.VISIBLE);
-                GoodwayHttpsClient.authenticate(getActivity(), new Action<User>() {
+                GoodwayHttpClientPost.authenticate(getActivity(), new Action<String>() {
                     @Override
-                    public void action(User u) {
+                    public void action(String token) {
                         SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
                                 MODE_PRIVATE);
                         SharedPreferences.Editor editor = shared_preferences.edit();
                         editor.putString("mail", mail.getText().toString());
                         editor.putString("password", password.getText().toString());
-                        editor.putInt("id", u.getId());
-                        editor.putString("fname", u.getFirstName());
-                        editor.putString("lname", u.getLastName());
-                        editor.putInt("title", u.getTitle());
                         editor.commit();
                         Intent i = new Intent(getActivity(), MainActivity.class);
-                        i.putExtra("user", u);
+                        i.putExtra("token", token);
                         startActivity(i);
                     }
                 }, new ErrorAction() {
@@ -292,7 +290,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                         if (client != null) {
                             client.cancel(true);
                         }
-                        client = GoodwayHttpsClient.checkMailAvailability(getActivity(), new Action<Integer>() {
+                        client = GoodwayHttpClientGet.checkMailAvailability(getActivity(), new Action<Integer>() {
                             @Override
                             public void action(Integer e) {
                                 mailAvailable = false;
@@ -367,7 +365,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                         dialog.setMessage(getString(R.string.updating_share_options));
                         dialog.setProgressStyle(dialog.STYLE_SPINNER);
                         dialog.show();
-                        GoodwayHttpsClient.register(getActivity(), new Action<User>() {
+                        GoodwayHttpClientPost.register(getActivity(), new Action<User>() {
                             @Override
                             public void action(User u) {
                                 SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
@@ -395,7 +393,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                     }
             }
             /*
-            GoodwayHttpsClient.
+            GoodwayHttpClientPost.
             SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
                     MODE_PRIVATE);
             SharedPreferences.Editor editor = shared_preferences.edit();

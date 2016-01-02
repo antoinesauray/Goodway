@@ -8,9 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,7 +24,7 @@ import io.goodway.model.User;
 import io.goodway.model.adapter.GroupLocationAdapter;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.model.callback.GroupLocationCallback;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
@@ -93,7 +91,7 @@ public class GroupActivity extends AppCompatActivity{
             }
         });
         recyclerView.setAdapter(adapter);
-        GoodwayHttpsClient.getGroupLocations(this, new Action<GroupLocation>() {
+        GoodwayHttpClientPost.getGroupLocations(this, new Action<GroupLocation>() {
             @Override
             public void action(GroupLocation e) {
                 adapter.add(e);
@@ -110,15 +108,15 @@ public class GroupActivity extends AppCompatActivity{
             }
         }, mail, password, group.getId());
 
-        GoodwayHttpsClient.getUpcomingEvents(this, new Action<GroupEvent>() {
+        GoodwayHttpClientPost.getUpcomingEvents(this, new Action<GroupEvent>() {
             @Override
             public void action(final GroupEvent e) {
                 String[] split = Address.splitIso8601(e.getS_time());
                 View upcomingEvent = getLayoutInflater().inflate(R.layout.view_group_event, null);
-                ((TextView)upcomingEvent.findViewById(R.id.name)).setText(e.getName());
-                ((TextView)upcomingEvent.findViewById(R.id.description)).setText(getString(R.string.organised_by)+" "+group.getName());
-                ((TextView)upcomingEvent.findViewById(R.id.date)).setText(split[2]+" "+GroupEvent.formatMonth(split[1]));
-                ((TextView)upcomingEvent.findViewById(R.id.time)).setText(split[3]+"h"+split[4]);
+                ((TextView) upcomingEvent.findViewById(R.id.name)).setText(e.getName());
+                ((TextView) upcomingEvent.findViewById(R.id.description)).setText(getString(R.string.organised_by) + " " + group.getName());
+                ((TextView) upcomingEvent.findViewById(R.id.date)).setText(split[2] + " " + GroupEvent.formatMonth(split[1]));
+                ((TextView) upcomingEvent.findViewById(R.id.time)).setText(split[3] + "h" + split[4]);
                 upcomingEvent.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -141,9 +139,9 @@ public class GroupActivity extends AppCompatActivity{
         }, new ErrorAction() {
             @Override
             public void action(int length) {
-                if(length==0){
+                if (length == 0) {
                     View error = getLayoutInflater().inflate(R.layout.view_way_not_found, null);
-                    ((TextView)error.findViewById(R.id.message)).setText(R.string.no_events);
+                    ((TextView) error.findViewById(R.id.message)).setText(R.string.no_events);
                     upcoming.addView(error);
                 }
             }
@@ -181,7 +179,7 @@ public class GroupActivity extends AppCompatActivity{
                 finish();
                 break;
             case R.id.action_quit:
-                GoodwayHttpsClient.quitGroup(this, new Action<Void>() {
+                GoodwayHttpClientPost.quitGroup(this, new Action<Void>() {
                     @Override
                     public void action(Void e) {
                         finish();
@@ -198,7 +196,7 @@ public class GroupActivity extends AppCompatActivity{
     }
 
     public void fabClick(View v){
-        GoodwayHttpsClient.joinGroup(this, new Action<Void>() {
+        GoodwayHttpClientPost.joinGroup(this, new Action<Void>() {
             @Override
             public void action(Void e) {
                 findViewById(R.id.fab).setVisibility(View.INVISIBLE);

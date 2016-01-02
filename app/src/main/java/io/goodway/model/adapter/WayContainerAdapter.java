@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.goodway.R;
-import io.goodway.UberActivity;
 import io.goodway.model.ContainerType;
 import io.goodway.model.Uber;
 import io.goodway.model.callback.WayCallback;
@@ -181,11 +180,12 @@ public class WayContainerAdapter extends RecyclerView.Adapter<WayContainerAdapte
                             uber.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+                                    /*
                                     Intent i = new Intent(activity, UberActivity.class);
                                     i.putExtra("uber", e);
                                     i.putExtra("from", from);
                                     i.putExtra("to", to);
-                                    activity.startActivity(i);
+                                    activity.startActivity(i);*/
                                 }
                             });
                             holder.ways.addView(uber);

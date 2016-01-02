@@ -50,7 +50,7 @@ import java.io.FileNotFoundException;
 import io.goodway.model.User;
 import io.goodway.model.callback.AddressSelected;
 import io.goodway.model.callback.FinishCallback;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.model.network.UploadDocument;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
@@ -163,7 +163,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
     public void fabClick(View v){
         Log.d("requesting", "requesting friend with id="+user.getId());
-        GoodwayHttpsClient.requestFriend(this, new Action<Boolean>() {
+        GoodwayHttpClientPost.requestFriend(this, new Action<Boolean>() {
             @Override
             public void action(Boolean e) {
                 Intent returnIntent = new Intent();
@@ -237,7 +237,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                         pd.setMessage(getString(R.string.add_address));
                         pd.setProgressStyle(pd.STYLE_SPINNER);
                         pd.show();
-                        GoodwayHttpsClient.addLocation(this, new Action<Boolean>() {
+                        GoodwayHttpClientPost.addLocation(this, new Action<Boolean>() {
                             @Override
                             public void action(Boolean e) {
                                 pd.dismiss();
@@ -319,7 +319,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                 pd.setMessage(getString(R.string.add_address));
                                 pd.setProgressStyle(pd.STYLE_SPINNER);
                                 pd.show();
-                                currentAsyncTask = GoodwayHttpsClient.updateLocation(ProfileActivity.this, new Action<Boolean>() {
+                                currentAsyncTask = GoodwayHttpClientPost.updateLocation(ProfileActivity.this, new Action<Boolean>() {
                                     @Override
                                     public void action(Boolean e) {
                                         pd.dismiss();
@@ -460,22 +460,21 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             locations = (LinearLayout) rootView.findViewById(R.id.locations);
 
             if(self){
-                GoodwayHttpsClient.getSelfLocations(getActivity(), new Action<UserLocation>() {
+                GoodwayHttpClientPost.getSelfLocations(getActivity(), new Action<UserLocation>() {
                     @Override
                     public void action(UserLocation e) {
-                        Log.d("adding address", "adding address:"+e.toString());
+                        Log.d("adding address", "adding address:" + e.toString());
                         addUserLocation(e);
                     }
                 }, new ErrorAction() {
                     @Override
                     public void action(int length) {
-                        if(length==0){
+                        if (length == 0) {
                             View addAddress = getLayoutInflater(null).inflate(R.layout.view_add_address, null);
                             locations.addView(addAddress);
-                        }
-                        else{
+                        } else {
                             View notFound = getLayoutInflater(null).inflate(R.layout.view_way_not_found, null);
-                            ((TextView)notFound.findViewById(R.id.message)).setText(R.string.unavailable);
+                            ((TextView) notFound.findViewById(R.id.message)).setText(R.string.unavailable);
                             locations.addView(notFound);
                         }
                     }
@@ -488,7 +487,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 }, mail, password, user.getFirstName());
             }
             else if(user.isFriend()){
-                GoodwayHttpsClient.getUserLocations(getActivity(), new Action<UserLocation>() {
+                GoodwayHttpClientPost.getUserLocations(getActivity(), new Action<UserLocation>() {
                     @Override
                     public void action(UserLocation e) {
                         Log.d("adding address", "adding address:" + e.toString());
@@ -497,7 +496,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 }, new ErrorAction() {
                     @Override
                     public void action(int length) {
-                        if (length <0) {
+                        if (length < 0) {
                             View notFound = getLayoutInflater(null).inflate(R.layout.view_way_not_found, null);
                             ((TextView) notFound.findViewById(R.id.message)).setText(R.string.unavailable);
                             locations.addView(notFound);
@@ -587,7 +586,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                     pd.setMessage(getString(R.string.deleting));
                                     pd.setProgressStyle(pd.STYLE_SPINNER);
                                     pd.show();
-                                    GoodwayHttpsClient.deleteLocation(getActivity(), new Action<Boolean>() {
+                                    GoodwayHttpClientPost.deleteLocation(getActivity(), new Action<Boolean>() {
                                         @Override
                                         public void action(Boolean e) {
                                             pd.dismiss();
@@ -599,7 +598,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                             pd.dismiss();
                                             Toast.makeText(getActivity(), R.string.failure, Toast.LENGTH_SHORT).show();
                                         }
-                                    }, ((ProfileActivity)getActivity()).mail, ((ProfileActivity)getActivity()).password, location);
+                                    }, ((ProfileActivity) getActivity()).mail, ((ProfileActivity) getActivity()).password, location);
                                 }
                             })
                             .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {

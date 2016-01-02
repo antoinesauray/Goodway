@@ -1,6 +1,5 @@
 package io.goodway.view.fragment;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -29,7 +28,7 @@ import io.goodway.model.User;
 import io.goodway.model.adapter.UserAdapter;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.model.callback.UserCallback;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
@@ -85,7 +84,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                 dialog.setProgressStyle(dialog.STYLE_SPINNER);
                 dialog.show();
                 userLocations = new ArrayList<>();
-                GoodwayHttpsClient.getUserLocations(getActivity(), new Action<UserLocation>() {
+                GoodwayHttpClientPost.getUserLocations(getActivity(), new Action<UserLocation>() {
                     @Override
                     public void action(UserLocation e) {
                         userLocations.add(e);
@@ -95,10 +94,9 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                     @Override
                     public void action(int length) {
                         dialog.dismiss();
-                        if(length==-1) {
+                        if (length == -1) {
                             Toast.makeText(getActivity(), R.string.connexion_error, Toast.LENGTH_SHORT).show();
-                        }
-                        else{
+                        } else {
                             sheet.show();
                         }
                     }
@@ -115,7 +113,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
             }
         }, mail, password);
 
-        GoodwayHttpsClient.getFriends(getActivity(), new Action<User>() {
+        GoodwayHttpClientPost.getFriends(getActivity(), new Action<User>() {
             @Override
             public void action(User e) {
                 swipeLayout.setRefreshing(false);
@@ -124,7 +122,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
         }, new ErrorAction() {
             @Override
             public void action(int length) {
-                switch (length){
+                switch (length) {
                     case 0:
                         swipeLayout.setRefreshing(false);
                         error.setText(R.string.no_friends);
@@ -154,7 +152,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
         swipeLayout.setRefreshing(true);
         adapter.clear();
         error.setVisibility(View.INVISIBLE);
-        GoodwayHttpsClient.getFriends(getActivity(), new Action<User>() {
+        GoodwayHttpClientPost.getFriends(getActivity(), new Action<User>() {
             @Override
             public void action(User e) {
                 swipeLayout.setRefreshing(false);
@@ -163,7 +161,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
         }, new ErrorAction() {
             @Override
             public void action(int length) {
-                switch (length){
+                switch (length) {
                     case 0:
                         swipeLayout.setRefreshing(false);
                         error.setText(R.string.no_friends);
@@ -177,7 +175,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                 }
 
             }
-        },mail, password);
+        }, mail, password);
     }
 
     private void finish(Address address){

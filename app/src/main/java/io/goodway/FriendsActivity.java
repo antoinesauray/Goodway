@@ -28,7 +28,7 @@ import io.goodway.model.User;
 import io.goodway.model.adapter.UserAdapter;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.model.callback.UserCallback;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.ErrorAction;
 
@@ -236,7 +236,7 @@ public class FriendsActivity extends AppCompatActivity {
             swipeLayout.setRefreshing(true);
             adapter.clear();
             error.setVisibility(View.INVISIBLE);
-            GoodwayHttpsClient.getFriends(getActivity(), new Action<User>() {
+            GoodwayHttpClientPost.getFriends(getActivity(), new Action<User>() {
                 @Override
                 public void action(User e) {
                     swipeLayout.setRefreshing(false);
@@ -245,7 +245,7 @@ public class FriendsActivity extends AppCompatActivity {
             }, new ErrorAction() {
                 @Override
                 public void action(int length) {
-                    switch (length){
+                    switch (length) {
                         case 0:
                             error.setText(R.string.no_friends);
                             break;
@@ -257,7 +257,7 @@ public class FriendsActivity extends AppCompatActivity {
                     swipeLayout.setRefreshing(false);
                     error.setVisibility(View.VISIBLE);
                 }
-            },mail, password);
+            }, mail, password);
         }
     }
     public static class FriendRequestFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -321,7 +321,7 @@ public class FriendsActivity extends AppCompatActivity {
             swipeLayout.setRefreshing(true);
             adapter.clear();
             error.setVisibility(View.INVISIBLE);
-            GoodwayHttpsClient.getFriendRequests(getActivity(), new Action<User>() {
+            GoodwayHttpClientPost.getFriendRequests(getActivity(), new Action<User>() {
                 @Override
                 public void action(User e) {
                     swipeLayout.setRefreshing(false);

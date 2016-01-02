@@ -40,7 +40,7 @@ import java.util.Locale;
 import io.goodway.MainActivity;
 import io.goodway.R;
 import io.goodway.WayActivity;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 
@@ -272,7 +272,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
         try {
             addresses = gcd.getFromLocation(userLocation.getLatitude(), userLocation.getLongitude(), 1);
             if (addresses.size() > 0){
-                GoodwayHttpsClient.updateUserCity(getActivity(), new Action<Boolean>() {
+                GoodwayHttpClientPost.updateUserCity(getActivity(), new Action<Boolean>() {
                     @Override
                     public void action(Boolean e) {
 
