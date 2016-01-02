@@ -117,12 +117,32 @@ public class MainActivity extends AppCompatActivity{
 
         Bundle extras = this.getIntent().getExtras();
         token = extras.getString("token");
+        Log.d("token", token);
 
         GoodwayHttpClientPost.me(this, new Action<User>() {
             @Override
             public void action(User user) {
                 MainActivity.this.user = user;
+                Log.d("user.getName()", "user.getName() "+user.getName());
                 ((TextView)navigationView.getHeaderView(0).findViewById(R.id.name)).setText(user.getName());
+                Log.d("user.getAvatar()", "user.getAvatar() "+user.getAvatar());
+                if(user.getAvatar()!="") {
+                    Picasso.with(MainActivity.this)
+                            .load(user.getAvatar())
+                            .error(R.mipmap.ic_person_white_48dp)
+                            .resize(150, 150)
+                            .centerCrop()
+                            .transform(new ImageTrans_CircleTransform())
+                            .into(((ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar)));
+                }
+                else{
+                    Picasso.with(MainActivity.this)
+                            .load(R.mipmap.ic_person_white_48dp)
+                            .resize(150, 150)
+                            .centerCrop()
+                            .transform(new ImageTrans_CircleTransform())
+                            .into(((ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar)));
+                }
             }
         }, new ErrorAction() {
             @Override
@@ -181,6 +201,7 @@ public class MainActivity extends AppCompatActivity{
         Address departure = extras.getParcelable("departure");
         Address destination = extras.getParcelable("destination");
         Bundle b = new Bundle();
+        b.putString("token", token);
         if(departure!=null){
             setFrom(departure);
             b.putParcelable("DEPARTURE", departure);
@@ -193,8 +214,6 @@ public class MainActivity extends AppCompatActivity{
         switchToMain(b, -1);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
         ((TextView)navigationView.getHeaderView(0).findViewById(R.id.version)).setText(getString(R.string.version) + " " + getVersionInfo());
-
-        Log.d("avatar", "avatar" + user.getAvatar());
 
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -269,19 +288,6 @@ public class MainActivity extends AppCompatActivity{
         b.putInt("REQUEST", request);
         b.putString("token", token);
         switchToSearch(b);
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        Picasso.with(this)
-                .load(user.getAvatar())
-                .error(R.mipmap.ic_person_white_48dp)
-                .resize(150, 150)
-                .centerCrop()
-                .transform(new ImageTrans_CircleTransform())
-                .into(((ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar)));
-
     }
 
     @Override

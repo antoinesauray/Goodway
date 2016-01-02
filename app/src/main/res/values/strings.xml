@@ -193,4 +193,6 @@
     <string name="estimate">environ</string>
 
     <string name="accounts">Comptes</string>
+
+    <string name="goodway_preferences">goodway_v1_preferences</string>
 </resources>

@@ -119,7 +119,7 @@ public class AddFriendActivity extends AppCompatActivity{
             public void action(User u) {
                 Intent i = new Intent(AddFriendActivity.this, ProfileActivity.class);
                 i.putExtra("user", u);
-                i.putExtra("mail", mail);
+                i.putExtra("token", mail);
                 i.putExtra("password", password);
                 i.putExtra("self", false);
                 startActivity(i);

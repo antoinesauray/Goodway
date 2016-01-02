@@ -114,7 +114,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
             public void action(int length) {
 
             }
-        }, null, token, user.getFirstName());
+        }, null, token);
 
         autocomplete.addTextChangedListener(new TextWatcher() {
             @Override
@@ -171,7 +171,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
                         public void action(int length) {
 
                         }
-                    }, null, token, user.getFirstName());
+                    }, null, token);
                 }
             }
         });

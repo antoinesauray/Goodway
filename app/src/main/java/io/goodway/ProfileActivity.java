@@ -227,7 +227,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                         newAddressFragment.location.setLongitude(address.getLongitude());
                     }
                     else{
-                        newAddressFragment.location = new UserLocation(name, address.getName(), user.getFirstName(), address.getLatitude(), address.getLongitude(), shared);
+                        newAddressFragment.location = new UserLocation(name, address.getName(), address.getLatitude(), address.getLongitude(), shared);
                     }
                     if(data.getBooleanExtra("insert", false)){
                         final ProgressDialog pd = new ProgressDialog(ProfileActivity.this);
@@ -484,7 +484,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                         View addAddress = getLayoutInflater(null).inflate(R.layout.view_add_address, null);
                         locations.addView(addAddress);
                     }
-                }, token, user.getFirstName());
+                }, token);
             }
             else if(user.isFriend()){
                 GoodwayHttpClientPost.getUserLocations(getActivity(), new Action<UserLocation>() {
@@ -502,7 +502,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                             locations.addView(notFound);
                         }
                     }
-                }, null, token, user.getFirstName(), user.getId());
+                }, null, token, user.getId());
             }
             else{
                 View notFound = getLayoutInflater(null).inflate(R.layout.view_not_friend, null);

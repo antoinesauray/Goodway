@@ -143,20 +143,20 @@ public class SplashScreenActivity extends AppCompatActivity {
                     GoodwayHttpClientPost.authenticate(getActivity(), new Action<String>() {
                         @Override
                         public void action(String token) {
-                            start(token);
-                            //connectedAs.setText(e.getMail());
+                            if(token!=null) {
+                                start(token);
+                                //connectedAs.setText(e.getMail());
+                            }
+                            else{
+                                root.findViewById(R.id.not_connected).setVisibility(View.VISIBLE);
+                            }
+
                         }
-                    }, new ErrorAction() {
-                        @Override
-                        public void action(int length) {
-                            root.findViewById(R.id.not_connected).setVisibility(View.VISIBLE);
-                        }
-                    }, mail, password);
+                    }, null, mail, password);
                 } else {
                     //start(new User(id, fname, lname, mail, title, null, false));
                     //connectedAs.setText(mail);
                 }
-
 
             } else {
                 root.findViewById(R.id.not_connected).setVisibility(View.VISIBLE);
@@ -224,23 +224,23 @@ public class SplashScreenActivity extends AppCompatActivity {
                 GoodwayHttpClientPost.authenticate(getActivity(), new Action<String>() {
                     @Override
                     public void action(String token) {
-                        SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
-                                MODE_PRIVATE);
-                        SharedPreferences.Editor editor = shared_preferences.edit();
-                        editor.putString("mail", mail.getText().toString());
-                        editor.putString("password", password.getText().toString());
-                        editor.commit();
-                        Intent i = new Intent(getActivity(), MainActivity.class);
-                        i.putExtra("token", token);
-                        startActivity(i);
+                        if(token!=null) {
+                            SharedPreferences shared_preferences = getActivity().getSharedPreferences(getString(R.string.goodway_preferences),
+                                    MODE_PRIVATE);
+                            SharedPreferences.Editor editor = shared_preferences.edit();
+                            editor.putString("mail", mail.getText().toString());
+                            editor.putString("password", password.getText().toString());
+                            editor.commit();
+                            Intent i = new Intent(getActivity(), MainActivity.class);
+                            i.putExtra("token", token);
+                            startActivity(i);
+                        }
+                        else{
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(getActivity(), getString(R.string.wrong_id), Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }, new ErrorAction() {
-                    @Override
-                    public void action(int length) {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getActivity(), getString(R.string.wrong_id), Toast.LENGTH_SHORT).show();
-                    }
-                }, mail.getText().toString(), password.getText().toString());
+                }, null, mail.getText().toString(), password.getText().toString());
             }
             else{
                 Toast.makeText(getActivity(), getString(R.string.connexion_error), Toast.LENGTH_SHORT).show();
@@ -368,14 +368,11 @@ public class SplashScreenActivity extends AppCompatActivity {
                         GoodwayHttpClientPost.register(getActivity(), new Action<User>() {
                             @Override
                             public void action(User u) {
-                                SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
+                                SharedPreferences shared_preferences = getActivity().getSharedPreferences(getString(R.string.goodway_preferences),
                                         MODE_PRIVATE);
                                 SharedPreferences.Editor editor = shared_preferences.edit();
                                 editor.putString("mail", mail.getText().toString());
                                 editor.putString("password", password.getText().toString());
-                                editor.putInt("id", u.getId());
-                                editor.putString("fname", u.getFirstName());
-                                editor.putString("lname", u.getLastName());
                                 editor.commit();
                                 Intent i = new Intent(getActivity(), MainActivity.class);
                                 i.putExtra("user", u);

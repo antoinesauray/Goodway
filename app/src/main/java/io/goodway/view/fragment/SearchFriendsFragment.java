@@ -103,7 +103,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                         dialog.dismiss();
                         sheet.show();
                     }
-                }, token, u.getFirstName(), u.getId());
+                }, token, u.getId());
 
                 // add the locations from https request
 
