@@ -165,12 +165,14 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
                 mainActivity.setFrom(address);
                 Bundle b1 = new Bundle();
                 b1.putParcelable("DEPARTURE", address);
+                b1.putString("token", token);
                 mainActivity.switchToMain(b1, request);
                 break;
             case MainActivity.DESTINATION:
                 mainActivity.setTo(address);
                 Bundle b2 = new Bundle();
                 b2.putParcelable("DESTINATION", address);
+                b2.putString("token", token);
                 mainActivity.switchToMain(b2, request);
                 break;
             default:

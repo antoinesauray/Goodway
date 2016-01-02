@@ -205,7 +205,9 @@ public class WayContainerAdapter extends RecyclerView.Adapter<WayContainerAdapte
                 }, new ErrorAction() {
                     @Override
                     public void action(int length) {
-
+                        View uber = activity.getLayoutInflater().inflate(R.layout.view_way_not_found, null);
+                        ((TextView)uber.findViewById(R.id.message)).setText(R.string.noUber);
+                        holder.ways.addView(uber);
                     }
                 }, from.getLatitude(), from.getLongitude(), to.getLatitude(), to.getLongitude());
 
