@@ -61,7 +61,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
     private int request;
     private static final CharacterStyle STYLE_BOLD = new StyleSpan(Typeface.BOLD);
     private User user;
-    private String mail, password;
+    private String token;
 
     private AsyncTask selfLocations;
 
@@ -70,11 +70,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
         root = inflater.inflate(R.layout.fragment_google_places, container, false);
         request = getArguments().getInt("REQUEST");
         user = getArguments().getParcelable("user");
-
-        SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
-                getActivity().MODE_PRIVATE);
-        mail = shared_preferences.getString("mail", null);
-        password = shared_preferences.getString("password", null);
+        token = getArguments().getString("token");
 
         mainActivity = (MainActivity) getActivity();
         googleApiClient = new GoogleApiClient.Builder(getActivity())
@@ -108,7 +104,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
             }
         });
         recyclerView.setAdapter(searchAdapter);
-        selfLocations = GoodwayHttpClientPost.getSelfLocations(getActivity(), new Action<UserLocation>() {
+        selfLocations = GoodwayHttpClientPost.getMyLocations(getActivity(), new Action<UserLocation>() {
             @Override
             public void action(UserLocation e) {
                 searchAdapter.add(e);
@@ -118,7 +114,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
             public void action(int length) {
 
             }
-        }, null, mail, password, user.getFirstName());
+        }, null, token, user.getFirstName());
 
         autocomplete.addTextChangedListener(new TextWatcher() {
             @Override
@@ -165,7 +161,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
                     });
                 }
                 else{
-                    selfLocations = GoodwayHttpClientPost.getSelfLocations(getActivity(), new Action<UserLocation>() {
+                    selfLocations = GoodwayHttpClientPost.getMyLocations(getActivity(), new Action<UserLocation>() {
                         @Override
                         public void action(UserLocation e) {
                             searchAdapter.add(e);
@@ -175,7 +171,7 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
                         public void action(int length) {
 
                         }
-                    }, null, mail, password, user.getFirstName());
+                    }, null, token, user.getFirstName());
                 }
             }
         });

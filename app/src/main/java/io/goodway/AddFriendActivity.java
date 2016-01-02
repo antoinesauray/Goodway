@@ -124,7 +124,7 @@ public class AddFriendActivity extends AppCompatActivity{
                 i.putExtra("self", false);
                 startActivity(i);
             }
-        }, mail, password);
+        });
 
 
         recyclerView.setLayoutManager(layoutManager);

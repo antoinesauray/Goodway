@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -80,8 +79,8 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
      */
     private Toolbar toolbar;
     private User user;
+    private String token;
 
-    private String mail, password;
     private LinearLayout locations;
 
     private boolean self;
@@ -103,6 +102,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         setContentView(R.layout.activity_profile);
         Bundle extras = this.getIntent().getExtras();
         user = extras.getParcelable("user");
+        token = extras.getString("token");
         self = extras.getBoolean("self", false);
         toolbar = (Toolbar) findViewById(R.id.mapToolbar);
         toolbar.setTitle(user.getName());
@@ -126,14 +126,9 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
-                MODE_PRIVATE);
-        mail = shared_preferences.getString("mail", null);
-        password = shared_preferences.getString("password", null);
 
         bundle = new Bundle();
-        bundle.putString("mail", mail);
-        bundle.putString("password", password);
+        bundle.putString("token", token);
         bundle.putBoolean("self", self);
         bundle.putParcelable("user", user);
         addressFragment = new AddressFragment();
@@ -163,6 +158,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
     public void fabClick(View v){
         Log.d("requesting", "requesting friend with id="+user.getId());
+        /*
         GoodwayHttpClientPost.requestFriend(this, new Action<Boolean>() {
             @Override
             public void action(Boolean e) {
@@ -175,7 +171,8 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             public void action(int length) {
                 Toast.makeText(ProfileActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
             }
-        }, mail, password, user.getId());
+        }, token, user.getId());
+        */
     }
 
     private void popStackBack(){
@@ -248,15 +245,17 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                 pd.dismiss();
                                 Toast.makeText(ProfileActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
                             }
-                        }, mail, password, newAddressFragment.location);
+                        }, token, newAddressFragment.location);
                     }
                 case FILE_SELECT_CODE:
                     Uri selectedImage = data.getData();
+                    /*
                     try {
-                        new UploadDocument(this, decodeUri(this, selectedImage, 100),  ProfileActivity.this.avatar, selectedImage.getLastPathSegment(), mail, password).execute();
+                        new UploadDocument(this, decodeUri(this, selectedImage, 100),  ProfileActivity.this.avatar, selectedImage.getLastPathSegment(), token).execute();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
+                    */
             }
         }
     }
@@ -319,6 +318,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                 pd.setMessage(getString(R.string.add_address));
                                 pd.setProgressStyle(pd.STYLE_SPINNER);
                                 pd.show();
+                                /*
                                 currentAsyncTask = GoodwayHttpClientPost.updateLocation(ProfileActivity.this, new Action<Boolean>() {
                                     @Override
                                     public void action(Boolean e) {
@@ -331,7 +331,8 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                         pd.dismiss();
                                         Toast.makeText(ProfileActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
                                     }
-                                }, mail, password, newAddressFragment.location);
+                                }, token, newAddressFragment.location);
+                                */
 
                             }
                         })
@@ -438,7 +439,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
     public static class AddressFragment extends Fragment{
         public static final String TAG = "address";
-        String mail, password;
+        String token;
         LinearLayout locations;
         boolean self;
         User user;
@@ -452,15 +453,14 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             View rootView = inflater.inflate(
                     R.layout.fragment_addresse, container, false);
             Bundle extras = getArguments();
-            mail = extras.getString("mail");
-            password = extras.getString("password");
+            token = extras.getString("token");
             self = extras.getBoolean("self");
             user = extras.getParcelable("user");
 
             locations = (LinearLayout) rootView.findViewById(R.id.locations);
 
             if(self){
-                GoodwayHttpClientPost.getSelfLocations(getActivity(), new Action<UserLocation>() {
+                GoodwayHttpClientPost.getMyLocations(getActivity(), new Action<UserLocation>() {
                     @Override
                     public void action(UserLocation e) {
                         Log.d("adding address", "adding address:" + e.toString());
@@ -484,7 +484,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                         View addAddress = getLayoutInflater(null).inflate(R.layout.view_add_address, null);
                         locations.addView(addAddress);
                     }
-                }, mail, password, user.getFirstName());
+                }, token, user.getFirstName());
             }
             else if(user.isFriend()){
                 GoodwayHttpClientPost.getUserLocations(getActivity(), new Action<UserLocation>() {
@@ -502,7 +502,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                             locations.addView(notFound);
                         }
                     }
-                }, null, mail, password, user.getFirstName(), user.getId());
+                }, null, token, user.getFirstName(), user.getId());
             }
             else{
                 View notFound = getLayoutInflater(null).inflate(R.layout.view_not_friend, null);
@@ -586,6 +586,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                     pd.setMessage(getString(R.string.deleting));
                                     pd.setProgressStyle(pd.STYLE_SPINNER);
                                     pd.show();
+                                    /*
                                     GoodwayHttpClientPost.deleteLocation(getActivity(), new Action<Boolean>() {
                                         @Override
                                         public void action(Boolean e) {
@@ -599,6 +600,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                             Toast.makeText(getActivity(), R.string.failure, Toast.LENGTH_SHORT).show();
                                         }
                                     }, ((ProfileActivity) getActivity()).mail, ((ProfileActivity) getActivity()).password, location);
+                                    */
                                 }
                             })
                             .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {

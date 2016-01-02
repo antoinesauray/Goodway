@@ -30,17 +30,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     private List<User> mDataset;
     private UserCallback callback;
-    private String mail, password;
     private Context context;
 
     private static final String TAG="LINE_ADAPTER";
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public UserAdapter(Context context, UserCallback callback, String mail, String password) {
+    public UserAdapter(Context context, UserCallback callback) {
         this.callback = callback;
         mDataset = new ArrayList<User>();
-        this.mail = mail;
-        this.password = password;
         this.context = context;
     }
 

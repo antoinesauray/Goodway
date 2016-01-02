@@ -51,7 +51,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
         this.url = URL;
     }
 
-    public static AsyncTask getSelfLocations(final Context c, Action<UserLocation> action, ErrorAction error, FinishCallback finish, String mail, String password, final String fname){
+    public static AsyncTask getMyLocations(final Context c, Action<UserLocation> action, ErrorAction error, FinishCallback finish, String token, final String fname){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<UserLocation>() {
             @Override
             public UserLocation processJson(JSONObject jsonObject) {
@@ -68,10 +68,10 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                     return null;
                 }
             }
-        }, action, error, finish, "https://api.goodway.io/user_locations.php").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password));
+        }, action, error, finish, "http://developper.goodway.io/api/v1/me/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
-    public static AsyncTask getUserLocations(final Context c, Action<UserLocation> action, ErrorAction error, FinishCallback finish, String mail, String password, final String fname, int id){
+    public static AsyncTask getUserLocations(final Context c, Action<UserLocation> action, ErrorAction error, FinishCallback finish, String token, final String fname, int id){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<UserLocation>() {
             @Override
             public UserLocation processJson(JSONObject jsonObject) {
@@ -87,7 +87,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                     return null;
                 }
             }
-        }, action, error, finish, "https://api.goodway.io/user_locations.php").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(id)));
+        }, action, error, finish, "http://developper.goodway.io/api/v1/user/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(id)));
     }
 
     public static AsyncTask getGroupLocations(final Context c, Action<GroupLocation> action, ErrorAction error, FinishCallback finish, String mail, String password, final int id){
@@ -125,13 +125,13 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
     }
 
 
-    public static AsyncTask addLocation(final Context c, Action<Boolean> action, ErrorAction error, String mail, String password, UserLocation address){
+    public static AsyncTask addLocation(final Context c, Action<Boolean> action, ErrorAction error, String token, UserLocation address){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<Boolean>() {
             @Override
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "https://api.goodway.io/add_user_location.php").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
+        }, action, error, "http://developper.goodway.io/api/v1/me/location/add").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
                 new AbstractMap.SimpleEntry<String, String>("shared", Boolean.toString(address.shared())), new AbstractMap.SimpleEntry<String, String>("lat", Double.toString(address.getLatitude())), new AbstractMap.SimpleEntry<String, String>("lng", Double.toString(address.getLongitude())));
     }
 
@@ -141,7 +141,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "https://api.goodway.io/update_user_location.php").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
+        }, action, error, "http://developper.goodway.io/api/v1/me/location/update").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
                 new AbstractMap.SimpleEntry<String, String>("loc_id", Integer.toString(address.getId())), new AbstractMap.SimpleEntry<String, String>("shared", Boolean.toString(address.shared())), new AbstractMap.SimpleEntry<String, String>("lat", Double.toString(address.getLatitude())), new AbstractMap.SimpleEntry<String, String>("lng", Double.toString(address.getLongitude())));
     }
 
@@ -177,7 +177,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
         }, action, error, "http://developer.goodway.io/api/v1/authentication/register?").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("password", password)
         , new AbstractMap.SimpleEntry<String, String>("fname", fname), new AbstractMap.SimpleEntry<String, String>("lname", lname), new AbstractMap.SimpleEntry<String, String>("birthday", birthday));
     }
-    public static AsyncTask getFriends(Context c, Action<User> action, ErrorAction error, String mail, String password){
+    public static AsyncTask getFriends(Context c, Action<User> action, ErrorAction error, String token){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<User>() {
             @Override
             public User processJson(JSONObject jsonObject) {
@@ -190,7 +190,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 if(city=="null"){city=null;}
                 return new User(id, fname, lname, avatar, title, city, true);
             }
-        }, action, error, "https://api.goodway.io/friends.php").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password));
+        }, action, error, "http://developper.goodway.io/api/v1/me/friends").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
     public static AsyncTask getFriendRequests(Context c, Action<User> action, ErrorAction error, FinishCallback finish, String token){
@@ -277,14 +277,14 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(id)), new AbstractMap.SimpleEntry<String, String>("state", Boolean.toString(state)));
     }
 
-    public static AsyncTask updateUserCity(Context c, Action<Boolean> action, ErrorAction error, String mail, String password, String city){
+    public static AsyncTask updateMyCity(Context c, Action<Boolean> action, ErrorAction error, String token, String city){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<Boolean>() {
             @Override
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "https://api.goodway.io/update_user_city.php").execute(
-                new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password),
+        }, action, error, "http://developper.goodway.io/api/v1/me/city/update").execute(
+                new AbstractMap.SimpleEntry<String, String>("token", token),
                 new AbstractMap.SimpleEntry<String, String>("city", city));
     }
 

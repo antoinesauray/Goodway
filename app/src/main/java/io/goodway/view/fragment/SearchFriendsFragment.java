@@ -50,7 +50,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
     private TextView error;
 
     private int request;
-    private String mail, password;
+    private String token;
     private static final CharacterStyle STYLE_BOLD = new StyleSpan(Typeface.BOLD);
     private ArrayList<UserLocation> userLocations;
 
@@ -59,13 +59,10 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
         root = inflater.inflate(R.layout.fragment_search_friends, container, false);
 
         request = getArguments().getInt("REQUEST");
+        token = getArguments().getString("token");
         mainActivity = (MainActivity) getActivity();
         recyclerView = (RecyclerView) root.findViewById(R.id.list);
 
-        SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
-                getActivity().MODE_PRIVATE);
-        mail = shared_preferences.getString("mail", null);
-        password = shared_preferences.getString("password", null);
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -106,12 +103,12 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                         dialog.dismiss();
                         sheet.show();
                     }
-                }, mail, password, u.getFirstName(), u.getId());
+                }, token, u.getFirstName(), u.getId());
 
                 // add the locations from https request
 
             }
-        }, mail, password);
+        });
 
         GoodwayHttpClientPost.getFriends(getActivity(), new Action<User>() {
             @Override
@@ -136,7 +133,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                 }
 
             }
-        }, mail, password);
+        }, token);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
@@ -175,7 +172,7 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                 }
 
             }
-        }, mail, password);
+        }, token);
     }
 
     private void finish(Address address){

@@ -64,13 +64,14 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
     private TextView fromText, toText;
 
     private Address from, to;
-    private String mail, password;
+    private String token;
 
     private static final int ACCESS_FINE_LOCATION=1;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_map, container, false);
-
+        Bundle extras = getArguments();
+        token = extras.getString("token");
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(getActivity(),
                     Manifest.permission.ACCESS_FINE_LOCATION)
@@ -112,10 +113,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
                     .addOnConnectionFailedListener(this)
                     .build();
         }
-        SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
-                getActivity().MODE_PRIVATE);
-        mail = shared_preferences.getString("mail", null);
-        password = shared_preferences.getString("password", null);
 
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -128,7 +125,6 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
         floatingActionButton.setBaselineAlignBottom(true);
         floatingActionButton.setOnClickListener(this);
 
-        Bundle extras = getArguments();
         LatLng latLng = null;
         if (extras.getParcelable("DEPARTURE") != null) {
             from = extras.getParcelable("DEPARTURE");
@@ -272,12 +268,12 @@ public class MainFragment extends Fragment implements OnMapReadyCallback, Google
         try {
             addresses = gcd.getFromLocation(userLocation.getLatitude(), userLocation.getLongitude(), 1);
             if (addresses.size() > 0){
-                GoodwayHttpClientPost.updateUserCity(getActivity(), new Action<Boolean>() {
+                GoodwayHttpClientPost.updateMyCity(getActivity(), new Action<Boolean>() {
                     @Override
                     public void action(Boolean e) {
 
                     }
-                }, null, mail, password, addresses.get(0).getLocality());
+                }, null, token, addresses.get(0).getLocality());
             }
         } catch (IOException e) {
             e.printStackTrace();

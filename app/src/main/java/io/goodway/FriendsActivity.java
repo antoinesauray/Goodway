@@ -57,7 +57,7 @@ public class FriendsActivity extends AppCompatActivity {
     private TabLayout tabLayout;
 
     private User user;
-    private String password;
+    private String token;
     private int nbFriendRequests;
 
     public static final int FRIENDACCEPTANCE=1;
@@ -68,6 +68,7 @@ public class FriendsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_friends);
         Bundle extras = this.getIntent().getExtras();
         user = extras.getParcelable("user");
+        token = extras.getString("token");
         nbFriendRequests = extras.getInt("nbFriendRequests");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.friends);
@@ -75,10 +76,6 @@ public class FriendsActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
-
-        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
-                MODE_PRIVATE);
-        password = shared_preferences.getString("password", null);
 
         pagerAdapter = new PagerAdapter(getSupportFragmentManager());
         viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -133,8 +130,7 @@ public class FriendsActivity extends AppCompatActivity {
 
             Bundle args = new Bundle();
             // Our object is just an integer :-P
-            args.putString("mail", user.getMail());
-            args.putString("password", password);
+            args.putString("token", token);
             f1.setArguments(args);
             f2.setArguments(args);
         }
@@ -186,7 +182,7 @@ public class FriendsActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager;
         TextView error;
         UserAdapter adapter;
-        String mail, password;
+        String token;
         @Override
         public View onCreateView(LayoutInflater inflater,
                                  ViewGroup container, Bundle savedInstanceState) {
@@ -194,6 +190,10 @@ public class FriendsActivity extends AppCompatActivity {
             // properly.
             View rootView = inflater.inflate(
                     R.layout.fragment_friends, container, false);
+
+            Bundle extras = getArguments();
+            token = extras.getString("token");
+
             recyclerView = (RecyclerView) rootView.findViewById(R.id.list);
 
             recyclerView.setHasFixedSize(true);
@@ -205,16 +205,11 @@ public class FriendsActivity extends AppCompatActivity {
                 public void action(User u) {
                     Intent i = new Intent(getActivity(), ProfileActivity.class);
                     i.putExtra("user", u);
-                    i.putExtra("mail", mail);
-                    i.putExtra("password", password);
+                    i.putExtra("token", token);
                     i.putExtra("self", false);
                     startActivity(i);
                 }
-            }, mail, password);
-
-            Bundle extras = getArguments();
-            mail = extras.getString("mail");
-            password = extras.getString("password");
+            });
 
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(adapter);
@@ -257,7 +252,7 @@ public class FriendsActivity extends AppCompatActivity {
                     swipeLayout.setRefreshing(false);
                     error.setVisibility(View.VISIBLE);
                 }
-            }, mail, password);
+            }, token);
         }
     }
     public static class FriendRequestFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
@@ -267,7 +262,7 @@ public class FriendsActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager;
         TextView error;
         UserAdapter adapter;
-        String mail, password;
+        String token;
         String nbRequests="";
         @Override
         public View onCreateView(LayoutInflater inflater,
@@ -286,20 +281,18 @@ public class FriendsActivity extends AppCompatActivity {
             error = (TextView) rootView.findViewById(R.id.error);
 
             Bundle extras = getArguments();
-            mail = extras.getString("mail");
-            password = extras.getString("password");
+            token = extras.getString("token");
 
             adapter = new UserAdapter(getActivity(), new UserCallback() {
                 @Override
                 public void action(User u) {
                     Intent i = new Intent(getActivity(), ProfileActivity.class);
                     i.putExtra("user", u);
-                    i.putExtra("mail", mail);
-                    i.putExtra("password", password);
+                    i.putExtra("token", token);
                     i.putExtra("self", false);
                     startActivityForResult(i, FRIENDACCEPTANCE);
                 }
-            }, mail, password);
+            });
 
 
             recyclerView.setLayoutManager(layoutManager);
@@ -346,7 +339,7 @@ public class FriendsActivity extends AppCompatActivity {
                 public void action(int length) {
 
                 }
-            }, mail, password);
+            }, token);
         }
     }
 }
