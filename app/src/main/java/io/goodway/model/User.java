@@ -27,8 +27,19 @@ public class User implements Parcelable {
             };
 
 
+    public User(int id, String mail, String fname, String lname, String avatar, int title, String city, boolean friend){
+        this.id = id;
+        this.mail = mail;
+        this.fname = fname;
+        this.lname = lname;
+        this.friend=friend;
+        this.title = title;
+        this.avatar = avatar;
+        this.city = city;
+    }
     public User(int id, String fname, String lname, String avatar, int title, String city, boolean friend){
         this.id = id;
+        this.mail = null;
         this.fname = fname;
         this.lname = lname;
         this.friend=friend;

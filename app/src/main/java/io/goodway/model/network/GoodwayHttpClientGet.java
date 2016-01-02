@@ -41,7 +41,7 @@ import io.goodway.navitia_android.ErrorAction;
  */
 
 
-public class GoodwayHttpClientGet<T> extends AsyncTask<AbstractMap.SimpleEntry, T, Integer>{
+public class GoodwayHttpClientGet<T> extends AsyncTask<AbstractMap.SimpleEntry<String, String>, T, Integer>{
 
     private Context c;
     private Action<T> action;
@@ -84,10 +84,10 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<AbstractMap.SimpleEntry, 
                 return ret;
             }
         }, action, error, "http://uber.goodway.io/estimate?").execute(
-                new AbstractMap.SimpleEntry("start_latitude", Double.toString(start_latitude)),
-                new AbstractMap.SimpleEntry("start_longitude", Double.toString(start_longitude)),
-                new AbstractMap.SimpleEntry("end_latitude", Double.toString(end_latitude)),
-                new AbstractMap.SimpleEntry("end_longitude", Double.toString(end_longitude)));
+                new AbstractMap.SimpleEntry<String, String>("start_latitude", Double.toString(start_latitude)),
+                new AbstractMap.SimpleEntry<String, String>("start_longitude", Double.toString(start_longitude)),
+                new AbstractMap.SimpleEntry<String, String>("end_latitude", Double.toString(end_latitude)),
+                new AbstractMap.SimpleEntry<String, String>("end_longitude", Double.toString(end_longitude)));
     }
     public static AsyncTask getUberTimeEstimate(Context c, Action<Integer> action, ErrorAction error, double start_latitude, double start_longitude, String productId) {
         return new GoodwayHttpClientGet<>(c, new ProcessJson<Integer>() {
@@ -105,9 +105,9 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<AbstractMap.SimpleEntry, 
                 return -1;
             }
         }, action, error, "http://uber.goodway.io/estimate_time?").execute(
-                new AbstractMap.SimpleEntry("start_latitude", Double.toString(start_latitude)),
-                new AbstractMap.SimpleEntry("start_longitude", Double.toString(start_longitude)),
-                new AbstractMap.SimpleEntry("product_id", productId));
+                new AbstractMap.SimpleEntry<String, String>("start_latitude", Double.toString(start_latitude)),
+                new AbstractMap.SimpleEntry<String, String>("start_longitude", Double.toString(start_longitude)),
+                new AbstractMap.SimpleEntry<String, String>("product_id", productId));
     }
     public static AsyncTask uberRequestEstimate(Context c, Action<UberProduct> action, ErrorAction error, double start_latitude, double start_longitude, double end_latitude, double end_longitude, final Uber uber) {
         return new GoodwayHttpClientGet<>(c, new ProcessJson<UberProduct>() {
@@ -142,11 +142,11 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<AbstractMap.SimpleEntry, 
                         surge_multiplier, distance_estimate, pickup_estimate);
             }
         }, action, error, "http://uber.goodway.io/request_estimate?").execute(
-                new AbstractMap.SimpleEntry("start_latitude", Double.toString(start_latitude)),
-                new AbstractMap.SimpleEntry("start_longitude", Double.toString(start_longitude)),
-                new AbstractMap.SimpleEntry("product_id", uber.getProduct_id()),
-                new AbstractMap.SimpleEntry("end_latitude", Double.toString(end_latitude)),
-                new AbstractMap.SimpleEntry("end_longitude", Double.toString(end_longitude)));
+                new AbstractMap.SimpleEntry<String, String>("start_latitude", Double.toString(start_latitude)),
+                new AbstractMap.SimpleEntry<String, String>("start_longitude", Double.toString(start_longitude)),
+                new AbstractMap.SimpleEntry<String, String>("product_id", uber.getProduct_id()),
+                new AbstractMap.SimpleEntry<String, String>("end_latitude", Double.toString(end_latitude)),
+                new AbstractMap.SimpleEntry<String, String>("end_longitude", Double.toString(end_longitude)));
     }
     public static AsyncTask uberRequest(Context c, Action<String> action, ErrorAction error, double start_latitude, double start_longitude, double end_latitude, double end_longitude, final Uber uber) {
         return new GoodwayHttpClientGet<>(c, new ProcessJson<String>() {
@@ -155,31 +155,38 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<AbstractMap.SimpleEntry, 
                 return jsonObject.optString("request_id");
             }
         }, action, error, "http://uber.goodway.io/request?").execute(
-                new AbstractMap.SimpleEntry("start_latitude", Double.toString(start_latitude)),
-                new AbstractMap.SimpleEntry("start_longitude", Double.toString(start_longitude)),
-                new AbstractMap.SimpleEntry("product_id", uber.getProduct_id()),
-                new AbstractMap.SimpleEntry("end_latitude", Double.toString(end_latitude)),
-                new AbstractMap.SimpleEntry("end_longitude", Double.toString(end_longitude)));
+                new AbstractMap.SimpleEntry<String, String>("start_latitude", Double.toString(start_latitude)),
+                new AbstractMap.SimpleEntry<String, String>("start_longitude", Double.toString(start_longitude)),
+                new AbstractMap.SimpleEntry<String, String>("product_id", uber.getProduct_id()),
+                new AbstractMap.SimpleEntry<String, String>("end_latitude", Double.toString(end_latitude)),
+                new AbstractMap.SimpleEntry<String, String>("end_longitude", Double.toString(end_longitude)));
     }
 
-    public static AsyncTask checkMailAvailability(Context c, Action<Integer> action, ErrorAction error, String mail){
-        return new GoodwayHttpClientGet<>(c, new ProcessJson<Integer>() {
+    public static AsyncTask checkMailAvailability(Context c, Action<Boolean> action, ErrorAction error, String mail){
+        return new GoodwayHttpClientGet<>(c, new ProcessJson<Boolean>() {
             @Override
-            public Integer processJson(JSONObject jsonObject) {
-                Integer id = jsonObject.optInt("id");
-                return id;
+            public Boolean processJson(JSONObject jsonObject) throws JSONException {
+                if(jsonObject.getBoolean("success")) {
+                    JSONArray users = jsonObject.getJSONArray("users");
+                    if (users.length() == 0) {
+                        return true;
+                    }
+                }
+                return false;
             }
-        }, action, error, "http://developer.goodway.io/api/v1/authentication/mail?").execute(new AbstractMap.SimpleEntry("mail", mail));
+        }, action, error, "http://developer.goodway.io/api/v1/authentication/mail?").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail));
     }
 
     @Override
-    protected Integer doInBackground(AbstractMap.SimpleEntry... entries) {
+    protected Integer doInBackground(AbstractMap.SimpleEntry<String, String>... entries) {
         int length=0;
         try {
             HttpURLConnection urlConnection = GoodwayProtocol.getHttpGetUrlConnection(this.url, entries);
+            Log.d("url=", "url= "+urlConnection.toString());
             int serverResponseCode = urlConnection.getResponseCode();
             String serverResponseMessage = urlConnection.getResponseMessage();
 
+            Log.d(serverResponseCode+"", "Response code");
             Log.d(serverResponseMessage, "Response message");
             String jsonResult;
             if (serverResponseCode == 201 || serverResponseCode == 200) {

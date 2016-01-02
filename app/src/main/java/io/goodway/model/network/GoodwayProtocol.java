@@ -72,31 +72,10 @@ public class GoodwayProtocol {
         return urlConnection;
     }
     public static HttpURLConnection getHttpGetUrlConnection(String url, AbstractMap.SimpleEntry[] entries) throws IOException {
-        HttpURLConnection urlConnection = (HttpURLConnection) new URL(getQuery(url, entries)).openConnection();
-        urlConnection.setReadTimeout(10000);
-        urlConnection.setConnectTimeout(15000);
-        urlConnection.setRequestMethod("GET");
-        urlConnection.setDoInput(true);
-        urlConnection.setDoOutput(true);
-
-        return urlConnection;
+        return (HttpURLConnection) new URL(getQuery(url, entries)).openConnection();
     }
     public static HttpsURLConnection getHttpsGetUrlConnection(String url, AbstractMap.SimpleEntry[] entries) throws IOException {
-        HttpsURLConnection urlConnection = (HttpsURLConnection) new URL(getQuery(url, entries)).openConnection();
-        urlConnection.setReadTimeout(10000);
-        urlConnection.setConnectTimeout(15000);
-        urlConnection.setRequestMethod("GET");
-        urlConnection.setDoInput(true);
-        urlConnection.setDoOutput(true);
-
-        OutputStream os = urlConnection.getOutputStream();
-        BufferedWriter writer = new BufferedWriter(
-                new OutputStreamWriter(os, "UTF-8"));
-        writer.write(postQuery(entries));
-        writer.flush();
-        writer.close();
-        os.close();
-        return urlConnection;
+        return (HttpsURLConnection) new URL(getQuery(url, entries)).openConnection();
     }
 
     private static String postQuery(AbstractMap.SimpleEntry[] params) throws UnsupportedEncodingException
@@ -112,11 +91,11 @@ public class GoodwayProtocol {
             else
                 result.append("&");
 
-            result.append(URLEncoder.encode((String) pair.getKey(), "UTF-8"));
+            result.append(URLEncoder.encode(pair.getKey().toString(), "UTF-8"));
             result.append("=");
-            result.append(URLEncoder.encode((String) pair.getValue(), "UTF-8"));
+            result.append(URLEncoder.encode(pair.getValue().toString(), "UTF-8"));
         }
-
+        Log.d("post params", result.toString());
         return result.toString();
     }
     private static String getQuery(String url, AbstractMap.SimpleEntry[] params) throws UnsupportedEncodingException

@@ -290,9 +290,9 @@ public class SplashScreenActivity extends AppCompatActivity {
                         if (client != null) {
                             client.cancel(true);
                         }
-                        client = GoodwayHttpClientGet.checkMailAvailability(getActivity(), new Action<Integer>() {
+                        client = GoodwayHttpClientGet.checkMailAvailability(getActivity(), new Action<Boolean>() {
                             @Override
-                            public void action(Integer e) {
+                            public void action(Boolean e) {
                                 mailAvailable = false;
                                 mailAvailibility.setText(R.string.notAvailable);
                                 mailAvailibility.setTextColor(getResources().getColor(R.color.red));
@@ -388,7 +388,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                                 dialog.dismiss();
                                 Toast.makeText(getActivity(), R.string.failure, Toast.LENGTH_SHORT).show();
                             }
-                        }, mail.getText().toString(), password.getText().toString(), fname.getText().toString(), lname.getText().toString(), new SimpleDateFormat("yyyyMMdd").format(date.getTime()));
+                        }, mail.getText().toString(), password.getText().toString(), fname.getText().toString(), lname.getText().toString(), new SimpleDateFormat("yyyy-MM-dd").format(date.getTime()));
                         break;
                     }
             }

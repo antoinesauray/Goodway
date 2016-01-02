@@ -37,6 +37,7 @@ import com.squareup.picasso.Picasso;
 
 import io.goodway.model.GroupEvent;
 import io.goodway.model.User;
+import io.goodway.model.network.GoodwayHttpClientGet;
 import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
@@ -111,16 +112,39 @@ public class MainActivity extends AppCompatActivity{
         checkGooglePlayServices();
         setContentView(R.layout.activity_main);
 
-        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
-                MODE_PRIVATE);
-        String mail = shared_preferences.getString("mail", null);
-        String password = shared_preferences.getString("password", null);
 
         //from = new Address(R.string.your_location, R.mipmap.ic_home_black_24dp, AddressType.POSITION);
 
         Bundle extras = this.getIntent().getExtras();
-        user = extras.getParcelable("user");
         token = extras.getString("token");
+
+        GoodwayHttpClientPost.me(this, new Action<User>() {
+            @Override
+            public void action(User user) {
+                MainActivity.this.user = user;
+                ((TextView)navigationView.getHeaderView(0).findViewById(R.id.name)).setText(user.getName());
+            }
+        }, new ErrorAction() {
+            @Override
+            public void action(int length) {
+
+            }
+        }, null, token);
+
+        GoodwayHttpClientPost.countFriendRequests(this, new Action<Integer>() {
+            @Override
+            public void action(Integer e) {
+                nbFriendRequests = e;
+                if (e > 0) {
+                    navigationView.getMenu().findItem(R.id.friends).setTitle(getString(R.string.friends) + " (" + e + ")");
+                }
+            }
+        }, new ErrorAction() {
+            @Override
+            public void action(int length) {
+
+            }
+        }, token);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -168,25 +192,9 @@ public class MainActivity extends AppCompatActivity{
 
         switchToMain(b, -1);
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        ((TextView)navigationView.getHeaderView(0).findViewById(R.id.name)).setText(user.getName());
         ((TextView)navigationView.getHeaderView(0).findViewById(R.id.version)).setText(getString(R.string.version) + " " + getVersionInfo());
 
         Log.d("avatar", "avatar" + user.getAvatar());
-
-        GoodwayHttpClientPost.getNbFriendRequests(this, new Action<Integer>() {
-            @Override
-            public void action(Integer e) {
-                nbFriendRequests = e;
-                if (e > 0) {
-                    navigationView.getMenu().findItem(R.id.friends).setTitle(getString(R.string.friends) + " (" + e + ")");
-                }
-            }
-        }, new ErrorAction() {
-            @Override
-            public void action(int length) {
-
-            }
-        }, mail, password);
 
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
