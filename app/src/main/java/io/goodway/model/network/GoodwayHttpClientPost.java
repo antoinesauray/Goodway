@@ -352,34 +352,49 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
         return null;
     }
 
-    public static AsyncTask findGroups(Context c, Action<Group> action, ErrorAction error, String token, String name) {
-        if (name != null) {
-            return new GoodwayHttpClientPost<>(c, new ProcessJson<Group>() {
+    public static AsyncTask findGroups(Context c, Action<List<Group>> action, ErrorAction error, String token, String name) {
+        if(name!=null) {
+            return new GoodwayHttpClientPost<>(c, new ProcessJson<List<Group>>() {
                 @Override
-                public Group processJson(JSONObject jsonObject) {
-                    Integer id = jsonObject.optInt("id");
-                    String name = jsonObject.optString("name");
-                    String description = jsonObject.optString("description");
-                    String avatar = jsonObject.optString("avatar");
-                    return new Group(id, name, description, avatar);
+                public List<Group> processJson(JSONObject jsonObject) throws JSONException {
+                    if (jsonObject.optBoolean("success")) {
+                        ArrayList groups = new ArrayList();
+                        JSONArray jsonArray = jsonObject.getJSONArray("groups");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            Integer id = jsonObject.optInt("id");
+                            String name = jsonObject.optString("name");
+                            String description = jsonObject.optString("description");
+                            String avatar = jsonObject.optString("avatar");
+                            groups.add(new Group(id, name, description, avatar));
+                        }
+                        return groups;
+                    }
+                    return null;
                 }
-            }, action, error, "http:/developer.goodway.io/api/v1/group/find").execute(
-                    new AbstractMap.SimpleEntry<String, String>("name", name),
-                    new AbstractMap.SimpleEntry<String, String>("token", token));
+            }, action, error, "http://developer.goodway.io/api/v1/me/groups/find").execute(
+                    new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("name", name));
         }
         return null;
     }
-    public static AsyncTask getMyGroups(Context c, Action<Group> action, ErrorAction error, String token) {
-            return new GoodwayHttpClientPost<>(c, new ProcessJson<Group>() {
+    public static AsyncTask getMyGroups(Context c, Action<List<Group>> action, ErrorAction error, String token) {
+            return new GoodwayHttpClientPost<>(c, new ProcessJson<List<Group>>() {
                 @Override
-                public Group processJson(JSONObject jsonObject) {
-                    Integer id = jsonObject.optInt("id");
-                    String name = jsonObject.optString("name");
-                    String description = jsonObject.optString("description");
-                    String avatar = jsonObject.optString("avatar");
-                    return new Group(id, name, description, avatar);
+                public List<Group> processJson(JSONObject jsonObject) throws JSONException {
+                    if(jsonObject.optBoolean("success")) {
+                        ArrayList groups = new ArrayList();
+                        JSONArray jsonArray = jsonObject.getJSONArray("groups");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            Integer id = jsonObject.optInt("id");
+                            String name = jsonObject.optString("name");
+                            String description = jsonObject.optString("description");
+                            String avatar = jsonObject.optString("avatar");
+                            groups.add(new Group(id, name, description, avatar));
+                        }
+                        return groups;
+                    }
+                    return null;
                 }
-            }, action, error, "http:/developer.goodway.io/api/v1/me/groups").execute(
+            }, action, error, "http://developer.goodway.io/api/v1/me/groups").execute(
                     new AbstractMap.SimpleEntry<String, String>("token", token));
     }
     public static AsyncTask joinGroup(Context c, Action<Void> action, ErrorAction error, String token, Group group) {
@@ -388,7 +403,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 public Void processJson(JSONObject jsonObject) {
                     return null;
                 }
-            }, action, error, "http:/developer.goodway.io/api/v1/group/join").execute(
+            }, action, error, "http://developer.goodway.io/api/v1/group/join").execute(
                     new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())),
                     new AbstractMap.SimpleEntry<String, String>("token", token));
     }
@@ -399,7 +414,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             public Void processJson(JSONObject jsonObject) {
                 return null;
             }
-        }, action, error, "http:/developer.goodway.io/api/v1/group/quit").execute(
+        }, action, error, "http://developer.goodway.io/api/v1/group/quit").execute(
                 new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())),
                 new AbstractMap.SimpleEntry<String, String>("token", token));
     }
@@ -418,7 +433,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 String html = jsonObject.optString("html");
                 return new GroupEvent(id, name, html, avatar, s_time, e_time, lat, lng);
             }
-        }, action, error, "http:/developer.goodway.io/api/v1/group/events/upcoming").execute(
+        }, action, error, "http://developer.goodway.io/api/v1/group/events/upcoming").execute(
                 new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())),
                 new AbstractMap.SimpleEntry<String, String>("token", token));
     }

@@ -199,11 +199,13 @@ public class MainActivity extends AppCompatActivity{
                     case R.id.friends:
                         Intent i = new Intent(MainActivity.this, FriendsActivity.class);
                         i.putExtra("token", token);
+                        i.putExtra("user", user);
                         i.putExtra("nbFriendRequests", nbFriendRequests);
                         startActivityForResult(i, MainActivity.FRIENDS);
                         break;
                     case R.id.groups:
                         Intent i2 = new Intent(MainActivity.this, UserGroupsActivity.class);
+                        i2.putExtra("user", user);
                         i2.putExtra("token", token);
                         startActivity(i2);
                         break;

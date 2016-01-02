@@ -15,6 +15,8 @@ import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import java.util.List;
+
 import io.goodway.model.Group;
 import io.goodway.model.adapter.GroupAdapter;
 import io.goodway.model.callback.GroupCallback;
@@ -75,10 +77,12 @@ public class GroupSearchActivity extends AppCompatActivity{
                 }
                 adapter.clear();
                 String text = findGroups.getText().toString();
-                task = GoodwayHttpClientPost.findGroups(GroupSearchActivity.this, new Action<Group>() {
+                task = GoodwayHttpClientPost.findGroups(GroupSearchActivity.this, new Action<List<Group>>() {
                     @Override
-                    public void action(Group e) {
-                        adapter.add(e);
+                    public void action(List<Group> e){
+                        for(Group g : e) {
+                            adapter.add(g);
+                        }
                     }
                 }, null, token, text);
 

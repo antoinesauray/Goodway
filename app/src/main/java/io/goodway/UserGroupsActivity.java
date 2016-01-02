@@ -17,6 +17,8 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 import io.goodway.model.Group;
 import io.goodway.model.User;
 import io.goodway.model.adapter.GroupAdapter;
@@ -120,24 +122,29 @@ public class UserGroupsActivity extends AppCompatActivity implements SwipeRefres
     }
 
     public void fabClick(View v){
-        startActivity(new Intent(this, SearchGroupActivity.class));
+        Intent i = new Intent(this, SearchGroupActivity.class);
+        i.putExtra("token", token);
+        startActivity(i);
     }
 
     @Override
     public void onRefresh() {
         adapter.clear();
         swipeRefreshLayout.setRefreshing(true);
-        GoodwayHttpClientPost.getMyGroups(this, new Action<Group>() {
+        GoodwayHttpClientPost.getMyGroups(this, new Action<List<Group>>() {
             @Override
-            public void action(Group e) {
-                adapter.add(e);
+            public void action(List<Group> e) {
+                if(e.size()!=0) {
+                    for (Group g : e) {
+                        adapter.add(g);
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+                else{
+
+                }
                 swipeRefreshLayout.setRefreshing(false);
             }
-        }, new ErrorAction() {
-            @Override
-            public void action(int length) {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        }, token);
+        }, null, token);
     }
 }

@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.style.CharacterStyle;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.cocosw.bottomsheet.BottomSheet;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.goodway.MainActivity;
 import io.goodway.R;
@@ -108,27 +110,22 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(adapter);
 
-        GoodwayHttpClientPost.getMyGroups(getActivity(), new Action<Group>() {
+        GoodwayHttpClientPost.getMyGroups(getActivity(), new Action<List<Group>>() {
             @Override
-            public void action(Group e) {
-                adapter.add(e);
-                swipeLayout.setRefreshing(false);
-            }
-        }, new ErrorAction() {
-            @Override
-            public void action(int length) {
-                switch (length) {
-                    case 0:
-                        error.setText(R.string.no_groups);
-                        break;
-                    case -1:
-                        error.setText(R.string.connexion_error);
-                        break;
+            public void action(List<Group> e) {
+                Log.d("e.size", "e.size = "+e.size());
+                if(e.size()!=0) {
+                    for (Group g : e) {
+                        adapter.add(g);
+                        swipeLayout.setRefreshing(false);
+                    }
                 }
-                error.setVisibility(View.VISIBLE);
-                swipeLayout.setRefreshing(false);
+                else{
+                    error.setText(R.string.no_groups);
+                    error.setVisibility(View.VISIBLE);
+                    swipeLayout.setRefreshing(false);}
             }
-        }, token);
+        }, null, token);
 
         swipeLayout = (SwipeRefreshLayout) root.findViewById(R.id.swipeRefreshLayout);
         swipeLayout.setOnRefreshListener(this);
@@ -143,27 +140,21 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
         swipeLayout.setRefreshing(true);
         adapter.clear();
         error.setVisibility(View.INVISIBLE);
-        GoodwayHttpClientPost.getMyGroups(getActivity(), new Action<Group>() {
+        GoodwayHttpClientPost.getMyGroups(getActivity(), new Action<List<Group>>() {
             @Override
-            public void action(Group e) {
-                adapter.add(e);
-                swipeLayout.setRefreshing(false);
-            }
-        }, new ErrorAction() {
-            @Override
-            public void action(int length) {
-                switch (length) {
-                    case 0:
-                        error.setText(R.string.no_groups);
-                        break;
-                    case -1:
-                        error.setText(R.string.connexion_error);
-                        break;
+            public void action(List<Group> e) {
+                if(e.size()!=0) {
+                    for (Group g : e) {
+                        adapter.add(g);
+                        swipeLayout.setRefreshing(false);
+                    }
                 }
-                error.setVisibility(View.VISIBLE);
-                swipeLayout.setRefreshing(false);
+                else{
+                    error.setText(R.string.no_groups);
+                    error.setVisibility(View.VISIBLE);
+                    swipeLayout.setRefreshing(false);}
             }
-        }, token);
+        }, null, token);
     }
 
     private void finish(Address address){
