@@ -53,7 +53,6 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<Pair, T, Integer>{
     private ErrorAction error;
     private FinishCallback finish;
     private ProcessJson<T> processJson;
-    private ProcessJsonArray<T> processJsonArray;
     private String url;
     private String[] array_ids;
 
@@ -146,8 +145,8 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<Pair, T, Integer>{
                     distance_estimate = innerJsonObject.optDouble("distance_estimate");
                 }
                 pickup_estimate = jsonObject.optInt("pickup_estimate");
-                return new UberProduct(uber.getProduct_id(), surge_confirmation_href, surge_confirmation_id, uber.getDisplayName(), high_estimate, minimum, low_estimate,
-                                        surge_multiplier, display, currency_code, distance_unit, distance_estimate, duration_estimate, pickup_estimate);
+                return new UberProduct(uber, surge_confirmation_href, surge_confirmation_id, display, currency_code, distance_unit, low_estimate, high_estimate, minimum, duration_estimate,
+                        surge_multiplier, distance_estimate, pickup_estimate);
             }
         }, action, error, "http://uber.goodway.io/request_estimate?").execute(
                 new Pair("start_latitude", Double.toString(start_latitude)),
