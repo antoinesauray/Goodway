@@ -24,6 +24,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 import io.goodway.model.User;
 import io.goodway.model.adapter.UserAdapter;
 import io.goodway.model.callback.FinishCallback;
@@ -231,11 +233,13 @@ public class FriendsActivity extends AppCompatActivity {
             swipeLayout.setRefreshing(true);
             adapter.clear();
             error.setVisibility(View.INVISIBLE);
-            GoodwayHttpClientPost.getFriends(getActivity(), new Action<User>() {
+            GoodwayHttpClientPost.getFriends(getActivity(), new Action<List<User>>() {
                 @Override
-                public void action(User e) {
-                    swipeLayout.setRefreshing(false);
-                    adapter.add(e);
+                public void action(List<User> e) {
+                    for(User u : e) {
+                        swipeLayout.setRefreshing(false);
+                        adapter.add(u);
+                    }
                 }
             }, new ErrorAction() {
                 @Override
@@ -314,11 +318,13 @@ public class FriendsActivity extends AppCompatActivity {
             swipeLayout.setRefreshing(true);
             adapter.clear();
             error.setVisibility(View.INVISIBLE);
-            GoodwayHttpClientPost.getFriendRequests(getActivity(), new Action<User>() {
+            GoodwayHttpClientPost.getFriendRequests(getActivity(), new Action<List<User>>() {
                 @Override
-                public void action(User e) {
-                    swipeLayout.setRefreshing(false);
-                    adapter.add(e);
+                public void action(List<User> e) {
+                    for(User u : e) {
+                        swipeLayout.setRefreshing(false);
+                        adapter.add(u);
+                    }
                 }
             }, new ErrorAction() {
                 @Override

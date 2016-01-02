@@ -112,11 +112,13 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
             }
         });
 
-        GoodwayHttpClientPost.getFriends(getActivity(), new Action<User>() {
+        GoodwayHttpClientPost.getFriends(getActivity(), new Action<List<User>>() {
             @Override
-            public void action(User e) {
+            public void action(List<User> e) {
                 swipeLayout.setRefreshing(false);
-                adapter.add(e);
+                for(User u : e) {
+                    adapter.add(u);
+                }
             }
         }, new ErrorAction() {
             @Override
@@ -151,11 +153,14 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
         swipeLayout.setRefreshing(true);
         adapter.clear();
         error.setVisibility(View.INVISIBLE);
-        GoodwayHttpClientPost.getFriends(getActivity(), new Action<User>() {
+        GoodwayHttpClientPost.getFriends(getActivity(), new Action<List<User>>() {
             @Override
-            public void action(User e) {
-                swipeLayout.setRefreshing(false);
-                adapter.add(e);
+            public void action(List<User> e) {
+                for(User u : e) {
+                    swipeLayout.setRefreshing(false);
+                    adapter.add(u);
+                }
+
             }
         }, new ErrorAction() {
             @Override

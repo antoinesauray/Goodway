@@ -205,32 +205,56 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
         }, action, error, "http://developer.goodway.io/api/v1/authentication/register?").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("password", password)
         , new AbstractMap.SimpleEntry<String, String>("fname", fname), new AbstractMap.SimpleEntry<String, String>("lname", lname), new AbstractMap.SimpleEntry<String, String>("birthday", birthday));
     }
-    public static AsyncTask getFriends(Context c, Action<User> action, ErrorAction error, String token){
-        return new GoodwayHttpClientPost<>(c, new ProcessJson<User>() {
+    public static AsyncTask getFriends(Context c, Action<List<User>> action, ErrorAction error, String token){
+        return new GoodwayHttpClientPost<>(c, new ProcessJson<List<User>>() {
             @Override
-            public User processJson(JSONObject jsonObject) {
-                Integer id = jsonObject.optInt("id");
-                String fname = jsonObject.optString("fname");
-                String lname = jsonObject.optString("lname");
-                String avatar = jsonObject.optString("avatar");
-                int title = jsonObject.optInt("title");
-                String city = jsonObject.optString("city");
-                if(city=="null"){city=null;}
-                return new User(id, fname, lname, avatar, title, city, true);
+            public List<User> processJson(JSONObject jsonObject) throws JSONException {
+                if(jsonObject.optBoolean("success")) {
+                    ArrayList users = new ArrayList();
+                    JSONArray jsonArray = jsonObject.getJSONArray("friends");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        Integer id = obj.optInt("id");
+                        String fname = obj.optString("fname");
+                        String lname = obj.optString("lname");
+                        String avatar = obj.optString("avatar");
+                        int title = obj.optInt("title");
+                        String city = obj.optString("city");
+                        if (city == "null") {
+                            city = null;
+                        }
+                        users.add(new User(id, fname, lname, avatar, title, city, true));
+                    }
+                    return users;
+                }
+                return null;
             }
         }, action, error, "http://developer.goodway.io/api/v1/me/friends").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
-    public static AsyncTask getFriendRequests(Context c, Action<User> action, ErrorAction error, FinishCallback finish, String token){
-        return new GoodwayHttpClientPost<>(c, new ProcessJson<User>() {
+    public static AsyncTask getFriendRequests(Context c, Action<List<User>> action, ErrorAction error, FinishCallback finish, String token){
+        return new GoodwayHttpClientPost<>(c, new ProcessJson<List<User>>() {
             @Override
-            public User processJson(JSONObject jsonObject) {
-                Integer id = jsonObject.optInt("id");
-                String fname = jsonObject.optString("fname");
-                String lname = jsonObject.optString("lname");
-                String avatar = jsonObject.optString("avatar");
-                int title = jsonObject.optInt("title");
-                return new User(id, fname, lname, avatar, title, null, false);
+            public List<User> processJson(JSONObject jsonObject) throws JSONException {
+                if(jsonObject.optBoolean("success")) {
+                    ArrayList users = new ArrayList();
+                    JSONArray jsonArray = jsonObject.getJSONArray("requests");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        Integer id = obj.optInt("id");
+                        String fname = obj.optString("fname");
+                        String lname = obj.optString("lname");
+                        String avatar = obj.optString("avatar");
+                        int title = obj.optInt("title");
+                        String city = obj.optString("city");
+                        if (city == "null") {
+                            city = null;
+                        }
+                        users.add(new User(id, fname, lname, avatar, title, city, true));
+                    }
+                    return users;
+                }
+                return null;
             }
         }, action, error, finish, "http://developer.goodway.io/api/v1/me/friends/requests").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
