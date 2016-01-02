@@ -45,6 +45,7 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 
 import io.goodway.model.User;
 import io.goodway.model.callback.AddressSelected;
@@ -318,7 +319,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                 pd.setMessage(getString(R.string.add_address));
                                 pd.setProgressStyle(pd.STYLE_SPINNER);
                                 pd.show();
-                                /*
+
                                 currentAsyncTask = GoodwayHttpClientPost.updateLocation(ProfileActivity.this, new Action<Boolean>() {
                                     @Override
                                     public void action(Boolean e) {
@@ -332,7 +333,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                         Toast.makeText(ProfileActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
                                     }
                                 }, token, newAddressFragment.location);
-                                */
+
 
                             }
                         })
@@ -460,11 +461,12 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             locations = (LinearLayout) rootView.findViewById(R.id.locations);
 
             if(self){
-                GoodwayHttpClientPost.getMyLocations(getActivity(), new Action<UserLocation>() {
+                GoodwayHttpClientPost.getMyLocations(getActivity(), new Action<List<UserLocation>>() {
                     @Override
-                    public void action(UserLocation e) {
-                        Log.d("adding address", "adding address:" + e.toString());
-                        addUserLocation(e);
+                    public void action(List<UserLocation> locations) {
+                        for(UserLocation location : locations) {
+                            addUserLocation(location);
+                        }
                     }
                 }, new ErrorAction() {
                     @Override
@@ -487,11 +489,13 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 }, token);
             }
             else if(user.isFriend()){
-                GoodwayHttpClientPost.getUserLocations(getActivity(), new Action<UserLocation>() {
+                GoodwayHttpClientPost.getUserLocations(getActivity(), new Action<List<UserLocation>>() {
                     @Override
-                    public void action(UserLocation e) {
-                        Log.d("adding address", "adding address:" + e.toString());
-                        addUserLocation(e).setOnClickListener(null);
+                    public void action(List<UserLocation> locations) {
+                        for(UserLocation location : locations) {
+                            Log.d("adding address", "adding address:" + location.toString());
+                            addUserLocation(location).setOnClickListener(null);
+                        }
                     }
                 }, new ErrorAction() {
                     @Override
@@ -518,6 +522,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                 public void onClick(View v) {
                     Bundle b = new Bundle();
                     b.putParcelable("location", userLocation);
+                    b.putString("token", token);
                     item = userLocation;
                     ((ProfileActivity) getActivity()).switchToNewAdress(b);
                 }
@@ -531,7 +536,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
     public static class NewAddressFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, TextWatcher {
         public static final String TAG = "newaddress";
-        String mail, password;
+        String token;
         EditText name;
         CheckBox shared;
         Button set;
@@ -547,8 +552,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
             View rootView = inflater.inflate(
                     R.layout.fragment_new_address, container, false);
             Bundle extras = getArguments();
-            mail = extras.getString("mail");
-            password = extras.getString("password");
+            token = extras.getString("token");
             self = extras.getBoolean("self");
             user = extras.getParcelable("user");
 
@@ -586,7 +590,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                     pd.setMessage(getString(R.string.deleting));
                                     pd.setProgressStyle(pd.STYLE_SPINNER);
                                     pd.show();
-                                    /*
+
                                     GoodwayHttpClientPost.deleteLocation(getActivity(), new Action<Boolean>() {
                                         @Override
                                         public void action(Boolean e) {
@@ -599,8 +603,8 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
                                             pd.dismiss();
                                             Toast.makeText(getActivity(), R.string.failure, Toast.LENGTH_SHORT).show();
                                         }
-                                    }, ((ProfileActivity) getActivity()).mail, ((ProfileActivity) getActivity()).password, location);
-                                    */
+                                    }, token, location);
+
                                 }
                             })
                             .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {

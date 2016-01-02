@@ -140,11 +140,11 @@ public class SplashScreenActivity extends AppCompatActivity {
             if (mail != null && password != null && id != -1 && fname != null && lname != null) {
 
                 if (GoodwayProtocol.isConnected(getActivity())) {
-                    GoodwayHttpClientPost.authenticate(getActivity(), new Action<String>() {
+                    GoodwayHttpClientPost.authenticate(getActivity(), new Action<User>() {
                         @Override
-                        public void action(String token) {
-                            if(token!=null) {
-                                start(token);
+                        public void action(User user) {
+                            if(user!=null) {
+                                start(user);
                                 //connectedAs.setText(e.getMail());
                             }
                             else{
@@ -163,7 +163,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             }
             return root;
         }
-        private void start(final String token){
+        private void start(final User user){
             ObjectAnimator alpha = ObjectAnimator.ofFloat(connectedAs, "alpha", 0f, 1f);
             alpha.setStartDelay(400);
             alpha.setDuration(600);
@@ -176,7 +176,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     Intent i = new Intent(getActivity(), MainActivity.class);
-                    i.putExtra("token", token);
+                    i.putExtra("user", user);
+                    i.putExtra("token", user.getToken());
                     startActivity(i);
                 }
 
@@ -221,10 +222,10 @@ public class SplashScreenActivity extends AppCompatActivity {
             closeKeyboard(getActivity(), root.findFocus());
             if(GoodwayProtocol.isConnected(getActivity())) {
                 progressBar.setVisibility(View.VISIBLE);
-                GoodwayHttpClientPost.authenticate(getActivity(), new Action<String>() {
+                GoodwayHttpClientPost.authenticate(getActivity(), new Action<User>() {
                     @Override
-                    public void action(String token) {
-                        if(token!=null) {
+                    public void action(User user) {
+                        if(user!=null) {
                             SharedPreferences shared_preferences = getActivity().getSharedPreferences(getString(R.string.goodway_preferences),
                                     MODE_PRIVATE);
                             SharedPreferences.Editor editor = shared_preferences.edit();
@@ -232,7 +233,8 @@ public class SplashScreenActivity extends AppCompatActivity {
                             editor.putString("password", password.getText().toString());
                             editor.commit();
                             Intent i = new Intent(getActivity(), MainActivity.class);
-                            i.putExtra("token", token);
+                            i.putExtra("user", user);
+                            i.putExtra("token", user.getToken());
                             startActivity(i);
                         }
                         else{

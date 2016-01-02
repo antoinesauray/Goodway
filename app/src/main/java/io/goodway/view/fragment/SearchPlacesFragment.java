@@ -31,6 +31,8 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.List;
+
 import io.goodway.MainActivity;
 import io.goodway.R;
 import io.goodway.model.User;
@@ -60,7 +62,6 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
 
     private int request;
     private static final CharacterStyle STYLE_BOLD = new StyleSpan(Typeface.BOLD);
-    private User user;
     private String token;
 
     private AsyncTask selfLocations;
@@ -69,7 +70,6 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_google_places, container, false);
         request = getArguments().getInt("REQUEST");
-        user = getArguments().getParcelable("user");
         token = getArguments().getString("token");
 
         mainActivity = (MainActivity) getActivity();
@@ -104,10 +104,13 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
             }
         });
         recyclerView.setAdapter(searchAdapter);
-        selfLocations = GoodwayHttpClientPost.getMyLocations(getActivity(), new Action<UserLocation>() {
+        selfLocations = GoodwayHttpClientPost.getMyLocations(getActivity(), new Action<List<UserLocation>>() {
             @Override
-            public void action(UserLocation e) {
-                searchAdapter.add(e);
+            public void action(List<UserLocation> locations) {
+                for (UserLocation location : locations) {
+                    searchAdapter.add(location);
+                }
+
             }
         }, new ErrorAction() {
             @Override
@@ -161,10 +164,12 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
                     });
                 }
                 else{
-                    selfLocations = GoodwayHttpClientPost.getMyLocations(getActivity(), new Action<UserLocation>() {
+                    selfLocations = GoodwayHttpClientPost.getMyLocations(getActivity(), new Action<List<UserLocation>>() {
                         @Override
-                        public void action(UserLocation e) {
-                            searchAdapter.add(e);
+                        public void action(List<UserLocation> locations) {
+                            for(UserLocation location : locations) {
+                                searchAdapter.add(location);
+                            }
                         }
                     }, new ErrorAction() {
                         @Override
@@ -228,12 +233,14 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
                 mainActivity.setFrom(address);
                 Bundle b1 = new Bundle();
                 b1.putParcelable("DEPARTURE", address);
+                b1.putString("token", token);
                 mainActivity.switchToMain(b1, request);
                 break;
             case MainActivity.DESTINATION:
                 mainActivity.setTo(address);
                 Bundle b2 = new Bundle();
                 b2.putParcelable("DESTINATION", address);
+                b2.putString("token", token);
                 mainActivity.switchToMain(b2, request);
                 break;
 

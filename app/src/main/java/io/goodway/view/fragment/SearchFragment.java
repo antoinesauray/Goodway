@@ -38,14 +38,14 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
     private SearchFriendsFragment f1;
     private SearchGroupsFragment f3;
 
-    private User user;
+    private String token;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_search, container, false);
         int item = getArguments().getInt("ITEM", 1);
         request = getArguments().getInt("REQUEST");
-        user = getArguments().getParcelable("user");
+        token = getArguments().getString("token");
         mainActivity = (MainActivity) getActivity();
 
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);

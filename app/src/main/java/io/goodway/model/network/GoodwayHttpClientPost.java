@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.goodway.model.Group;
 import io.goodway.model.GroupEvent;
@@ -51,41 +54,56 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
         this.url = URL;
     }
 
-    public static AsyncTask getMyLocations(final Context c, Action<UserLocation> action, ErrorAction error, FinishCallback finish, String token){
-        return new GoodwayHttpClientPost<>(c, new ProcessJson<UserLocation>() {
+    public static AsyncTask getMyLocations(final Context c, Action<List<UserLocation>> action, ErrorAction error, FinishCallback finish, String token){
+        return new GoodwayHttpClientPost<>(c, new ProcessJson<List<UserLocation>>() {
             @Override
-            public UserLocation processJson(JSONObject jsonObject) {
-                int id = jsonObject.optInt("id");
-                String a_name = jsonObject.optString("a_name");
-                String s_name = jsonObject.optString("s_name");
-                String lat = jsonObject.optString("st_y");
-                String lng = jsonObject.optString("st_x");
-                boolean shared = jsonObject.optBoolean("shared");
-                try{
-                    return new UserLocation(id, s_name, a_name, Double.parseDouble(lat), Double.parseDouble(lng), shared);
+            public List<UserLocation> processJson(JSONObject jsonObject) throws JSONException {
+                if(jsonObject.optBoolean("success")) {
+                    ArrayList userLocation = new ArrayList();
+                    JSONArray jsonArray = jsonObject.getJSONArray("locations");
+                    for(int i=0;i<jsonArray.length();i++){
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        int id = obj.optInt("id");
+                        String a_name = obj.optString("a_name");
+                        String s_name = obj.optString("s_name");
+                        String lat = obj.optString("st_y");
+                        String lng = obj.optString("st_x");
+                        boolean shared = obj.optBoolean("shared");
+                        try {
+                            userLocation.add(new UserLocation(id, s_name, a_name, Double.parseDouble(lat), Double.parseDouble(lng), shared));
+                        } catch (NumberFormatException e) {}
+                    }
+                    return userLocation;
+
                 }
-                catch (NumberFormatException e){
-                    return null;
-                }
+                return null;
             }
         }, action, error, finish, "http://developer.goodway.io/api/v1/me/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
-    public static AsyncTask getUserLocations(final Context c, Action<UserLocation> action, ErrorAction error, FinishCallback finish, String token, int id){
-        return new GoodwayHttpClientPost<>(c, new ProcessJson<UserLocation>() {
+    public static AsyncTask getUserLocations(final Context c, Action<List<UserLocation>> action, ErrorAction error, FinishCallback finish, String token, int id){
+        return new GoodwayHttpClientPost<>(c, new ProcessJson<List<UserLocation>>() {
             @Override
-            public UserLocation processJson(JSONObject jsonObject) {
-                int id = jsonObject.optInt("id");
-                String a_name = jsonObject.optString("a_name");
-                String s_name = jsonObject.optString("s_name");
-                String lat = jsonObject.optString("st_y");
-                String lng = jsonObject.optString("st_x");
-                try{
-                    return new UserLocation(id, s_name, a_name, Double.parseDouble(lat), Double.parseDouble(lng), true);
+            public List<UserLocation> processJson(JSONObject jsonObject) throws JSONException {
+                if(jsonObject.optBoolean("success")) {
+                    ArrayList userLocation = new ArrayList();
+                    JSONArray jsonArray = jsonObject.getJSONArray("locations");
+                    for(int i=0;i<jsonArray.length();i++){
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        int id = obj.optInt("id");
+                        String a_name = obj.optString("a_name");
+                        String s_name = obj.optString("s_name");
+                        String lat = obj.optString("st_y");
+                        String lng = obj.optString("st_x");
+                        boolean shared = obj.optBoolean("shared");
+                        try {
+                            userLocation.add(new UserLocation(id, s_name, a_name, Double.parseDouble(lat), Double.parseDouble(lng), shared));
+                        } catch (NumberFormatException e) {}
+                    }
+                    return userLocation;
+
                 }
-                catch (NumberFormatException e){
-                    return null;
-                }
+                return null;
             }
         }, action, error, finish, "http://developer.goodway.io/api/v1/user/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(id)));
     }
@@ -111,14 +129,15 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
     public static AsyncTask me(final Context c, Action<User> action, ErrorAction error, FinishCallback finish, String token){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<User>() {
             @Override
-            public User processJson(JSONObject jsonObject) {
-                int id = jsonObject.optInt("id");
-                String mail = jsonObject.optString("mail");
-                String fname = jsonObject.optString("fname");
-                String lname = jsonObject.optString("lname");
-                String avatar = jsonObject.optString("avatar");
-                int title = jsonObject.optInt("title");
-                String city = jsonObject.optString("city");
+            public User processJson(JSONObject jsonObject) throws JSONException {
+                JSONObject obj = jsonObject.getJSONArray("user").getJSONObject(0);
+                int id = obj.optInt("id");
+                String mail = obj.optString("mail");
+                String fname = obj.optString("fname");
+                String lname = obj.optString("lname");
+                String avatar = obj.optString("avatar");
+                int title = obj.optInt("title");
+                String city = obj.optString("city");
                 return new User(id, mail, fname, lname, avatar, title, city, false);
             }
         }, action, error, finish, "http://developer.goodway.io/api/v1/me").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
@@ -131,36 +150,45 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "http://developer.goodway.io/api/v1/me/location/add").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
+        }, action, error, "http://developer.goodway.io/api/v1/me/locations/add").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
                 new AbstractMap.SimpleEntry<String, String>("shared", Boolean.toString(address.shared())), new AbstractMap.SimpleEntry<String, String>("lat", Double.toString(address.getLatitude())), new AbstractMap.SimpleEntry<String, String>("lng", Double.toString(address.getLongitude())));
     }
 
-    public static AsyncTask updateLocation(final Context c, Action<Boolean> action, ErrorAction error, String mail, String password, UserLocation address){
+    public static AsyncTask updateLocation(final Context c, Action<Boolean> action, ErrorAction error, String token, UserLocation address){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<Boolean>() {
             @Override
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "http://developer.goodway.io/api/v1/me/location/update").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
-                new AbstractMap.SimpleEntry<String, String>("loc_id", Integer.toString(address.getId())), new AbstractMap.SimpleEntry<String, String>("shared", Boolean.toString(address.shared())), new AbstractMap.SimpleEntry<String, String>("lat", Double.toString(address.getLatitude())), new AbstractMap.SimpleEntry<String, String>("lng", Double.toString(address.getLongitude())));
+        }, action, error, "http://developer.goodway.io/api/v1/me/locations/update").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
+                new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(address.getId())), new AbstractMap.SimpleEntry<String, String>("shared", Boolean.toString(address.shared())), new AbstractMap.SimpleEntry<String, String>("lat", Double.toString(address.getLatitude())), new AbstractMap.SimpleEntry<String, String>("lng", Double.toString(address.getLongitude())));
     }
 
-    public static AsyncTask deleteLocation(final Context c, Action<Boolean> action, ErrorAction error, String mail, String password, UserLocation address){
+    public static AsyncTask deleteLocation(final Context c, Action<Boolean> action, ErrorAction error, String token, UserLocation address){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<Boolean>() {
             @Override
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "https://api.goodway.io/delete_user_location.php").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password), new AbstractMap.SimpleEntry<String, String>("loc", Integer.toString(address.getId())));
+        }, action, error, "http://developer.goodway.io/api/v1/me/locations/delete").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(address.getId())));
     }
 
-    public static AsyncTask authenticate(Context c, Action<String> action, ErrorAction error, final String mail, String password){
-        return new GoodwayHttpClientPost<>(c, new ProcessJson<String>() {
+    public static AsyncTask authenticate(Context c, Action<User> action, ErrorAction error, final String mail, String password){
+        return new GoodwayHttpClientPost<>(c, new ProcessJson<User>() {
             @Override
-            public String processJson(JSONObject jsonObject) throws JSONException {
+            public User processJson(JSONObject jsonObject) throws JSONException {
                 boolean success = jsonObject.getBoolean("success");
                 if(success) {
-                    return jsonObject.optString("token");
+                    String token = jsonObject.optString("token");
+                    JSONObject obj = jsonObject.getJSONArray("user").getJSONObject(0);
+                    int id = obj.optInt("id");
+                    String mail = obj.optString("mail");
+                    String fname = obj.optString("fname");
+                    String lname = obj.optString("lname");
+                    String avatar = obj.optString("avatar");
+                    int title = obj.optInt("title");
+                    String city = obj.optString("city");
+                    return new User(id, mail, fname, lname, avatar, title, city, false, token);
                 }
                 return null;
             }

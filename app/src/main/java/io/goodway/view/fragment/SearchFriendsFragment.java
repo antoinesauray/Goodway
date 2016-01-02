@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.cocosw.bottomsheet.BottomSheet;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.goodway.MainActivity;
 import io.goodway.R;
@@ -81,11 +82,13 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                 dialog.setProgressStyle(dialog.STYLE_SPINNER);
                 dialog.show();
                 userLocations = new ArrayList<>();
-                GoodwayHttpClientPost.getUserLocations(getActivity(), new Action<UserLocation>() {
+                GoodwayHttpClientPost.getUserLocations(getActivity(), new Action<List<UserLocation>>() {
                     @Override
-                    public void action(UserLocation e) {
-                        userLocations.add(e);
-                        sheet.sheet(userLocations.size(), e.getName());
+                    public void action(List<UserLocation> locations) {
+                        for(UserLocation location : locations) {
+                            userLocations.add(location);
+                            sheet.sheet(userLocations.size(), location.getName());
+                        }
                     }
                 }, new ErrorAction() {
                     @Override
@@ -106,7 +109,6 @@ public class SearchFriendsFragment extends Fragment implements SwipeRefreshLayou
                 }, token, u.getId());
 
                 // add the locations from https request
-
             }
         });
 
