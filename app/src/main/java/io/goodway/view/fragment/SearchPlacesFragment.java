@@ -82,10 +82,10 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
 
         switch (request){
             case MainActivity.DEPARTURE:
-                autocomplete.setHint(R.string.departure);
+                autocomplete.setHint(R.string.type_address_start);
                 break;
             case MainActivity.DESTINATION:
-                autocomplete.setHint(R.string.arrival);
+                autocomplete.setHint(R.string.type_address_end);
                 break;
         }
 

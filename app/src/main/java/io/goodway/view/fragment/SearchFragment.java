@@ -58,7 +58,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         mainActivity = (MainActivity) getActivity();
 
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);
-        titles = new String[]{getString(R.string.friends), getString(R.string.action_search), getString(R.string.groups)};
+        titles = new String[]{getString(R.string.friends), getString(R.string.address), getString(R.string.groups)};
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) root.findViewById(R.id.tabs);

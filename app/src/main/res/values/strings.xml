@@ -189,6 +189,8 @@
     <string name="find_groups">Rechercher des groupes</string>
     <string name="groups">Groupes</string>
 
+    <string name="address">Adresses</string>
+
     <string name="organised_by">organisé par</string>
     <string name="the">le</string>
     <string name="action_quit">Quitter</string>
@@ -199,6 +201,8 @@
     <string name="goodway_preferences">goodway_v1_preferences</string>
 
     <string name="route_type_prompt">Choisissez départ ou arrivée</string>
+    <string name="type_address_start">Rentrez une adresse de départ</string>
+    <string name="type_address_end">Rentrez une adresse d\'arrivée</string>
     <string-array name="route_type">
         <item>Départ</item>
         <item>Arrivée</item>
