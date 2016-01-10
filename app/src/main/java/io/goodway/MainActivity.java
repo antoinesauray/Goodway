@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private String token;
 
     private Button fromButton, toButton;
+    private Spinner startOrEnd;
 
     private FragmentManager fragmentManager;
 
@@ -127,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         fromButton = (Button) findViewById(R.id.from);
         toButton = (Button) findViewById(R.id.to);
+        startOrEnd = (Spinner) findViewById(R.id.spinner);
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
 
@@ -343,25 +346,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         switchToSearch(b);
     }
 
-    private void switchFragment(Fragment fragment, Bundle bundle)
-    {
-        if(bundle!=null) {
-            if (bundle.getParcelable("DEPARTURE") == null) {
-                bundle.putParcelable("DEPARTURE", from);
-            }
-            if (bundle.getParcelable("DESTINATION") == null) {
-                bundle.putParcelable("DESTINATION", to);
-            }
-            Log.d("fragment with bundle", "fragment with bundle");
-            fragment.setArguments(bundle);
-        }
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit, R.animator.enter, R.animator.exit);
-        fragmentTransaction.addToBackStack(fragment.getTag());
-        fragmentTransaction.replace(R.id.fragment, fragment);
-        fragmentTransaction.commit();
-    }
-
     public void switchToSearch(Bundle bundle){
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit, R.animator.enter, R.animator.exit);
@@ -369,11 +353,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         fragmentTransaction.replace(R.id.fragment, SearchFragment.newInstance(bundle));
         fragmentTransaction.commit();
         floatingActionButton.setVisibility(View.INVISIBLE);
-        //tabLayout.setVisibility(View.VISIBLE);
-        //toolbar.setLogo(null);
     }
     public void switchToMain(Bundle bundle, int request){
-        //switchFragment(main, bundle);
         fragmentManager.popBackStack(SearchFragment.TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         floatingActionButton.setVisibility(View.VISIBLE);
     }
