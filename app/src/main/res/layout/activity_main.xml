@@ -78,7 +78,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
-            android:layout_margin="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
             android:elevation="@dimen/card_elevation"
             card_view:cardCornerRadius="@dimen/cardview_default_radius">
         <FrameLayout

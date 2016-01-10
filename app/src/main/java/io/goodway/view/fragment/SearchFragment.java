@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +40,14 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
 
     private String token;
     private String[] titles;
+
+    public static final String TAG="SEARCH_FRAGMENT";
+
+    public static SearchFragment newInstance(Bundle args) {
+        SearchFragment fragment = new SearchFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -91,7 +100,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
 
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
+    class ViewPagerAdapter extends FragmentStatePagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
 
         public ViewPagerAdapter(FragmentManager manager) {

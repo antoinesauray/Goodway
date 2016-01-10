@@ -16,6 +16,14 @@ public class MainFragment extends Fragment {
 
     private View root;
 
+    public static final String TAG="MAIN_FRAGMENT";
+
+    public static MainFragment newInstance(Bundle args) {
+        MainFragment fragment = new MainFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_main, container, false);

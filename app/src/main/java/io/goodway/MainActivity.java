@@ -61,13 +61,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private Button fromButton, toButton;
 
+    private FragmentManager fragmentManager;
+
     public static final int DEPARTURE=1, DESTINATION=2;
 
     private static final int ACCESS_FINE_LOCATION=1;
 
-    private Fragment current;
-    private SearchFragment search;
-    private MainFragment main;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,15 +148,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             //latLng = new LatLng(a.getLatitude(), a.getLongitude());
         }
 
-        search = new SearchFragment();
-        main = new MainFragment();
-        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit, R.animator.enter, R.animator.exit);
-        fragmentTransaction.addToBackStack(main.getTag());
-        fragmentTransaction.add(R.id.fragment, main);
+        fragmentTransaction.addToBackStack(MainFragment.TAG);
+        fragmentTransaction.replace(R.id.fragment, MainFragment.newInstance(null));
         fragmentTransaction.commit();
-        current = main;
     }
 
     @Override
@@ -359,36 +355,26 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             Log.d("fragment with bundle", "fragment with bundle");
             fragment.setArguments(bundle);
         }
-        FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit, R.animator.enter, R.animator.exit);
         fragmentTransaction.addToBackStack(fragment.getTag());
-        fragmentTransaction.add(R.id.fragment, fragment);
+        fragmentTransaction.replace(R.id.fragment, fragment);
         fragmentTransaction.commit();
-        current = fragment;
     }
 
     public void switchToSearch(Bundle bundle){
-        if(current==search) {
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit, R.animator.enter, R.animator.exit);
-            fragmentTransaction.remove(search);
-            fragmentTransaction.addToBackStack(search.getTag());
-            fragmentTransaction.add(R.id.fragment, search);
-            fragmentTransaction.commit();
-            current=search;
-        }
-        else {
-            switchFragment(search, bundle);
-        }
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit, R.animator.enter, R.animator.exit);
+        fragmentTransaction.addToBackStack(SearchFragment.TAG);
+        fragmentTransaction.replace(R.id.fragment, SearchFragment.newInstance(bundle));
+        fragmentTransaction.commit();
+        floatingActionButton.setVisibility(View.INVISIBLE);
         //tabLayout.setVisibility(View.VISIBLE);
         //toolbar.setLogo(null);
     }
     public void switchToMain(Bundle bundle, int request){
         //switchFragment(main, bundle);
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.popBackStack();
-        current = main;
+        fragmentManager.popBackStack(SearchFragment.TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        floatingActionButton.setVisibility(View.VISIBLE);
     }
 }
