@@ -12,9 +12,7 @@ import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -27,9 +25,6 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import io.goodway.model.GroupEvent;
 import io.goodway.model.User;
@@ -94,22 +89,6 @@ public class EventActivity extends AppCompatActivity {
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom arg1) {
                     // TODO Create your drawable from bitmap and append where you like.
                     appBarLayout.setBackground(new BitmapDrawable(getResources(), bitmap));
-
-                    // Asynchronous
-                    Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                        public void onGenerated(Palette p) {
-                            // Use generated instance
-                            int dark = p.getDarkMutedColor(getResources().getColor(R.color.primary));
-                            //findViewById(R.id.scrollView).setDrawingCacheBackgroundColor(dark);
-                            Window window = getWindow();
-                            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                window.setStatusBarColor(dark);
-                            }
-                        }
-                    });
-
                 }
 
                 @Override

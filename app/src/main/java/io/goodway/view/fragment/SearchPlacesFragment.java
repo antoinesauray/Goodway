@@ -1,11 +1,10 @@
 package io.goodway.view.fragment;
 
+import android.app.Fragment;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -35,7 +34,6 @@ import java.util.List;
 
 import io.goodway.MainActivity;
 import io.goodway.R;
-import io.goodway.model.User;
 import io.goodway.model.adapter.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;
 import io.goodway.model.network.GoodwayHttpClientPost;

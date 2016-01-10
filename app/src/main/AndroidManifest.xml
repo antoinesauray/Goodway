@@ -16,6 +16,14 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         >
+
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider871254659639982"
+            android:exported="true"
+            android:writePermission="true" />
+
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
@@ -85,11 +93,7 @@
             android:screenOrientation="portrait"
             android:label="@string/app_name"/>
         <activity
-            android:name=".UberActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/app_name"/>
-        <activity
-            android:name=".UberLoginActivity"
+            android:name="com.facebook.FacebookActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name"/>
 

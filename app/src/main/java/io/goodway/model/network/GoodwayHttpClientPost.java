@@ -468,7 +468,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 String html = jsonObject.optString("html");
                 return new GroupEvent(id, name, html, avatar, s_time, e_time, lat, lng);
             }
-        }, action, error, "https://uber.goodway.io/prices").execute(
+        }, action, error, "https://developer.goodway.io/uber/prices").execute(
                 new AbstractMap.SimpleEntry<String, String>("start_latitude", Double.toString(start_latitude)),
                 new AbstractMap.SimpleEntry<String, String>("start_longitude", Double.toString(start_longitude)),
                 new AbstractMap.SimpleEntry<String, String>("end_latitude", Double.toString(end_latitude)),

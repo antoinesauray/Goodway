@@ -2,6 +2,8 @@
     <string name="app_name">Goodway</string>
     <string name="version">Version Alpha</string>
 
+    <string name="facebook_app_id">871254659639982</string>
+
     <!-- register operations -->
     <string name="mail">Adresse mail</string>
     <string name="fname">Prénom</string>

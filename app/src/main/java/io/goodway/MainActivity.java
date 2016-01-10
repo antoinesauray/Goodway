@@ -1,253 +1,332 @@
 package io.goodway;
 
-
-import android.annotation.TargetApi;
-import android.app.Dialog;
+import android.Manifest;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.squareup.picasso.Picasso;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
-import io.goodway.model.GroupEvent;
-import io.goodway.model.User;
-import io.goodway.model.network.GoodwayHttpClientGet;
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
-import io.goodway.navitia_android.ErrorAction;
-import io.goodway.view.ImageTrans_CircleTransform;
 import io.goodway.view.fragment.MainFragment;
 import io.goodway.view.fragment.SearchFragment;
 
 
 /**
- * The main activity of the program
- * @author Antoine Sauray
- * @version 2.0
+ * Created by sauray on 14/03/15.
  */
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener{
 
-    // ----------------------------------- UI
-
-    /**
-     * These variables are used to get result from other activities.
-     *
-     * @see
-     */
-    public static final int FROM_LOCATION = 1, TO_LOCATION = 2, EVENT_REQUEST =3, SETLOCATION=4, PROFILE=5, FRIENDS=6;
-
-    private static final String TAG = "HOME_ACTIVITY";
-    /**
-     * Displays the modes available for selection
-     */
-    private ListView mDrawerList;
-    /**
-     * Toolbar widget
-     */
+    private GoogleApiClient googleApiClient;
+    private boolean openedState;
+    private SupportMapFragment mapFragment;
+    private FloatingActionButton floatingActionButton;
+    private CoordinatorLayout coordinatorLayout;
     private Toolbar toolbar;
-    /**
-     * The user interface for the current mode selected
-     */
-    private View ui;
 
-    private NavigationView navigationView;
+    private LinearLayout bottom;
 
-    private FrameLayout fragmentView;
+    private Location userLocation;
 
-
-    private DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle actionBarDrawerToggle;
-    private TabLayout tabLayout;
-
-    // ----------------------------------- Model
-    /**
-     * Provides markers on a marker. The key is the marker title attribute
-     */
     private Address from, to;
-
-    private User user;
     private String token;
 
+    private Button fromButton, toButton;
+
     public static final int DEPARTURE=1, DESTINATION=2;
+
+    private static final int ACCESS_FINE_LOCATION=1;
 
     private Fragment current;
     private SearchFragment search;
     private MainFragment main;
-    private int nbFriendRequests;
-
-    // ----------------------------------- Constants
-    private static final int MAIN=1, SEARCH=2;
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        checkGooglePlayServices();
         setContentView(R.layout.activity_main);
 
-
-        //from = new Address(R.string.your_location, R.mipmap.ic_home_black_24dp, AddressType.POSITION);
-
-        Bundle extras = this.getIntent().getExtras();
-        token = extras.getString("token");
-        user = extras.getParcelable("user");
-        Log.d("token", token);
-
-        GoodwayHttpClientPost.countFriendRequests(this, new Action<Integer>() {
-            @Override
-            public void action(Integer e) {
-                nbFriendRequests = e;
-                if (e > 0) {
-                    navigationView.getMenu().findItem(R.id.friends).setTitle(getString(R.string.friends) + " (" + e + ")");
-                }
-            }
-        }, new ErrorAction() {
-            @Override
-            public void action(int length) {
-
-            }
-        }, token);
-
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.openDrawer, R.string.closeDrawer){
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                // Code here will be triggered once the drawer closes as we dont want anything to happen so we leave this blank
-                super.onDrawerClosed(drawerView);
-            }
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
-                super.onDrawerOpened(drawerView);
-            }
-        };
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        drawerLayout.setDrawerListener(actionBarDrawerToggle);
+        actionBar.setHomeButtonEnabled(true);
 
-        actionBarDrawerToggle.syncState();
-        actionBar.setDisplayShowTitleEnabled(false);
-        toolbar.setLogo(R.drawable.goodway_text_very_small);
+        Bundle extras = getIntent().getExtras();
+        token = extras.getString("token");
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
 
-        fragmentView = (FrameLayout) findViewById(R.id.fragment);
+                // Should we show an explanation?
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION)) {
 
-        main = new MainFragment();
-        search = new SearchFragment();
+                    // Show an expanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
 
-        Address departure = extras.getParcelable("departure");
-        Address destination = extras.getParcelable("destination");
-        Bundle b = new Bundle();
-        b.putString("token", token);
-        if(departure!=null){
-            setFrom(departure);
-            b.putParcelable("DEPARTURE", departure);
-        }
-        if(destination!=null){
-            setTo(destination);
-            b.putParcelable("DESTINATION", departure);
-        }
+                } else {
 
-        switchToMain(b, -1);
-        navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        ((TextView)navigationView.getHeaderView(0).findViewById(R.id.name)).setText(user.getName());
-        ((TextView)navigationView.getHeaderView(0).findViewById(R.id.version)).setText(getString(R.string.version) + " " + getVersionInfo());
-        Picasso.with(MainActivity.this)
-                .load(user.getAvatar())
-                .error(R.mipmap.ic_person_white_48dp)
-                .resize(150, 150)
-                .centerCrop()
-                .transform(new ImageTrans_CircleTransform())
-                .into(((ImageView) navigationView.getHeaderView(0).findViewById(R.id.avatar)));
+                    // No explanation needed, we can request the permission.
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.friends:
-                        Intent i = new Intent(MainActivity.this, FriendsActivity.class);
-                        i.putExtra("token", token);
-                        i.putExtra("user", user);
-                        i.putExtra("nbFriendRequests", nbFriendRequests);
-                        startActivityForResult(i, MainActivity.FRIENDS);
-                        break;
-                    case R.id.groups:
-                        Intent i2 = new Intent(MainActivity.this, UserGroupsActivity.class);
-                        i2.putExtra("user", user);
-                        i2.putExtra("token", token);
-                        startActivity(i2);
-                        break;
-                    case R.id.uber:
-                        /*
-                        Intent i3 = new Intent(MainActivity.this, UberLoginActivity.class);
-                        startActivity(i3);*/
-                        break;
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            ACCESS_FINE_LOCATION);
+
+                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                    // app-defined int constant. The callback method gets the
+                    // result of the request.
                 }
-                return false;
             }
-        });
-
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        actionBarDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        actionBarDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(current==search){
-            onBackPressed();
-            return true;
+            else{
+                googleApiClient = new GoogleApiClient.Builder(this)
+                        .addApi(LocationServices.API)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .build();
+            }
         }
         else{
-            if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
-                return true;
-            }
+            googleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
         }
-        return super.onOptionsItemSelected(item);
+
+        bottom = (LinearLayout) findViewById(R.id.bottom);
+
+        fromButton = (Button) findViewById(R.id.from);
+        toButton = (Button) findViewById(R.id.to);
+
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        floatingActionButton.setBaselineAlignBottom(true);
+        floatingActionButton.setOnClickListener(this);
+
+        LatLng latLng = null;
+        if (extras.getParcelable("DEPARTURE") != null) {
+            from = extras.getParcelable("DEPARTURE");
+
+            fromButton.setText(extras.getParcelable("DEPARTURE").toString());
+            //latLng = new LatLng(a.getLatitude(), a.getLongitude());
+        }
+
+        if (extras.getParcelable("DESTINATION") != null) {
+            to = extras.getParcelable("DESTINATION");
+            toButton.setText(to.toString());
+            //latLng = new LatLng(a.getLatitude(), a.getLongitude());
+        }
+
+        search = new SearchFragment();
+        main = new MainFragment();
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit, R.animator.enter, R.animator.exit);
+        fragmentTransaction.addToBackStack(main.getTag());
+        fragmentTransaction.add(R.id.fragment, main);
+        fragmentTransaction.commit();
+        current = main;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    googleApiClient = new GoogleApiClient.Builder(this)
+                            .addApi(LocationServices.API)
+                            .addConnectionCallbacks(this)
+                            .addOnConnectionFailedListener(this)
+                            .build();
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Bottom Sheet";
+    }
+
+    public void setFrom(Address from) {
+        this.from = from;
+        Log.d("setfrom", "setfrom: " + from.toString());
+        fromButton.setText(from.toString());
+        Log.d("setTo", "setTo : " + from.getLatitude() + ";" + from.getLongitude());
+    }
+
+    public void setTo(Address to) {
+        this.to = to;
+        Log.d("setfrom", "setfrom: " + to.toString());
+        toButton.setText(to.toString());
+        Log.d("setTo", "setTo : " + to.getLatitude() + ";" + to.getLongitude());
+        /*
+*/
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(googleApiClient!=null){googleApiClient.connect();}
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (googleApiClient!=null && googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
+    }
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            userLocation = LocationServices.FusedLocationApi.getLastLocation(
+                    googleApiClient);
+            if(userLocation!=null) {
+                Geocoder gcd = new Geocoder(this, Locale.getDefault());
+                List<android.location.Address> addresses = null;
+                try {
+                    addresses = gcd.getFromLocation(userLocation.getLatitude(), userLocation.getLongitude(), 1);
+                    if (addresses.size() > 0) {
+                        GoodwayHttpClientPost.updateMyCity(this, new Action<Boolean>() {
+                            @Override
+                            public void action(Boolean e) {
+
+                            }
+                        }, null, token, addresses.get(0).getLocality());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        if(from != null){
+            Button from = (Button) (findViewById(R.id.from));
+            from.setText(getString(R.string.your_location) + " (" + getString(R.string.unavailable) + ")");
+        }
+        else if (to != null){
+            Button to = (Button) (findViewById(R.id.to));
+            to.setText(getString(R.string.your_location)+" ("+getString(R.string.unavailable)+")");
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(this.from == null && this.to==null){
+            Snackbar.make(coordinatorLayout, R.string.no_to, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.select, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            MainActivity.this.changeLocation(DESTINATION);
+                        }
+                    }).show();
+        }
+        else{
+            if(this.from==null && userLocation!=null){
+                Log.d("setting user location", "setting user location");
+                this.from = new Address(getString(R.string.your_location), userLocation.getLatitude(), userLocation.getLongitude());
+            }
+            else if (this.to == null & userLocation!=null){
+                Log.d("setting user location", "setting user location");
+                this.to = new Address(getString(R.string.your_location), userLocation.getLatitude(), userLocation.getLongitude());
+            }
+
+            if(this.from==null){
+                Snackbar.make(coordinatorLayout, R.string.your_location_not_available, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.select, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                MainActivity.this.changeLocation(DEPARTURE);
+                            }
+                        }).show();
+            }
+            else if(this.to==null){
+                Snackbar.make(coordinatorLayout, R.string.your_location_not_available, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.select, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                MainActivity.this.changeLocation(DESTINATION);
+                            }
+                        }).show();
+            }
+            else{
+                Intent intent = new Intent(this, WayActivity.class);
+                intent.putExtra("FROM", this.from);
+                intent.putExtra("TO", this.to);
+
+                Log.d(from.toString(), "from");
+                Log.d(to.toString(), "to");
+                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
+                    //ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity());
+                    startActivity(intent);
+                }
+                else{
+                    startActivity(intent);
+                }
+            }
+
+        }
+    }
     public void changeLocation(View v){
         int request=0;
         switch (v.getId()) {
@@ -268,142 +347,6 @@ public class MainActivity extends AppCompatActivity{
         switchToSearch(b);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("onActivityResult", "onActivityResult");
-        if (requestCode == MainActivity.EVENT_REQUEST){
-            if(resultCode == RESULT_OK){
-                Log.d("EVENT_REQUEST", "request code");
-                GroupEvent groupEvent = data.getExtras().getParcelable("GROUPEVENT");
-                Address eventAddr = new Address(groupEvent.getName(), groupEvent.getLatitude(), groupEvent.getLongitude());
-                switchAfterResult(data, eventAddr);
-            } else{
-                search.setCurrentItem(2);
-            }
-        }
-        else if(requestCode==MainActivity.PROFILE){
-            if(resultCode == RESULT_OK) {
-                Log.d("EVENT_REQUEST", "request code");
-                //user = data.getExtras().getParcelable("user");
-            }
-        }
-        else if(requestCode==MainActivity.FRIENDS){
-            if(resultCode==RESULT_OK){
-                nbFriendRequests = data.getIntExtra("nbFriendRequests", 0);
-                if(nbFriendRequests>0){navigationView.getMenu().findItem(R.id.friends).setTitle(getString(R.string.friends)+" ("+nbFriendRequests+")");}
-                else{navigationView.getMenu().findItem(R.id.friends).setTitle(getString(R.string.friends));}
-            }
-        }
-    }
-
-    private void switchAfterResult(Intent data, Address addr){
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        Bundle bundle = new Bundle();
-        int request = data.getIntExtra("REQUEST", DESTINATION);
-        switch(request){
-            case DESTINATION:
-                setTo(addr);
-                bundle.putParcelable("DESTINATION", addr);
-                break;
-            case DEPARTURE:
-                setFrom(addr);
-                bundle.putParcelable("DEPARTURE", addr);
-                break;
-        }
-        drawerLayout.closeDrawer(GravityCompat.START);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        actionBarDrawerToggle.syncState();
-        tabLayout.setVisibility(View.INVISIBLE);
-        toolbar.setLogo(R.drawable.goodway_text_very_small);
-        main.setArguments(bundle);
-        fragmentTransaction.replace(R.id.fragment, main);
-        fragmentTransaction.commitAllowingStateLoss();
-        current=main;
-    }
-
-    public void swap(View v){
-        Log.d("swap", "swap");
-        TextView from = (TextView) fragmentView.getRootView().findViewById(R.id.from);
-        String fromText = from.getText().toString();
-        float fromAlpha = from.getAlpha();
-        TextView to = (TextView) fragmentView.getRootView().findViewById(R.id.to);
-        from.setText(to.getText().toString());
-        from.setAlpha(to.getAlpha());
-        to.setText(fromText);
-        to.setAlpha(fromAlpha);
-    }
-
-
-    public void drawerHeaderClick(View v){
-        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        intent.putExtra("token", token);
-        intent.putExtra("user", user);
-        intent.putExtra("self", true);
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP) {
-            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this);
-            startActivityForResult(intent, PROFILE);
-            //startActivityForResult(intent, PROFILE, options.toBundle());
-        } else {
-            startActivityForResult(intent, PROFILE);
-        }
-    }
-
-    private boolean checkGooglePlayServices() {
-        final int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (status != ConnectionResult.SUCCESS) {
-            Log.e(TAG, GooglePlayServicesUtil.getErrorString(status));
-
-            // ask user to update google play services.
-            Dialog dialog = GooglePlayServicesUtil.getErrorDialog(status, this, 1);
-            dialog.show();
-            return false;
-        } else {
-            Log.i(TAG, GooglePlayServicesUtil.getErrorString(status));
-            // google play services is updated.
-            //your code goes here...
-            return true;
-        }
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        try {
-            return super.dispatchTouchEvent(ev);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public void setFrom(Address adress){
-        this.from = adress;
-        Log.d("setFrom", "setFrom : " + adress.getLatitude() + ";" + adress.getLongitude());
-    }
-
-    public void setTo(Address adress){
-        this.to = adress;
-    }
-
-    public void onBackPressed(){
-        if(current==search) {
-            Bundle extras = new Bundle();
-            extras.putString("token", token);
-            int request = -1;
-            if (from != null) {
-                extras.putParcelable("DEPARTURE", from);
-                request = DEPARTURE;
-            }
-            if (to != null) {
-                extras.putParcelable("DESTINATION", to);
-                request = DESTINATION;
-            }
-            switchToMain(extras, request);
-        }
-        else{
-            super.onBackPressed();
-        }
-    }
     private void switchFragment(Fragment fragment, Bundle bundle)
     {
         if(bundle!=null) {
@@ -416,53 +359,36 @@ public class MainActivity extends AppCompatActivity{
             Log.d("fragment with bundle", "fragment with bundle");
             fragment.setArguments(bundle);
         }
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment, fragment);
+        fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit, R.animator.enter, R.animator.exit);
+        fragmentTransaction.addToBackStack(fragment.getTag());
+        fragmentTransaction.add(R.id.fragment, fragment);
         fragmentTransaction.commit();
         current = fragment;
     }
 
     public void switchToSearch(Bundle bundle){
-        switchFragment(search, bundle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        tabLayout.setVisibility(View.VISIBLE);
-        toolbar.setLogo(null);
+        if(current==search) {
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit, R.animator.enter, R.animator.exit);
+            fragmentTransaction.remove(search);
+            fragmentTransaction.addToBackStack(search.getTag());
+            fragmentTransaction.add(R.id.fragment, search);
+            fragmentTransaction.commit();
+            current=search;
+        }
+        else {
+            switchFragment(search, bundle);
+        }
+        //tabLayout.setVisibility(View.VISIBLE);
+        //toolbar.setLogo(null);
     }
-
     public void switchToMain(Bundle bundle, int request){
-        switchFragment(main, bundle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        actionBarDrawerToggle.syncState();
-        tabLayout.setVisibility(View.INVISIBLE);
-        toolbar.setLogo(R.drawable.goodway_text_very_small);
-        switch(request){
-            case DEPARTURE:
-                setFrom(from);
-                main.setFrom(from);
-                break;
-            case DESTINATION:
-                setTo(to);
-                main.setTo(to);
-                break;
-        }
+        //switchFragment(main, bundle);
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.popBackStack();
+        current = main;
     }
-    public String getVersionInfo() {
-        PackageInfo packageInfo;
-        try {
-            packageInfo = getApplicationContext()
-                    .getPackageManager()
-                    .getPackageInfo(
-                            getApplicationContext().getPackageName(),
-                            0
-                    );
-            return packageInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            return "";
-        }
-    }
-
 }

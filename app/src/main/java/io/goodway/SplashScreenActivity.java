@@ -9,6 +9,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,6 +20,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +34,24 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.Profile;
+import com.facebook.ProfileTracker;
+import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.regex.Matcher;
@@ -57,8 +80,10 @@ public class SplashScreenActivity extends AppCompatActivity {
     private static final int CHOOSE = 1, LOGIN = 2, REGISTER = 3;
 
     private FrameLayout fragmentLayout;
-    private Fragment splash, login, register, current;
+    private Fragment splash, register, current;
+    private LoginFragment login;
     private FragmentManager fragmentManager;
+
 
     // ----------------------------------- Constants
     @Override
@@ -71,9 +96,42 @@ public class SplashScreenActivity extends AppCompatActivity {
         login = new LoginFragment();
         register = new RegisterFragment();
 
+        FacebookSdk.sdkInitialize(getApplicationContext());
         fragmentManager = getSupportFragmentManager();
         splash();
+        showHashKey(this);
     }
+
+    public static void showHashKey(Context context) {
+        try {
+            PackageInfo info = context.getPackageManager().getPackageInfo(
+                    "io.goodway", PackageManager.GET_SIGNATURES); //Your package name here
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.v("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+        } catch (NoSuchAlgorithmException e) {
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Logs 'install' and 'app activate' App Events.
+        AppEventsLogger.activateApp(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Logs 'app deactivate' App Event.
+        AppEventsLogger.deactivateApp(this);
+    }
+
     void splash() {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
@@ -124,7 +182,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             root = inflater.inflate(R.layout.fragment_splashscreen, container, false);
-            SharedPreferences shared_preferences = getActivity().getSharedPreferences("shared_preferences_test",
+            SharedPreferences shared_preferences = getActivity().getSharedPreferences(getString(R.string.goodway_preferences),
                     MODE_PRIVATE);
 
             connectedAs = (TextView) root.findViewById(R.id.connectedAs);
@@ -137,7 +195,7 @@ public class SplashScreenActivity extends AppCompatActivity {
             int title = shared_preferences.getInt("title", 2);
 
             logo = (ImageView) root.findViewById(R.id.logo);
-            if (mail != null && password != null && id != -1 && fname != null && lname != null) {
+            if (mail != null && password != null) {
 
                 if (GoodwayProtocol.isConnected(getActivity())) {
                     GoodwayHttpClientPost.authenticate(getActivity(), new Action<User>() {
@@ -199,6 +257,8 @@ public class SplashScreenActivity extends AppCompatActivity {
         EditText mail, password;
         TextView login;
         ProgressBar progressBar;
+        LoginButton loginButton;
+        CallbackManager callbackManager;
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -209,7 +269,75 @@ public class SplashScreenActivity extends AppCompatActivity {
             progressBar = (ProgressBar) root.findViewById(R.id.progressBar);
             login.setOnClickListener(this);
             mail.requestFocus();
+
+            loginButton = (LoginButton) root.findViewById(R.id.login_button);
+            loginButton.setReadPermissions("user_friends");
+            // If using in a fragment
+            loginButton.setFragment(this);
+            // Other app specific specialization
+            callbackManager = CallbackManager.Factory.create();
+            LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+
+                @Override
+                public void onSuccess(LoginResult loginResult) {
+
+                }
+
+                @Override
+                public void onCancel() {
+
+                }
+
+                @Override
+                public void onError(FacebookException error) {
+
+                }
+            });
+            loginButton.registerCallback(callbackManager,
+                    new FacebookCallback<LoginResult>() {
+                        @Override
+                        public void onSuccess(LoginResult loginResult) {
+                            //handlePendingAction();
+                            GraphRequest request = GraphRequest.newMeRequest(
+                                    loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+                                        @Override
+                                        public void onCompleted(JSONObject object, GraphResponse response) {
+                                            Log.v("LoginActivity", response.toString());
+                                        }
+                                    });
+                            request.executeAsync();
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            Log.d("LoginActivity", "error");
+                        }
+
+                        @Override
+                        public void onError(FacebookException exception) {
+
+                        }
+
+
+                    });
+            ProfileTracker profileTracker = new ProfileTracker() {
+                @Override
+                protected void onCurrentProfileChanged(
+                        Profile oldProfile,
+                        Profile currentProfile) {
+                    //GoodwayHttpClientPost.currentProfile.getProfilePictureUri(200, 200)
+                    // Envoyer la nouvelle photo de profil
+                    // App code
+                }
+            };
+
             return root;
+        }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
 
         public void onResume(){

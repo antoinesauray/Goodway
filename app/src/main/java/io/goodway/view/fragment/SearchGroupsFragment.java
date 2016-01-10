@@ -1,11 +1,10 @@
 package io.goodway.view.fragment;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -115,17 +114,19 @@ public class SearchGroupsFragment extends Fragment implements SwipeRefreshLayout
         GoodwayHttpClientPost.getMyGroups(getActivity(), new Action<List<Group>>() {
             @Override
             public void action(List<Group> e) {
-                Log.d("e.size", "e.size = "+e.size());
-                if(e.size()!=0) {
-                    for (Group g : e) {
-                        adapter.add(g);
+                if (e != null) {
+                    Log.d("e.size", "e.size = " + e.size());
+                    if (e.size() != 0) {
+                        for (Group g : e) {
+                            adapter.add(g);
+                            swipeLayout.setRefreshing(false);
+                        }
+                    } else {
+                        error.setText(R.string.no_groups);
+                        error.setVisibility(View.VISIBLE);
                         swipeLayout.setRefreshing(false);
                     }
                 }
-                else{
-                    error.setText(R.string.no_groups);
-                    error.setVisibility(View.VISIBLE);
-                    swipeLayout.setRefreshing(false);}
             }
         }, null, token);
 
