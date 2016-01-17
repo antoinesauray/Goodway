@@ -14,27 +14,20 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
-
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
 import io.goodway.model.ContainerType;
-import io.goodway.model.Uber;
 import io.goodway.model.adapter.WayContainerAdapter;
 import io.goodway.model.callback.WayCallback;
-import io.goodway.model.network.GoodwayHttpClientGet;
-import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
-import io.goodway.navitia_android.ErrorAction;
 import io.goodway.navitia_android.Way;
 
 /**
@@ -62,8 +55,8 @@ public class WayActivity extends AppCompatActivity implements WayCallback, Swipe
         password = shared_preferences.getString("password", null);
 
         Bundle extras = this.getIntent().getExtras();
-        this.to = extras.getParcelable("TO");
-        this.from = extras.getParcelable("FROM");
+        this.to = extras.getParcelable("destination");
+        this.from = extras.getParcelable("departure");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.routes);

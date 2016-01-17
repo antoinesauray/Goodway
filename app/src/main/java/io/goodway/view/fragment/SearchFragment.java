@@ -4,10 +4,13 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,6 +22,9 @@ import java.util.List;
 
 import io.goodway.MainActivity;
 import io.goodway.R;
+import io.goodway.view.fragment.nested.SearchFriendsFragment;
+import io.goodway.view.fragment.nested.SearchGroupsFragment;
+import io.goodway.view.fragment.nested.SearchPlacesFragment;
 
 
 /**
@@ -33,6 +39,8 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
 
     private int request;
     private MainActivity mainActivity;
+
+    private Toolbar toolbar;
 
     private SearchPlacesFragment f2;
     private SearchFriendsFragment f1;
@@ -57,6 +65,11 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         token = getArguments().getString("token");
         mainActivity = (MainActivity) getActivity();
 
+        toolbar = (Toolbar) root.findViewById(R.id.toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ActionBar actionBar =  ((AppCompatActivity) getActivity()).getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);
         titles = new String[]{getString(R.string.friends), getString(R.string.address), getString(R.string.groups)};
         setupViewPager(viewPager);
@@ -79,6 +92,15 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         adapter.addFragment(f2);
         adapter.addFragment(f3);
         viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getActivity().getFragmentManager().popBackStack();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void setCurrentItem(int item){

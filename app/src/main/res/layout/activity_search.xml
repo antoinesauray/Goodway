@@ -20,7 +20,7 @@
             android:transitionName="search"
             android:layout_margin="16dp">
             <android.support.v7.widget.Toolbar
-                android:id="@+id/mapToolbar"
+                android:id="@+id/toolbar"
                 android:onClick="toolbarClick"
                 android:layout_height="?attr/actionBarSize"
                 android:gravity="center_vertical"
