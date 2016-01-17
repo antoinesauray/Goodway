@@ -12,11 +12,11 @@ public class Reveal {
 
     public static void enterReveal(View v) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            // get the center for the clipping circle
+            // get the center for the clipping circle_red
             int cx = v.getMeasuredWidth() / 2;
             int cy = v.getMeasuredHeight() / 2;
 
-            // get the final radius for the clipping circle
+            // get the final radius for the clipping circle_red
             int finalRadius = Math.max(v.getWidth(), v.getHeight()) / 2;
 
             // create the animator for this view (the start radius is zero)
@@ -34,11 +34,11 @@ public class Reveal {
     }
     public static void exitReveal(final View v) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            // get the center for the clipping circle
+            // get the center for the clipping circle_red
             int cx = v.getMeasuredWidth() / 2;
             int cy = v.getMeasuredHeight() / 2;
 
-            // get the initial radius for the clipping circle
+            // get the initial radius for the clipping circle_red
             int initialRadius = v.getWidth() / 2;
 
             // create the animation (the final radius is zero)

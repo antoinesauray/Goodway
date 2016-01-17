@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -92,15 +93,6 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         adapter.addFragment(f2);
         adapter.addFragment(f3);
         viewPager.setAdapter(adapter);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getActivity().getFragmentManager().popBackStack();
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     public void setCurrentItem(int item){

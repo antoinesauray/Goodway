@@ -36,7 +36,6 @@
                     android:textSize="16sp"
                     android:padding="8dp"
                     android:textColor="@color/primary"
-                    android:background="@drawable/goodway_ripple"
                     android:elevation="@dimen/card_elevation"
                     android:layout_marginRight="16dp"/>
 
@@ -45,7 +44,6 @@
                     android:onClick="onClick"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/goodway_ripple"
                     android:padding="8dp"
                     android:textSize="16sp"
                     android:elevation="@dimen/card_elevation"

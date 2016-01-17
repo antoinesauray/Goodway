@@ -43,7 +43,6 @@
             android:padding="8dp"
             android:textSize="16sp"
             android:layout_marginRight="4dp"
-            android:background="@drawable/goodway_ripple"
             android:text="@string/login"/>
         <TextView
             android:layout_width="wrap_content"
@@ -52,7 +51,6 @@
             android:onClick="register"
             android:padding="8dp"
             android:textSize="16sp"
-            android:background="@drawable/goodway_ripple"
             android:layout_marginLeft="4dp"
             android:text="@string/register"/>
     </LinearLayout>

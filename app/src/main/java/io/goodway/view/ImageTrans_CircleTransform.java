@@ -48,6 +48,6 @@ public class ImageTrans_CircleTransform implements Transformation {
     }
     @Override
     public String key() {
-        return "circle";
+        return "circle_red";
     }
 }

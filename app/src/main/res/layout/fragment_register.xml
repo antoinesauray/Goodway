@@ -89,7 +89,6 @@
         android:id="@+id/register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/goodway_ripple"
         android:layout_marginTop="42dp"
         android:layout_gravity="center_horizontal"
         android:textSize="16sp"

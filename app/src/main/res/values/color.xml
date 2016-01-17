@@ -1,13 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#3f51b5</color>
-    <color name="primary_dark"> #283593</color>
-    <color name="primary_light">#7f87b5</color>
-    <!--<color name="accent">#ffab00</color>-->
-    <color name="accent">#3f51b5</color>
+    <!--
+    teinte #1
+    <color name="primary">#546e7a</color>
+    <color name="primary_dark">#455a64</color>
+    <color name="primary_light">#78909c</color>
+    <color name="accent">#00796b</color> -->
 
-    <color name="green">#4caf50</color>
-    <color name="red">#f44336</color>
+
+    <!--teinte #2
+    <color name="primary">#2196f3</color>
+    <color name="primary_dark">#1565c0</color>
+    <color name="accent">#2962ff</color> -->
+
+    <color name="primary">#446CB3</color>
+    <color name="primary_dark">#36558d</color>
+    <color name="accent">#446CB3</color>
+
+    <color name="green">#388e3c</color>
+    <color name="red">#d32f2f</color>
+    <color name="pink">#d81b60</color>
+    <color name="amber">#ffc107</color>
+
+    <color name="facebook">#3b5998</color>
+    <color name="grey">#616161</color>
 
     <color name="semitransparent_grey">#85000000</color>
 </resources>

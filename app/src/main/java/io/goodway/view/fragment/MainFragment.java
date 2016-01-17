@@ -1,8 +1,11 @@
 package io.goodway.view.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -12,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -40,6 +44,8 @@ public class MainFragment extends Fragment{
     private TabLayout tabLayout;
     private String[] titles;
 
+    private FloatingActionButton floatingActionButton;
+
     public static MainFragment newInstance(Bundle args) {
         MainFragment fragment = new MainFragment();
         fragment.setArguments(args);
@@ -50,7 +56,6 @@ public class MainFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_main, container, false);
 
-
         Bundle extras = getArguments();
         token = extras.getString("token");
         user = extras.getParcelable("user");
@@ -59,13 +64,21 @@ public class MainFragment extends Fragment{
         titles = new String[]{"Accueil", "Notifications", "Profil"};
         setupViewPager(viewPager);
 
+        floatingActionButton = (FloatingActionButton) root.findViewById(R.id.floatingActionButton);
+
         tabLayout = (TabLayout) root.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_navigation_white_48dp);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_public_white_48dp);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_menu_white_48dp);
+
+
         return root;
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         home = new MainFragmentHome();
         home.setArguments(getArguments());
 
@@ -78,7 +91,78 @@ public class MainFragment extends Fragment{
         adapter.addFragment(home);
         adapter.addFragment(t1);
         adapter.addFragment(profile);
+
         viewPager.setAdapter(adapter);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position != 0) {
+                    if(floatingActionButton.getVisibility()!=View.INVISIBLE) {
+                        unrevealFab();
+                    }
+                } else {
+                    revealFab();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
+    private void revealFab(){
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        int cx = floatingActionButton.getWidth() / 2;
+        int cy = floatingActionButton.getHeight() / 2;
+
+        float finalRadius = (float) Math.hypot(cx, cy);
+
+        Animator anim =
+                null;
+
+            anim = ViewAnimationUtils.createCircularReveal(floatingActionButton, cx, cy, 0, finalRadius);
+        floatingActionButton.setVisibility(View.VISIBLE);
+        anim.start();
+        }
+        else{
+            floatingActionButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void unrevealFab(){
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+
+            int cx = floatingActionButton.getWidth() / 2;
+            int cy = floatingActionButton.getHeight() / 2;
+
+            float initialRadius = (float) Math.hypot(cx, cy);
+
+            Animator anim =
+                    ViewAnimationUtils.createCircularReveal(floatingActionButton, cx, cy, initialRadius, 0);
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    floatingActionButton.setVisibility(View.INVISIBLE);
+                }
+            });
+
+            anim.start();
+        }
+        else{
+            floatingActionButton.setVisibility(View.INVISIBLE);
+        }
     }
 
     class ViewPagerAdapter extends FragmentStatePagerAdapter {
@@ -104,7 +188,7 @@ public class MainFragment extends Fragment{
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return titles[position];
+            return "";
         }
     }
 

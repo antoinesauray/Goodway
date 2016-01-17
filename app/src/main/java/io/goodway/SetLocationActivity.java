@@ -100,7 +100,6 @@ public class SetLocationActivity extends AppCompatActivity implements GoogleApiC
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
-        toolbar.setLogo(R.drawable.goodway_text_very_small);
 
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Places.GEO_DATA_API)

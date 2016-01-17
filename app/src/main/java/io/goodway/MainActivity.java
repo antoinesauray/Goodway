@@ -15,6 +15,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -216,6 +217,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             googleApiClient.disconnect();
         }
     }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                fragmentManager.popBackStack();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onBackPressed(){
@@ -286,6 +295,26 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
+    }
+
+    public void onClick(View v){
+        switch (v.getId()){
+            case R.id.contacts:
+                Intent i = new Intent(this, FriendsActivity.class);
+                i.putExtra("token", token);
+                i.putExtra("user", user);
+                i.putExtra("nbFriendRequests", nbFriendRequests);
+                startActivity(i);
+                break;
+            case R.id.share:
+                String message = "Téléchargez Goodway, l'application de déplacement moderne";
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("text/plain");
+                share.putExtra(Intent.EXTRA_TEXT, message);
+
+                startActivity(Intent.createChooser(share, "Partager"));
+                break;
+        }
     }
 
 }
