@@ -69,18 +69,9 @@ public class UserGroupsActivity extends AppCompatActivity implements SwipeRefres
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        toolbar.setTitle(user.getName() + " " + getString(R.string.groups));
+        toolbar.setTitle(R.string.groups);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
-
-        avatar = (ImageView) findViewById(R.id.avatar);
-        Picasso.with(this)
-                .load(user.getAvatar())
-                .error(R.mipmap.ic_person_white_48dp)
-                .resize(200, 200)
-                .centerCrop()
-                .transform(new ImageTrans_CircleTransform())
-                .into(avatar);
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();

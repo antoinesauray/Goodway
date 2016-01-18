@@ -10,10 +10,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -72,7 +70,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);
-        titles = new String[]{getString(R.string.friends), getString(R.string.address), getString(R.string.groups)};
+        titles = new String[]{getString(R.string.contacts), getString(R.string.address), getString(R.string.groups)};
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) root.findViewById(R.id.tabs);

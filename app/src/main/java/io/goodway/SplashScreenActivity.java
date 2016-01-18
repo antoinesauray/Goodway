@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -203,17 +205,31 @@ public class SplashScreenActivity extends AppCompatActivity {
                         public void action(User user) {
                             if(user!=null) {
                                 start(user);
-                                //connectedAs.setText(e.getMail());
                             }
                             else{
-                                root.findViewById(R.id.not_connected).setVisibility(View.VISIBLE);
+                                new AlertDialog.Builder(getActivity())
+                                        .setTitle(R.string.connexion_error)
+                                        .setMessage("Impossible de se connecter à internet. Goodway ne pourra vous proposer aucun contenu en mode hors-ligne")
+                                        .setNeutralButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // continue with delete
+                                            }
+                                        })
+                                        .show();
                             }
 
                         }
                     }, null, mail, password);
                 } else {
-                    //start(new User(id, fname, lname, mail, title, null, false));
-                    //connectedAs.setText(mail);
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle(R.string.connexion_error)
+                            .setMessage("Impossible de se connecter à internet. Goodway ne pourra vous proposer aucun contenu en mode hors-ligne")
+                            .setNeutralButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // continue with delete
+                                }
+                            })
+                            .show();
                 }
 
             } else {

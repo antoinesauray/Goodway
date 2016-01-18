@@ -2,7 +2,6 @@ package io.goodway;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.TabLayout;
@@ -73,7 +72,7 @@ public class FriendsActivity extends AppCompatActivity {
         token = extras.getString("token");
         nbFriendRequests = extras.getInt("nbFriendRequests");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.friends);
+        toolbar.setTitle(R.string.contacts);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -161,7 +160,7 @@ public class FriendsActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position){
                 case 0:
-                    return getString(R.string.friends);
+                    return getString(R.string.contacts);
                 case 1:
                     if(nbFriendRequests!=0) {
                         return getString(R.string.pending) + " (" +nbFriendRequests+")";
