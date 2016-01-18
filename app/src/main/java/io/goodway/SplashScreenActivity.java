@@ -233,7 +233,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 }
 
             } else {
-                root.findViewById(R.id.not_connected).setVisibility(View.VISIBLE);
+                ((SplashScreenActivity)getActivity()).login();
             }
             return root;
         }

@@ -120,10 +120,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         actionBar.setHomeButtonEnabled(true);
 
 
-        bundle = new Bundle();
-        bundle.putString("token", token);
-        bundle.putBoolean("self", self);
-        bundle.putParcelable("user", user);
+        bundle = extras;
         addressFragment = new AddressFragment();
         newAddressFragment = new NewAddressFragment();
         addressFragment.setArguments(bundle);

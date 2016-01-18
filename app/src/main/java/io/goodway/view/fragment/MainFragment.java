@@ -44,8 +44,6 @@ public class MainFragment extends Fragment{
     private TabLayout tabLayout;
     private String[] titles;
 
-    private FloatingActionButton floatingActionButton;
-
     public static MainFragment newInstance(Bundle args) {
         MainFragment fragment = new MainFragment();
         fragment.setArguments(args);
@@ -63,8 +61,6 @@ public class MainFragment extends Fragment{
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);
         titles = new String[]{"Accueil", "Notifications", "Profil"};
         setupViewPager(viewPager);
-
-        floatingActionButton = (FloatingActionButton) root.findViewById(R.id.floatingActionButton);
 
         tabLayout = (TabLayout) root.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
@@ -93,31 +89,8 @@ public class MainFragment extends Fragment{
         adapter.addFragment(profile);
 
         viewPager.setAdapter(adapter);
-
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                if (position != 0) {
-                    if(floatingActionButton.getVisibility()!=View.INVISIBLE) {
-                        unrevealFab();
-                    }
-                } else {
-                    revealFab();
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
     }
-
+/*
     private void revealFab(){
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -164,7 +137,7 @@ public class MainFragment extends Fragment{
             floatingActionButton.setVisibility(View.INVISIBLE);
         }
     }
-
+*/
     class ViewPagerAdapter extends FragmentStatePagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
 

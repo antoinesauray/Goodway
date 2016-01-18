@@ -19,8 +19,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.goodway.MainActivity;
 import io.goodway.R;
+import io.goodway.SearchActivity;
 import io.goodway.view.fragment.nested.SearchFriendsFragment;
 import io.goodway.view.fragment.nested.SearchGroupsFragment;
 import io.goodway.view.fragment.nested.SearchPlacesFragment;
@@ -37,9 +37,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
     private TabLayout tabLayout;
 
     private int request;
-    private MainActivity mainActivity;
-
-    private Toolbar toolbar;
+    private SearchActivity searchActivity;
 
     private SearchPlacesFragment f2;
     private SearchFriendsFragment f1;
@@ -62,12 +60,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         int item = getArguments().getInt("ITEM", 1);
         request = getArguments().getInt("REQUEST");
         token = getArguments().getString("token");
-        mainActivity = (MainActivity) getActivity();
-
-        toolbar = (Toolbar) root.findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        ActionBar actionBar =  ((AppCompatActivity) getActivity()).getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        searchActivity = (SearchActivity) getActivity();
 
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);
         titles = new String[]{getString(R.string.contacts), getString(R.string.address), getString(R.string.groups)};

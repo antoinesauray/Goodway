@@ -147,14 +147,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     private void switchToFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit, R.animator.enter_pop, R.animator.exit_pop);
+        fragmentTransaction.setCustomAnimations(0, R.animator.exit, R.animator.enter_pop, R.animator.exit_pop);
         fragmentTransaction.addToBackStack(fragment.getTag());
         fragmentTransaction.replace(R.id.fragment, fragment);
         fragmentTransaction.commit();
     }
     private void switchToFragmentWithExitAnim(Fragment fragment) {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit_pop, R.animator.enter_pop, R.animator.exit_pop);
+        fragmentTransaction.setCustomAnimations(R.animator.enter_pop, R.animator.exit_pop, R.animator.enter_pop, R.animator.exit_pop);
         fragmentTransaction.addToBackStack(fragment.getTag());
         fragmentTransaction.replace(R.id.fragment, fragment);
         fragmentTransaction.commit();
@@ -308,11 +308,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 i.putExtra("nbFriendRequests", nbFriendRequests);
                 startActivity(i);
                 break;
-            case R.id.groups:
-                Intent i2 = new Intent(this, UserGroupsActivity.class);
+            case R.id.places:
+                Intent i2 = new Intent(this, PlacesActivity.class);
                 i2.putExtra("token", token);
                 i2.putExtra("user", user);
+                i2.putExtra("nbFriendRequests", nbFriendRequests);
                 startActivity(i2);
+                break;
+            case R.id.groups:
+                Intent i3 = new Intent(this, UserGroupsActivity.class);
+                i3.putExtra("token", token);
+                i3.putExtra("user", user);
+                startActivity(i3);
                 break;
             case R.id.share:
                 String message = "Téléchargez Goodway, l'application de déplacement moderne";
