@@ -152,6 +152,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         fragmentTransaction.replace(R.id.fragment, fragment);
         fragmentTransaction.commit();
     }
+    private void switchToFragmentWithExitAnim(Fragment fragment) {
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.animator.enter, R.animator.exit_pop, R.animator.enter_pop, R.animator.exit_pop);
+        fragmentTransaction.addToBackStack(fragment.getTag());
+        fragmentTransaction.replace(R.id.fragment, fragment);
+        fragmentTransaction.commit();
+    }
 
     public void setFrom(Address address) {
         this.departure = address;
@@ -159,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         b.putParcelable("departure", departure);
         b.putParcelable("destination", destination);
         b.putAll(getIntent().getExtras());
-        switchToFragment(MainFragment.newInstance(b));
+        switchToFragmentWithExitAnim(MainFragment.newInstance(b));
     }
 
     public void setTo(Address address) {
@@ -168,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         b.putParcelable("departure", departure);
         b.putParcelable("destination", destination);
         b.putAll(getIntent().getExtras());
-        switchToFragment(MainFragment.newInstance(b));
+        switchToFragmentWithExitAnim(MainFragment.newInstance(b));
     }
 
     @Override
@@ -198,8 +205,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             // permissions this app might request
         }
     }
-
-
 
     @Override
     public void onResume() {
