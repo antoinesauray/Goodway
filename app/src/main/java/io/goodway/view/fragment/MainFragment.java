@@ -59,15 +59,17 @@ public class MainFragment extends Fragment{
         user = extras.getParcelable("user");
 
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);
-        titles = new String[]{"Accueil", "Notifications", "Profil"};
+        titles = new String[]{"Accueil",
+                //"Notifications",
+                "Profil"};
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) root.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_navigation_white_48dp);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_public_white_48dp);
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_menu_white_48dp);
+        //tabLayout.getTabAt(1).setIcon(R.drawable.ic_public_white_48dp);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_menu_white_48dp);
 
 
         return root;
@@ -78,14 +80,14 @@ public class MainFragment extends Fragment{
         home = new MainFragmentHome();
         home.setArguments(getArguments());
 
-        FlowFragment t1 = new FlowFragment();
-        t1.setArguments(getArguments());
+        //FlowFragment t1 = new FlowFragment();
+        //t1.setArguments(getArguments());
 
         ProfileFragment profile = new ProfileFragment();
         profile.setArguments(getArguments());
 
         adapter.addFragment(home);
-        adapter.addFragment(t1);
+        //adapter.addFragment(t1);
         adapter.addFragment(profile);
 
         viewPager.setAdapter(adapter);

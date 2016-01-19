@@ -38,7 +38,7 @@
     <string name="events">Evènements</string>
     <string name="engagement">Engagement</string>
     <string name="trips">Voyages</string>
-    <string name="places">Lieux</string>
+    <string name="addresses">Adresses</string>
     <string name="routes">Itinéraires</string>
     <string name="prevEvents">Evènements passés</string>
     <string name="finished">Trajet terminé</string>
@@ -62,7 +62,7 @@
     <string name="home">Maison</string>
     <string name="work">Travail</string>
     <string name="your_location">Votre position</string>
-    <string name="your_location_waiting">Votre position(en attente)</string>
+    <string name="your_location_waiting">En attente de votre gps</string>
     <string name="markerPosition">Position carte</string>
 
     <string name="home_not_available">Maison (non partagée)</string>
@@ -207,4 +207,8 @@
         <item>Départ</item>
         <item>Arrivée</item>
     </string-array>
+
+    <string name="what_to_do">Que faire</string>
+    <string name="current_location">position actuelle</string>
+    <string name="unset">Non définie</string>
 </resources>

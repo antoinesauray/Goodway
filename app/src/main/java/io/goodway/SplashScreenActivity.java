@@ -136,7 +136,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     void splash() {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+        fragmentTransaction.setCustomAnimations(0, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
         fragmentTransaction.replace(R.id.fragment, splash);
         fragmentTransaction.addToBackStack("splash");
         fragmentTransaction.commit();

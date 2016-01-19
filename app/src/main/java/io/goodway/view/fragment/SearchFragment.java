@@ -6,9 +6,6 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +16,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.goodway.MainActivity;
 import io.goodway.R;
-import io.goodway.SearchActivity;
 import io.goodway.view.fragment.nested.SearchFriendsFragment;
 import io.goodway.view.fragment.nested.SearchGroupsFragment;
 import io.goodway.view.fragment.nested.SearchPlacesFragment;
@@ -37,7 +34,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
     private TabLayout tabLayout;
 
     private int request;
-    private SearchActivity searchActivity;
+    private MainActivity searchActivity;
 
     private SearchPlacesFragment f2;
     private SearchFriendsFragment f1;
@@ -60,7 +57,6 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
         int item = getArguments().getInt("ITEM", 1);
         request = getArguments().getInt("REQUEST");
         token = getArguments().getString("token");
-        searchActivity = (SearchActivity) getActivity();
 
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);
         titles = new String[]{getString(R.string.contacts), getString(R.string.address), getString(R.string.groups)};

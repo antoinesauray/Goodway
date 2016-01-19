@@ -55,8 +55,8 @@ public class WayActivity extends AppCompatActivity implements WayCallback, Swipe
         password = shared_preferences.getString("password", null);
 
         Bundle extras = this.getIntent().getExtras();
-        this.to = extras.getParcelable("destination");
         this.from = extras.getParcelable("departure");
+        this.to = extras.getParcelable("arrival");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.routes);
