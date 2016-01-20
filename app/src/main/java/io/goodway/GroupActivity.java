@@ -82,10 +82,10 @@ public class GroupActivity extends AppCompatActivity{
         adapter = new GroupLocationAdapter(this, new GroupLocationCallback() {
             @Override
             public void action(GroupLocation item) {
-                Intent i = new Intent(GroupActivity.this, MainActivity.class);
-                i.putExtra("user", user);
-                i.putExtra("destination", item);
-                startActivity(i);
+                //Intent i = new Intent(GroupActivity.this, MainActivity.class);
+                //i.putExtra("user", user);
+                //i.putExtra("destination", item);
+                //startActivity(i);
             }
         });
         recyclerView.setAdapter(adapter);

@@ -13,9 +13,21 @@
     <color name="primary_dark">#1565c0</color>
     <color name="accent">#2962ff</color> -->
 
-    <color name="primary">#446CB3</color>
-    <color name="primary_dark">#36558d</color>
-    <color name="accent">#446CB3</color>
+    <!--teinte #3
+    <color name="primary">#34495E</color>
+    <color name="primary_dark">#273746</color>
+    <color name="accent">#34495E</color> -->
+
+    <!-- teinte #4
+    <color name="primary">#67809f</color>
+    <color name="primary_dark">#50647c</color>
+    <color name="accent">#67809f</color> -->
+
+    <color name="primary">#2574A9</color>
+    <color name="primary_dark">#1f618d</color>
+    <color name="accent">#2574A9</color>
+
+
 
     <color name="green">#388e3c</color>
     <color name="red">#d32f2f</color>

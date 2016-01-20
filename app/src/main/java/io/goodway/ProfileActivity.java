@@ -342,12 +342,6 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
     }
 
-    public void addAddress(View v){
-        bundle.remove("location");
-        newAddressFragment.setLocation(null);
-        addressFragment.setItem(null);
-        switchToNewAdress(bundle);
-    }
     public void setAddress(View v){
         if(newAddressFragment.getName().getText().toString().trim().length() > 0) {
             Intent i = new Intent(this, SetLocationActivity.class);
@@ -361,17 +355,6 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         else{
             Toast.makeText(ProfileActivity.this, "Veuillez rentrer un nom", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public void switchToNewAdress(Bundle bundle){
-        newAddressFragment.setArguments(bundle);
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
-        fragmentTransaction.addToBackStack(newAddressFragment.getTag());
-        fragmentTransaction.replace(R.id.addressContainer, newAddressFragment);
-        fragmentTransaction.commitAllowingStateLoss();
-        current = newAddressFragment;
     }
 
     @Override
