@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    android:id="@+id/coordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:layout_gravity="top"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/topPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="@dimen/card_elevation"
+            card_view:cardCornerRadius="@dimen/cardview_default_radius">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/action"
+                android:onClick="setDeparture"
+                android:animateLayoutChanges="true"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
+                    android:paddingLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageView
+                        android:id="@+id/avatar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"/>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/what_to_do"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:textSize="16sp"
+                            android:textColor="@android:color/secondary_text_light" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_place_black_18dp"
+                                android:alpha="0.54"
+                                android:layout_marginRight="4dp"/>
+
+                            <TextView
+                                android:id="@+id/geolocation"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="12sp"
+                                android:text="@string/your_location_waiting"
+                                android:textColor="@android:color/tertiary_text_light"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+
+
+                    </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/actions"
+                    android:animateLayoutChanges="true"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/action1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        layout="@layout/view_action"
+                        android:layout_gravity="center_horizontal" />
+                    <include
+                        android:id="@+id/action2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        layout="@layout/view_action"
+                        android:layout_gravity="center_horizontal" />
+
+                    <include
+                        android:id="@+id/action4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        layout="@layout/view_action"
+                        android:layout_gravity="center_horizontal" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:divider="@android:color/white"
+            android:dividerHeight="0dp">
+        </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>
+
+    </android.support.design.widget.CoordinatorLayout>

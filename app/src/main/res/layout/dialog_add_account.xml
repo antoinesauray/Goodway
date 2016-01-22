@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/add_facebook_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:onClick="onClick"
+        android:paddingLeft="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/circle_blue"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="16sp"
+            android:textColor="@android:color/secondary_text_light"
+            android:text="Facebook"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/add_goodway_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:onClick="onClick"
+        android:paddingLeft="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/circle_blue"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="16sp"
+            android:textColor="@android:color/secondary_text_light"
+            android:text="Goodway"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/add_uber_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:onClick="onClick"
+        android:paddingLeft="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerInside"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/uber_badge"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/circle_black"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="16sp"
+            android:textColor="@android:color/secondary_text_light"
+            android:text="Uber"/>
+    </LinearLayout>
+
+</LinearLayout>
