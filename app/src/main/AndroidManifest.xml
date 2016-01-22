@@ -113,6 +113,14 @@
             android:screenOrientation="portrait"
             android:label="@string/app_name"/>
         <activity
+            android:name=".activities.UberAccountActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"/>
+        <activity
+            android:name=".activities.FacebookAccountActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"/>
+        <activity
             android:name="com.facebook.FacebookActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name"/>

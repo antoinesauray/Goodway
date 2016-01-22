@@ -1,5 +1,6 @@
 package io.goodway;
 
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -10,6 +11,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
+import io.goodway.activities.FacebookAccountActivity;
+import io.goodway.activities.UberAccountActivity;
 import io.goodway.model.User;
 import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
@@ -200,8 +203,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 share.putExtra(Intent.EXTRA_TEXT, message);
                 startActivity(Intent.createChooser(share, "Partager"));
                 break;
+            case R.id.facebook_account:
+                Intent i4 = new Intent(this, FacebookAccountActivity.class);
+                i4.putExtra("token", token);
+                startActivity(i4);
+                break;
+            case R.id.uber_account:
+                Intent i5 = new Intent(this, UberAccountActivity.class);
+                i5.putExtra("token", token);
+                startActivity(i5);
+                break;
             case R.id.add_account:
-
+                final Dialog dialog = new Dialog(this);
+                dialog.setContentView(R.layout.dialog_add_account);
+                dialog.setTitle(R.string.add_account);
+                dialog.show();
                 break;
             default:
                 setDeparture(null);

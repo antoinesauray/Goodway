@@ -211,4 +211,7 @@
     <string name="what_to_do">Que faire</string>
     <string name="current_location">position actuelle</string>
     <string name="unset">Non définie</string>
+
+    <string name="add_account">Ajouter un compte</string>
+
 </resources>

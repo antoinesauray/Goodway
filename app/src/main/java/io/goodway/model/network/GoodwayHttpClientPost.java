@@ -10,10 +10,11 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import io.goodway.model.Group;
 import io.goodway.model.GroupEvent;
@@ -78,7 +79,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 }
                 return null;
             }
-        }, action, error, finish, "http://developer.goodway.io/api/v1/me/user/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
+        }, action, error, finish, "https://developer.goodway.io/api/v1/me/user/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
     public static AsyncTask getUserLocations(final Context c, Action<List<UserLocation>> action, ErrorAction error, FinishCallback finish, String token, int id){
@@ -105,7 +106,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 }
                 return null;
             }
-        }, action, error, finish, "http://developer.goodway.io/api/v1/user/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(id)));
+        }, action, error, finish, "https://developer.goodway.io/api/v1/user/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(id)));
     }
 
     public static AsyncTask getGroupLocations(final Context c, Action<List<GroupLocation>> action, ErrorAction error, FinishCallback finish, String token, final Group group){
@@ -129,7 +130,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 }
                 return locations;
             }
-        }, action, error, finish, "http://developer.goodway.io/api/v1/group/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())));
+        }, action, error, finish, "https://developer.goodway.io/api/v1/group/locations").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())));
     }
 
     public static AsyncTask me(final Context c, Action<User> action, ErrorAction error, FinishCallback finish, String token){
@@ -146,7 +147,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 String city = obj.optString("city");
                 return new User(id, mail, fname, lname, avatar, title, city, false);
             }
-        }, action, error, finish, "http://developer.goodway.io/api/v1/me/user").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
+        }, action, error, finish, "https://developer.goodway.io/api/v1/me/user").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
 
@@ -156,7 +157,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "http://developer.goodway.io/api/v1/me/user/locations/add").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
+        }, action, error, "https://developer.goodway.io/api/v1/me/user/locations/add").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
                 new AbstractMap.SimpleEntry<String, String>("shared", Boolean.toString(address.shared())), new AbstractMap.SimpleEntry<String, String>("lat", Double.toString(address.getLatitude())), new AbstractMap.SimpleEntry<String, String>("lng", Double.toString(address.getLongitude())));
     }
 
@@ -166,7 +167,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "http://developer.goodway.io/api/v1/me/user/locations/update").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
+        }, action, error, "https://developer.goodway.io/api/v1/me/user/locations/update").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("a_name", address.getA_name()), new AbstractMap.SimpleEntry<String, String>("s_name", address.getName()),
                 new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(address.getId())), new AbstractMap.SimpleEntry<String, String>("shared", Boolean.toString(address.shared())), new AbstractMap.SimpleEntry<String, String>("lat", Double.toString(address.getLatitude())), new AbstractMap.SimpleEntry<String, String>("lng", Double.toString(address.getLongitude())));
     }
 
@@ -176,7 +177,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "http://developer.goodway.io/api/v1/me/user/locations/delete").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(address.getId())));
+        }, action, error, "https://developer.goodway.io/api/v1/me/user/locations/delete").execute(new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(address.getId())));
     }
 
     public static AsyncTask authenticate(Context c, Action<User> action, ErrorAction error, final String mail, String password){
@@ -198,7 +199,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 }
                 return null;
             }
-        }, action, error, "http://developer.goodway.io/api/v1/authentication/user").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("password", password));
+        }, action, error, "https://developer.goodway.io/api/v1/authentication/user").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("password", password));
     }
     public static AsyncTask register(Context c, Action<User> action, ErrorAction error, final String mail, String password, final String fname, final String lname, String birthday){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<User>() {
@@ -208,7 +209,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 int title = jsonObject.optInt("title");
                 return new User(id, mail, fname, lname, mail, title, null, false);
             }
-        }, action, error, "http://developer.goodway.io/api/v1/authentication/user/register").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("password", password)
+        }, action, error, "https://developer.goodway.io/api/v1/authentication/user/register").execute(new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("password", password)
         , new AbstractMap.SimpleEntry<String, String>("fname", fname), new AbstractMap.SimpleEntry<String, String>("lname", lname), new AbstractMap.SimpleEntry<String, String>("birthday", birthday));
     }
     public static AsyncTask getFriends(Context c, Action<List<User>> action, ErrorAction error, String token){
@@ -235,7 +236,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 }
                 return null;
             }
-        }, action, error, "http://developer.goodway.io/api/v1/me/user/friends").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
+        }, action, error, "https://developer.goodway.io/api/v1/me/user/friends").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
     public static AsyncTask getFriendRequests(Context c, Action<List<User>> action, ErrorAction error, FinishCallback finish, String token){
@@ -262,7 +263,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 }
                 return null;
             }
-        }, action, error, finish, "http://developer.goodway.io/api/v1/me/user/friends/requests").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
+        }, action, error, finish, "https://developer.goodway.io/api/v1/me/user/friends/requests").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
     public static AsyncTask countFriendRequests(Context c, Action<Integer> action, ErrorAction error, String token){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<Integer>() {
@@ -270,7 +271,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             public Integer processJson(JSONObject jsonObject) throws JSONException {
                 return jsonObject.getJSONArray("count").getJSONObject(0).optInt("count");
             }
-        }, action, error, null, "http://developer.goodway.io/api/v1/me/user/friends/requests/count").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
+        }, action, error, null, "https://developer.goodway.io/api/v1/me/user/friends/requests/count").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
     public static AsyncTask getEvents(Context c, Action<GroupEvent> action, ErrorAction error, FinishCallback finish, String token){
         return new GoodwayHttpClientPost<>(c, new ProcessJson<GroupEvent>() {
@@ -286,7 +287,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 String html = jsonObject.optString("html");
                 return new GroupEvent(id, name, html, avatar, s_time, e_time, lat, lng);
             }
-        }, action, error,finish, "http://developer.goodway.io/api/v1/me/user/events").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
+        }, action, error,finish, "https://developer.goodway.io/api/v1/me/user/events").execute(new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
     public static AsyncTask acceptFriend(Context c, Action<Integer> action, ErrorAction error, String mail, String password, int id){
@@ -317,7 +318,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             public Boolean processJson(JSONObject jsonObject) {
                 return true;
             }
-        }, action, error, "http://developer.goodway.io/api/v1/me/user/city/update").execute(
+        }, action, error, "https://developer.goodway.io/api/v1/me/user/city/update").execute(
                 new AbstractMap.SimpleEntry<String, String>("token", token),
                 new AbstractMap.SimpleEntry<String, String>("city", city));
     }
@@ -378,7 +379,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                     }
                     return groups;
                 }
-            }, action, error, "http://developer.goodway.io/api/v1/group/find").execute(
+            }, action, error, "https://developer.goodway.io/api/v1/group/find").execute(
                     new AbstractMap.SimpleEntry<String, String>("token", token), new AbstractMap.SimpleEntry<String, String>("name", name));
         }
         return null;
@@ -402,7 +403,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                     }
                     return null;
                 }
-            }, action, error, "http://developer.goodway.io/api/v1/me/user/groups").execute(
+            }, action, error, "https://developer.goodway.io/api/v1/me/user/groups").execute(
                     new AbstractMap.SimpleEntry<String, String>("token", token));
     }
     public static AsyncTask joinGroup(Context c, Action<Boolean> action, ErrorAction error, String token, Group group) {
@@ -411,7 +412,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 public Boolean processJson(JSONObject jsonObject) {
                     return jsonObject.optBoolean("success");
                 }
-            }, action, error, "http://developer.goodway.io/api/v1/group/join").execute(
+            }, action, error, "https://developer.goodway.io/api/v1/group/join").execute(
                     new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())),
                     new AbstractMap.SimpleEntry<String, String>("token", token));
     }
@@ -422,7 +423,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             public Boolean processJson(JSONObject jsonObject) {
                 return jsonObject.optBoolean("success");
             }
-        }, action, error, "http://developer.goodway.io/api/v1/group/quit").execute(
+        }, action, error, "https://developer.goodway.io/api/v1/group/quit").execute(
                 new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())),
                 new AbstractMap.SimpleEntry<String, String>("token", token));
     }
@@ -449,7 +450,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 }
                 return events;
             }
-        }, action, error, "http://developer.goodway.io/api/v1/group/events/upcoming").execute(
+        }, action, error, "https://developer.goodway.io/api/v1/group/events/upcoming").execute(
                 new AbstractMap.SimpleEntry<String, String>("id", Integer.toString(group.getId())),
                 new AbstractMap.SimpleEntry<String, String>("token", token));
     }
@@ -480,7 +481,7 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
 
         int length=0;
         try {
-            HttpURLConnection urlConnection = GoodwayProtocol.getHttpPostUrlConnection(this.url, entries);
+            HttpsURLConnection urlConnection = GoodwayProtocol.getHttpsPostUrlConnection(this.url, entries);
             Log.d("url=", "url= "+urlConnection.toString());
             int serverResponseCode = urlConnection.getResponseCode();
             String serverResponseMessage = urlConnection.getResponseMessage();
