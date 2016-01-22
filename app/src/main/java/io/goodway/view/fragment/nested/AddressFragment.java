@@ -4,10 +4,17 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -33,6 +40,7 @@ public class AddressFragment extends Fragment {
     boolean self;
     User user;
     UserLocation item;
+    Toolbar toolbar;
 
     public static AddressFragment newInstance(Bundle args) {
         AddressFragment fragment = new AddressFragment();
@@ -110,6 +118,15 @@ public class AddressFragment extends Fragment {
             View notFound = getActivity().getLayoutInflater().inflate(R.layout.view_not_friend, null);
             locations.addView(notFound);
         }
+
+        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        setHasOptionsMenu(true);
+        actionBar.setHomeButtonEnabled(true);
+
         return rootView;
     }
 
@@ -139,6 +156,17 @@ public class AddressFragment extends Fragment {
         ((TextView) location.findViewById(R.id.name)).setText(userLocation.getA_name());
         locations.addView(location);
         return location;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                getActivity().onBackPressed();
+                break;
+        }
+        return false;
     }
 
     public UserLocation getItem(){

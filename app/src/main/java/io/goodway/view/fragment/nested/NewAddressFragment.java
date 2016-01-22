@@ -73,8 +73,8 @@ public class NewAddressFragment extends Fragment implements CompoundButton.OnChe
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         setHasOptionsMenu(true);
-
         actionBar.setHomeButtonEnabled(true);
+
         return rootView;
     }
 
@@ -121,7 +121,7 @@ public class NewAddressFragment extends Fragment implements CompoundButton.OnChe
                         .show();
                 return true;
             case android.R.id.home:
-                getActivity().getFragmentManager().popBackStack();
+                getActivity().onBackPressed();
                 break;
         }
         return false;
