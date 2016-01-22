@@ -97,7 +97,7 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         user = extras.getParcelable("user");
         token = extras.getString("token");
         self = extras.getBoolean("self", false);
-        toolbar = (Toolbar) findViewById(R.id.mapToolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(user.getName());
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
