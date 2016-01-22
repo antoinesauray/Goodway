@@ -1,16 +1,11 @@
 package io.goodway;
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -19,13 +14,8 @@ import android.text.TextWatcher;
 import android.text.style.CharacterStyle;
 import android.text.style.StyleSpan;
 import android.util.Log;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.cocosw.bottomsheet.BottomSheet;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -38,21 +28,15 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import io.goodway.model.User;
 import io.goodway.model.adapter.AdressSearchAdapter;
-import io.goodway.model.adapter.UserAdapter;
 import io.goodway.model.callback.AddressSelected;
-import io.goodway.model.callback.FinishCallback;
-import io.goodway.model.callback.UserCallback;
 import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
 import io.goodway.navitia_android.UserLocation;
-import io.goodway.view.fragment.MainFragmentHome;
 import io.goodway.view.fragment.SearchFragment;
 
 

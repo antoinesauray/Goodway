@@ -103,7 +103,9 @@ public class FriendsActivity extends AppCompatActivity {
     }
 
     public void fabClick(View v){
-        startActivity(new Intent(FriendsActivity.this, AddFriendActivity.class));
+        Intent i = new Intent(FriendsActivity.this, AddFriendActivity.class);
+        i.putExtra("token", token);
+        startActivity(i);
     }
 
     @Override
@@ -235,9 +237,11 @@ public class FriendsActivity extends AppCompatActivity {
             GoodwayHttpClientPost.getFriends(getActivity(), new Action<List<User>>() {
                 @Override
                 public void action(List<User> e) {
-                    for(User u : e) {
-                        swipeLayout.setRefreshing(false);
-                        adapter.add(u);
+                    if(e!=null) {
+                        for (User u : e) {
+                            swipeLayout.setRefreshing(false);
+                            adapter.add(u);
+                        }
                     }
                 }
             }, new ErrorAction() {
@@ -245,7 +249,7 @@ public class FriendsActivity extends AppCompatActivity {
                 public void action(int length) {
                     switch (length) {
                         case 0:
-                            error.setText(R.string.no_friends);
+                            //error.setText(R.string.no_friends);
                             break;
                         case -1:
 

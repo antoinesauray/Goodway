@@ -201,8 +201,8 @@
     <string name="goodway_preferences">goodway_v1_preferences</string>
 
     <string name="route_type_prompt">Choisissez départ ou arrivée</string>
-    <string name="type_address_start">Rentrez une adresse de départ</string>
-    <string name="type_address_end">Rentrez une adresse d\'arrivée</string>
+    <string name="type_address_start">Entrez une adresse de départ</string>
+    <string name="type_address_end">Entrez une adresse d\'arrivée</string>
     <string-array name="route_type">
         <item>Départ</item>
         <item>Arrivée</item>

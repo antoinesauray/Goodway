@@ -98,9 +98,11 @@ public class AddressFragment extends Fragment {
             GoodwayHttpClientPost.getUserLocations(getActivity(), new Action<List<UserLocation>>() {
                 @Override
                 public void action(List<UserLocation> locations) {
-                    for (UserLocation location : locations) {
-                        Log.d("adding address", "adding address:" + location.toString());
-                        addUserLocation(location, true);
+                    if(locations!=null) {
+                        for (UserLocation location : locations) {
+                            Log.d("adding address", "adding address:" + location.toString());
+                            addUserLocation(location, true);
+                        }
                     }
                 }
             }, new ErrorAction() {

@@ -1,7 +1,6 @@
 package io.goodway.view.fragment.nested;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -221,14 +219,6 @@ public class SearchPlacesFragment extends Fragment implements GoogleApiClient.Co
     }
 
     private void finish(Address address){
-
-
-
-        if(autocomplete!=null) {
-            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(autocomplete.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-
         switch (request){
 
             case MainActivity.DEPARTURE:

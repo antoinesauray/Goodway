@@ -145,8 +145,6 @@ public class GoContactActivity extends AppCompatActivity implements SwipeRefresh
                 switch (length) {
                     case 0:
                         swipeLayout.setRefreshing(false);
-                        error.setText(R.string.no_friends);
-                        error.setVisibility(View.VISIBLE);
                         break;
                     case -1:
                         swipeLayout.setRefreshing(false);

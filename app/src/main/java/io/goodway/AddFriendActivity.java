@@ -44,7 +44,7 @@ public class AddFriendActivity extends AppCompatActivity{
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private UserAdapter adapter;
-    private String mail, password;
+    private String token;
     private EditText findFriends;
     private AsyncTask task;
 
@@ -89,7 +89,7 @@ public class AddFriendActivity extends AppCompatActivity{
                             public void action(User e) {
                                 adapter.add(e);
                             }
-                        }, null, mail, password, s1, s2);
+                        }, null, token, s1, s2);
                     }
 
                 }
@@ -109,18 +109,14 @@ public class AddFriendActivity extends AppCompatActivity{
 
         layoutManager = new LinearLayoutManager(this);
 
-        SharedPreferences shared_preferences = getSharedPreferences("shared_preferences_test",
-                MODE_PRIVATE);
-        mail = shared_preferences.getString("mail", null);
-        password = shared_preferences.getString("password", null);
+        token = getIntent().getExtras().getString("token");
 
         adapter = new UserAdapter(this, new UserCallback() {
             @Override
             public void action(User u) {
                 Intent i = new Intent(AddFriendActivity.this, ProfileActivity.class);
                 i.putExtra("user", u);
-                i.putExtra("token", mail);
-                i.putExtra("password", password);
+                i.putExtra("token", token);
                 i.putExtra("self", false);
                 startActivity(i);
             }

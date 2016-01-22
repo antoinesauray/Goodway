@@ -323,9 +323,9 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                 new AbstractMap.SimpleEntry<String, String>("city", city));
     }
 
-    public static AsyncTask getUsersFromName(Context c, Action<User> action, ErrorAction error, String mail, String password, String fname, String lname){
+    public static AsyncTask getUsersFromName(Context c, Action<User> action, ErrorAction error, String token, String fname, String lname){
         if(fname != null ){
-            if(lname!=null){
+            if(lname!=null) {
                 return new GoodwayHttpClientPost<>(c, new ProcessJson<User>() {
                     @Override
                     public User processJson(JSONObject jsonObject) {
@@ -336,24 +336,9 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
                         int title = jsonObject.optInt("title");
                         return new User(id, fname, lname, avatar, title, null, false);
                     }
-                }, action, error, "https://api.goodway.io/users.php").execute(
-                        new AbstractMap.SimpleEntry<String, String>("u1", fname), new AbstractMap.SimpleEntry<String, String>("u2", lname),
-                        new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password));
-            }
-            else{
-                return new GoodwayHttpClientPost<>(c, new ProcessJson<User>() {
-                    @Override
-                    public User processJson(JSONObject jsonObject) {
-                        Integer id = jsonObject.optInt("id");
-                        String fname = jsonObject.optString("fname");
-                        String lname = jsonObject.optString("lname");
-                        String avatar = jsonObject.optString("avatar");
-                        int title = jsonObject.optInt("title");
-                        return new User(id, fname, lname, avatar, title, null, false);
-                    }
-                }, action, error, "https://api.goodway.io/users.php").execute(
-                        new AbstractMap.SimpleEntry<String, String>("u1", fname),
-                        new AbstractMap.SimpleEntry<String, String>("mail", mail), new AbstractMap.SimpleEntry<String, String>("pass", password));
+                }, action, error, "https://developer.goodway.io/api/v1/user/find").execute(
+                        new AbstractMap.SimpleEntry<String, String>("fname", fname), new AbstractMap.SimpleEntry<String, String>("lname", lname),
+                        new AbstractMap.SimpleEntry<String, String>("token", token));
             }
         }
         return null;

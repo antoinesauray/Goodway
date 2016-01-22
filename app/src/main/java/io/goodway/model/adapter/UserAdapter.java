@@ -61,6 +61,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         holder.name.setText(a.getFirstName()+" "+a.getLastName());
         if(a.getCity()!=null){holder.title.setText(a.getCity());}
         else{holder.title.setText(a.getTitle(context));}
+        /*
         Picasso.with(context)
                 .load(a.getAvatar())
                 .error(R.mipmap.ic_person_black_36dp)
@@ -68,6 +69,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(holder.avatar);
+                */
     }
 
     public void add(User item) {
