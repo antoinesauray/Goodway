@@ -1,8 +1,6 @@
 package io.goodway.view.fragment.nested;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -12,16 +10,12 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
 
-import io.goodway.AddressActivity;
-import io.goodway.ProfileActivity;
+import io.goodway.activities.AddressActivity;
 import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.model.callback.FinishCallback;

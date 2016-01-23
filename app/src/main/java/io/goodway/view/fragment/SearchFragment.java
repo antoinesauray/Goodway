@@ -16,7 +16,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.goodway.MainActivity;
+import io.goodway.activities.MainActivity;
 import io.goodway.R;
 import io.goodway.view.fragment.nested.SearchFriendsFragment;
 import io.goodway.view.fragment.nested.SearchGroupsFragment;

@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import io.goodway.ProfileActivity;
+import io.goodway.activities.ProfileActivity;
 import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.view.ImageTrans_CircleTransform;

@@ -199,32 +199,6 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/uber_account"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:onClick="onClick"
-        android:paddingLeft="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="centerInside"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/uber_badge"
-            android:layout_marginRight="16dp"
-            android:background="@drawable/circle_black"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:textSize="16sp"
-            android:textColor="@android:color/secondary_text_light"
-            android:text="Uber"/>
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/add_account"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

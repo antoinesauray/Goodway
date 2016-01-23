@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 
 import android.annotation.TargetApi;
@@ -33,6 +33,7 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 
+import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.model.adapter.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;

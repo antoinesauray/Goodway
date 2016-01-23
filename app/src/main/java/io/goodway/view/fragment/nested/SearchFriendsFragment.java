@@ -22,7 +22,7 @@ import com.cocosw.bottomsheet.BottomSheet;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.goodway.MainActivity;
+import io.goodway.activities.MainActivity;
 import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.model.adapter.UserAdapter;

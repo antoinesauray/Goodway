@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 /**
  * Created by antoine on 12/5/15.
@@ -8,6 +8,8 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 
 import java.util.List;
+
+import io.goodway.R;
 
 public class PreferencesActivity extends PreferenceActivity {
 

@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.style.CharacterStyle;
 import android.text.style.StyleSpan;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +24,7 @@ import com.cocosw.bottomsheet.BottomSheet;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.model.adapter.UserAdapter;
 import io.goodway.model.callback.FinishCallback;
@@ -155,6 +157,16 @@ public class GoContactActivity extends AppCompatActivity implements SwipeRefresh
 
             }
         }, token);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

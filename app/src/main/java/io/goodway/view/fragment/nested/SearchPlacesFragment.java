@@ -30,9 +30,9 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
-import io.goodway.MainActivity;
+import io.goodway.activities.MainActivity;
 import io.goodway.R;
-import io.goodway.SearchActivity;
+import io.goodway.activities.SearchActivity;
 import io.goodway.model.adapter.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;
 import io.goodway.model.network.GoodwayHttpClientPost;

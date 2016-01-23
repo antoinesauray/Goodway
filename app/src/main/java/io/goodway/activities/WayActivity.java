@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import io.goodway.R;
 import io.goodway.model.ContainerType;
 import io.goodway.model.adapter.WayContainerAdapter;
 import io.goodway.model.callback.WayCallback;

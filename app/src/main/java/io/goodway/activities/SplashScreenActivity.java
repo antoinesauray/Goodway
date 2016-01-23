@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 
 import android.animation.Animator;
@@ -49,7 +49,6 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.MessageDigest;
@@ -59,6 +58,7 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.goodway.R;
 import io.goodway.model.GroupEvent;
 import io.goodway.model.User;
 import io.goodway.model.network.GoodwayHttpClientGet;

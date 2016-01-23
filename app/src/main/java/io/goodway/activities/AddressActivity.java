@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import io.goodway.R;
 import io.goodway.navitia_android.UserLocation;
 import io.goodway.view.fragment.nested.AddressFragment;
 import io.goodway.view.fragment.nested.NewAddressFragment;

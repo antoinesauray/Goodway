@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -39,7 +38,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -48,19 +46,16 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import io.goodway.GoAddressActivity;
-import io.goodway.GoContactActivity;
-import io.goodway.GoPlaceActivity;
-import io.goodway.MainActivity;
+import io.goodway.activities.GoAddressActivity;
+import io.goodway.activities.GoContactActivity;
+import io.goodway.activities.GoPlaceActivity;
+import io.goodway.activities.MainActivity;
 import io.goodway.R;
-import io.goodway.SearchActivity;
 import io.goodway.model.User;
-import io.goodway.model.adapter.GroupAdapter;
 import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.view.ImageTrans_CircleTransform;
-import io.goodway.view.fragment.nested.FlowFragment;
 
 
 /**

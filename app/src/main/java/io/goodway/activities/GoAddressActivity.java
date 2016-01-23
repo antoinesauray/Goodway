@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -14,6 +14,7 @@ import android.text.TextWatcher;
 import android.text.style.CharacterStyle;
 import android.text.style.StyleSpan;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -30,6 +31,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
+import io.goodway.R;
 import io.goodway.model.adapter.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;
 import io.goodway.model.network.GoodwayHttpClientPost;
@@ -183,6 +185,15 @@ public class GoAddressActivity extends AppCompatActivity implements GoogleApiCli
         });
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onResume(){

@@ -1,17 +1,15 @@
-package io.goodway.activities;
+package io.goodway.activities.account;
 
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.widget.TextView;
 
 import io.goodway.R;
-import io.goodway.model.network.GoodwayHttpClientGet;
-import io.goodway.navitia_android.Action;
+import io.goodway.model.User;
 
 
 /**
@@ -19,7 +17,7 @@ import io.goodway.navitia_android.Action;
  * @author Antoine Sauray
  * @version 2.0
  */
-public class FacebookAccountActivity extends AppCompatActivity{
+public class GoodwayAccountActivity extends AppCompatActivity{
 
     // ----------------------------------- Model
 
@@ -27,9 +25,14 @@ public class FacebookAccountActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_facebook);
+        setContentView(R.layout.activity_goodway);
 
         String token = getIntent().getExtras().getString("token");
+        User user = getIntent().getExtras().getParcelable("user");
+        ((TextView)findViewById(R.id.name)).setText(user.getName());
+
+        ((TextView)findViewById(R.id.mail)).setText(user.getMail());
+        ((TextView)findViewById(R.id.phone)).setText(R.string.not_set);
 
         Window window = getWindow();
 

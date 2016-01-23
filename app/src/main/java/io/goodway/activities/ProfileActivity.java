@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -39,6 +39,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
 
+import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.model.callback.AddressSelected;
 import io.goodway.model.network.GoodwayHttpClientPost;

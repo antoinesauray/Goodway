@@ -15,7 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.goodway.ProfileActivity;
+import io.goodway.activities.ProfileActivity;
 import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.model.network.GoodwayHttpClientPost;

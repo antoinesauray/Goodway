@@ -1,7 +1,6 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -15,18 +14,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
-
 import java.util.List;
 
+import io.goodway.R;
 import io.goodway.model.Group;
 import io.goodway.model.User;
 import io.goodway.model.adapter.GroupAdapter;
 import io.goodway.model.callback.GroupCallback;
 import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
-import io.goodway.navitia_android.ErrorAction;
-import io.goodway.view.ImageTrans_CircleTransform;
 
 
 /**

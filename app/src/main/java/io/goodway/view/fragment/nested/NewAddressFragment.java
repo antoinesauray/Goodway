@@ -23,7 +23,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import io.goodway.AddressActivity;
+import io.goodway.activities.AddressActivity;
 import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.model.network.GoodwayHttpClientPost;

@@ -214,4 +214,6 @@
 
     <string name="add_account">Ajouter un compte</string>
 
+    <string name="not_set">Non renseigné</string>
+
 </resources>

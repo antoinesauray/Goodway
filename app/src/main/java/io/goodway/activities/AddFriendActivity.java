@@ -1,7 +1,6 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -15,11 +14,10 @@ import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.widget.EditText;
 
-import java.util.List;
-
-import io.goodway.model.Group;
-import io.goodway.model.adapter.GroupAdapter;
-import io.goodway.model.callback.GroupCallback;
+import io.goodway.R;
+import io.goodway.model.User;
+import io.goodway.model.adapter.UserAdapter;
+import io.goodway.model.callback.UserCallback;
 import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 
@@ -29,7 +27,7 @@ import io.goodway.navitia_android.Action;
  * @author Antoine Sauray
  * @version 2.0
  */
-public class SearchGroupActivity extends AppCompatActivity{
+public class AddFriendActivity extends AppCompatActivity{
 
     // ----------------------------------- Model
     /**
@@ -45,26 +43,25 @@ public class SearchGroupActivity extends AppCompatActivity{
     private Toolbar toolbar;
     private RecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
-    private GroupAdapter adapter;
+    private UserAdapter adapter;
     private String token;
-    private EditText find_groups;
+    private EditText findFriends;
     private AsyncTask task;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_group);
-        token = getIntent().getExtras().getString("token");
+        setContentView(R.layout.activity_add_friend);
+        Bundle extras = this.getIntent().getExtras();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.find_groups);
+        toolbar.setTitle(R.string.find_friend);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-
-        find_groups = (EditText) findViewById(R.id.find_groups);
-        find_groups.addTextChangedListener(new TextWatcher() {
+        findFriends = (EditText) findViewById(R.id.find_friends);
+        findFriends.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -76,15 +73,27 @@ public class SearchGroupActivity extends AppCompatActivity{
                     task.cancel(true);
                 }
                 adapter.clear();
-                String text = find_groups.getText().toString();
-                task = GoodwayHttpClientPost.findGroups(SearchGroupActivity.this, new Action<List<Group>>() {
-                    @Override
-                    public void action(List<Group> e) {
-                        for(Group g : e) {
-                            adapter.add(g);
+                String text = findFriends.getText().toString();
+                if (text != null) {
+                    String[] split = text.split(" ");
+                    if (split != null) {
+                        String s1 = null, s2 = null;
+                        if (split.length > 0) {
+                            s1 = split[0];
+                            if (split.length > 1) {
+                                s2 = split[1];
+                            }
                         }
+                        task = GoodwayHttpClientPost.getUsersFromName(AddFriendActivity.this, new Action<User>() {
+                            @Override
+                            public void action(User e) {
+                                adapter.add(e);
+                            }
+                        }, null, token, s1, s2);
                     }
-                }, null, token, text);
+
+                }
+
             }
 
             @Override
@@ -100,13 +109,15 @@ public class SearchGroupActivity extends AppCompatActivity{
 
         layoutManager = new LinearLayoutManager(this);
 
-        adapter = new GroupAdapter(this, new GroupCallback() {
+        token = getIntent().getExtras().getString("token");
+
+        adapter = new UserAdapter(this, new UserCallback() {
             @Override
-            public void action(Group g) {
-                Intent i = new Intent(SearchGroupActivity.this, GroupActivity.class);
-                i.putExtra("group", g);
+            public void action(User u) {
+                Intent i = new Intent(AddFriendActivity.this, ProfileActivity.class);
+                i.putExtra("user", u);
                 i.putExtra("token", token);
-                i.putExtra("joined", false);
+                i.putExtra("self", false);
                 startActivity(i);
             }
         });

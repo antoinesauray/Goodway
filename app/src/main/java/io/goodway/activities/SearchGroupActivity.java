@@ -1,7 +1,6 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -17,6 +16,7 @@ import android.widget.EditText;
 
 import java.util.List;
 
+import io.goodway.R;
 import io.goodway.model.Group;
 import io.goodway.model.adapter.GroupAdapter;
 import io.goodway.model.callback.GroupCallback;
@@ -29,7 +29,7 @@ import io.goodway.navitia_android.Action;
  * @author Antoine Sauray
  * @version 2.0
  */
-public class GroupSearchActivity extends AppCompatActivity{
+public class SearchGroupActivity extends AppCompatActivity{
 
     // ----------------------------------- Model
     /**
@@ -47,15 +47,14 @@ public class GroupSearchActivity extends AppCompatActivity{
     private LinearLayoutManager layoutManager;
     private GroupAdapter adapter;
     private String token;
-    private EditText findGroups;
+    private EditText find_groups;
     private AsyncTask task;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_search);
-        Bundle extras = this.getIntent().getExtras();
-        token = extras.getString("token");
+        setContentView(R.layout.activity_search_group);
+        token = getIntent().getExtras().getString("token");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.find_groups);
         setSupportActionBar(toolbar);
@@ -63,8 +62,9 @@ public class GroupSearchActivity extends AppCompatActivity{
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        findGroups = (EditText) findViewById(R.id.find_groups);
-        findGroups.addTextChangedListener(new TextWatcher() {
+
+        find_groups = (EditText) findViewById(R.id.find_groups);
+        find_groups.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -76,16 +76,15 @@ public class GroupSearchActivity extends AppCompatActivity{
                     task.cancel(true);
                 }
                 adapter.clear();
-                String text = findGroups.getText().toString();
-                task = GoodwayHttpClientPost.findGroups(GroupSearchActivity.this, new Action<List<Group>>() {
+                String text = find_groups.getText().toString();
+                task = GoodwayHttpClientPost.findGroups(SearchGroupActivity.this, new Action<List<Group>>() {
                     @Override
-                    public void action(List<Group> e){
+                    public void action(List<Group> e) {
                         for(Group g : e) {
                             adapter.add(g);
                         }
                     }
                 }, null, token, text);
-
             }
 
             @Override
@@ -104,9 +103,10 @@ public class GroupSearchActivity extends AppCompatActivity{
         adapter = new GroupAdapter(this, new GroupCallback() {
             @Override
             public void action(Group g) {
-                Intent i = new Intent(GroupSearchActivity.this, UserGroupsActivity.class);
+                Intent i = new Intent(SearchGroupActivity.this, GroupActivity.class);
                 i.putExtra("group", g);
                 i.putExtra("token", token);
+                i.putExtra("joined", false);
                 startActivity(i);
             }
         });
@@ -120,8 +120,7 @@ public class GroupSearchActivity extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
-                break;
+                onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }

@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
+
+import io.goodway.R;
 
 /**
  * Created by antoine on 11/7/15.

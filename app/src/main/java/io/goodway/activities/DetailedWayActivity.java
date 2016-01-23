@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
+import io.goodway.R;
 import io.goodway.model.adapter.WayPartAdapter;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.Way;

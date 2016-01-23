@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -16,7 +16,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -26,6 +25,7 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import io.goodway.R;
 import io.goodway.model.GroupEvent;
 import io.goodway.model.User;
 import io.goodway.navitia_android.Address;

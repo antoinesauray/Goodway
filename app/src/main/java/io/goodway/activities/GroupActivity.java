@@ -1,7 +1,6 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +19,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import io.goodway.R;
 import io.goodway.model.Group;
 import io.goodway.model.GroupEvent;
 import io.goodway.model.User;

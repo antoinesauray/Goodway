@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.app.Dialog;
 import android.app.Fragment;
@@ -11,8 +11,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-import io.goodway.activities.FacebookAccountActivity;
-import io.goodway.activities.UberAccountActivity;
+import io.goodway.R;
+import io.goodway.activities.account.FacebookAccountActivity;
+import io.goodway.activities.account.GoodwayAccountActivity;
 import io.goodway.model.User;
 import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
@@ -208,10 +209,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 i4.putExtra("token", token);
                 startActivity(i4);
                 break;
-            case R.id.uber_account:
-                Intent i5 = new Intent(this, UberAccountActivity.class);
-                i5.putExtra("token", token);
-                startActivity(i5);
+            case R.id.goodway_account:
+                Intent i6 = new Intent(this, GoodwayAccountActivity.class);
+                i6.putExtra("token", token);
+                i6.putExtra("user", user);
+                startActivity(i6);
                 break;
             case R.id.add_account:
                 final Dialog dialog = new Dialog(this);

@@ -1,4 +1,4 @@
-package io.goodway;
+package io.goodway.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import io.goodway.R;
 import io.goodway.model.User;
 import io.goodway.model.adapter.UserAdapter;
 import io.goodway.model.callback.FinishCallback;
