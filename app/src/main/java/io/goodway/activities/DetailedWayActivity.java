@@ -1,5 +1,6 @@
 package io.goodway.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -130,6 +131,12 @@ public class DetailedWayActivity extends AppCompatActivity{
 
     public void irlPaiement(View v){
 
+    }
+
+    public void fabClick(View v){
+        Intent i = new Intent(this, TripActivity.class);
+        i.putExtra("way", way);
+        startActivity(i);
     }
 
     private LatLngBounds getCenter(LatLng from, LatLng to){

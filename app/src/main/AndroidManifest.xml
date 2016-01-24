@@ -124,6 +124,11 @@
             android:name=".activities.account.GoodwayAccountActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name"/>
+
+        <activity
+            android:name=".activities.TripActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"/>
         <activity
             android:name="com.facebook.FacebookActivity"
             android:screenOrientation="portrait"
