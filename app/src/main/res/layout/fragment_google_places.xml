@@ -6,6 +6,7 @@
         android:id="@+id/autocomplete"
         android:layout_margin="16dp"
         android:singleLine="true"
+        android:hint="@string/type_address_end"
         android:imeOptions="actionDone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

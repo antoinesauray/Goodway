@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <header
-        android:fragment="io.goodway.PreferencesActivity$Prefs1Fragment"
+        android:fragment="io.goodway.activities.PreferencesActivity$Prefs1Fragment"
         android:title="Data preferences"
         android:summary="Manage your data policy" />
 

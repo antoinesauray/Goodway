@@ -30,17 +30,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     private List<User> mDataset;
     private UserCallback callback;
-    private String mail, password;
     private Context context;
 
     private static final String TAG="LINE_ADAPTER";
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public UserAdapter(Context context, UserCallback callback, String mail, String password) {
+    public UserAdapter(Context context, UserCallback callback) {
         this.callback = callback;
         mDataset = new ArrayList<User>();
-        this.mail = mail;
-        this.password = password;
         this.context = context;
     }
 
@@ -64,6 +61,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         holder.name.setText(a.getFirstName()+" "+a.getLastName());
         if(a.getCity()!=null){holder.title.setText(a.getCity());}
         else{holder.title.setText(a.getTitle(context));}
+        /*
         Picasso.with(context)
                 .load(a.getAvatar())
                 .error(R.mipmap.ic_person_black_36dp)
@@ -71,6 +69,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(holder.avatar);
+                */
     }
 
     public void add(User item) {

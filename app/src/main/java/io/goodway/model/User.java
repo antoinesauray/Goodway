@@ -11,7 +11,7 @@ import io.goodway.R;
  */
 public class User implements Parcelable {
 
-    private String fname, lname, mail, avatar, city;
+    private String fname, lname, mail, avatar, city, token;
     private int id, title;
     private boolean friend;
 
@@ -27,8 +27,30 @@ public class User implements Parcelable {
             };
 
 
+    public User(int id, String mail, String fname, String lname, String avatar, int title, String city, boolean friend){
+        this.id = id;
+        this.mail = mail;
+        this.fname = fname;
+        this.lname = lname;
+        this.friend=friend;
+        this.title = title;
+        this.avatar = avatar;
+        this.city = city;
+    }
+    public User(int id, String mail, String fname, String lname, String avatar, int title, String city, boolean friend, String token){
+        this.id = id;
+        this.mail = mail;
+        this.fname = fname;
+        this.lname = lname;
+        this.friend=friend;
+        this.title = title;
+        this.avatar = avatar;
+        this.city = city;
+        this.token = token;
+    }
     public User(int id, String fname, String lname, String avatar, int title, String city, boolean friend){
         this.id = id;
+        this.mail = null;
         this.fname = fname;
         this.lname = lname;
         this.friend=friend;
@@ -60,6 +82,8 @@ public class User implements Parcelable {
     public String getLastName(){return lname;}
 
     public String getName(){return fname+" "+lname;}
+
+    public String getToken(){return token;}
 
     public int getTitle(){return title;}
 

@@ -173,6 +173,7 @@ public class WayContainerAdapter extends RecyclerView.Adapter<WayContainerAdapte
                 holder.provider.setText(R.string.uber);
                 GoodwayHttpClientGet.getUberEstimate(activity, new Action<Uber>() {
                     @Override
+<<<<<<< HEAD
                     public void action(Uber e) {
                         final View uber = activity.getLayoutInflater().inflate(R.layout.view_uber, null);
                         ((TextView) uber.findViewById(R.id.display_name)).setText(e.getDisplayName());
@@ -189,6 +190,42 @@ public class WayContainerAdapter extends RecyclerView.Adapter<WayContainerAdapte
 
                             }
                         }, from.getLatitude(), from.getLongitude(), e.getProduct_id());
+=======
+                    public void action(List<Uber> list) {
+                        if (list.size() == 0) {
+                            View uber = activity.getLayoutInflater().inflate(R.layout.view_way_not_found, null);
+                            ((TextView) uber.findViewById(R.id.message)).setText(R.string.noUber);
+                            holder.ways.addView(uber);
+                        }
+                        for (final Uber e : list) {
+                            final View uber = activity.getLayoutInflater().inflate(R.layout.view_uber, null);
+                            ((TextView) uber.findViewById(R.id.display_name)).setText(e.getDisplayName());
+                            ((TextView) uber.findViewById(R.id.duration)).setText(activity.getString(R.string.duration) + " " + Address.secondToStr(activity, e.getDuration()));
+                            uber.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    /*
+                                    Intent i = new Intent(activity, UberActivity.class);
+                                    i.putExtra("uber", e);
+                                    i.putExtra("from", from);
+                                    i.putExtra("to", to);
+                                    activity.startActivity(i);*/
+                                }
+                            });
+                            holder.ways.addView(uber);
+                            GoodwayHttpClientGet.getUberTimeEstimate(activity, new Action<Integer>() {
+                                @Override
+                                public void action(Integer estimate) {
+                                    ((TextView) uber.findViewById(R.id.estimate)).setText(activity.getString(R.string.estimate) + " " + Address.secondToStr(activity, estimate));
+                                }
+                            }, new ErrorAction() {
+                                @Override
+                                public void action(int length) {
+
+                                }
+                            }, from.getLatitude(), from.getLongitude(), e.getProduct_id());
+                        }
+>>>>>>> feature-new_ui_old_state
                     }
                 }, new ErrorAction() {
                     @Override

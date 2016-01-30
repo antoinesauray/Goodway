@@ -9,19 +9,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.goodway.ProfileActivity;
+import io.goodway.activities.ProfileActivity;
 import io.goodway.R;
 import io.goodway.model.User;
-import io.goodway.model.network.GoodwayHttpsClient;
+import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
-import io.goodway.navitia_android.ErrorAction;
 import io.goodway.view.ImageTrans_CircleTransform;
 
 
@@ -127,7 +125,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
             Log.d("click", "id=" + v.getId());
             switch (v.getId()){
                 case R.id.accept_friend_request:
-                    GoodwayHttpsClient.acceptFriend(activity, new Action<Integer>() {
+                    GoodwayHttpClientPost.acceptFriend(activity, new Action<Integer>() {
                         @Override
                         public void action(Integer e) {
                             int pos = getAdapterPosition();

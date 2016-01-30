@@ -44,7 +44,7 @@ public class PercentView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        //draw background circle anyway
+        //draw background circle_red anyway
         int left = 0;
         int width = getWidth();
         int top = 0;

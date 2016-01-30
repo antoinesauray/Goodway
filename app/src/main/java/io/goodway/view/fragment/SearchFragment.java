@@ -1,10 +1,10 @@
 package io.goodway.view.fragment;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +16,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.goodway.MainActivity;
+import io.goodway.activities.MainActivity;
 import io.goodway.R;
-import io.goodway.model.User;
+import io.goodway.view.fragment.nested.SearchFriendsFragment;
+import io.goodway.view.fragment.nested.SearchGroupsFragment;
+import io.goodway.view.fragment.nested.SearchPlacesFragment;
 
 
 /**
@@ -32,38 +34,42 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
     private TabLayout tabLayout;
 
     private int request;
-    private MainActivity mainActivity;
+    private MainActivity searchActivity;
 
     private SearchPlacesFragment f2;
     private SearchFriendsFragment f1;
     private SearchGroupsFragment f3;
 
-    private User user;
+    private String token;
+    private String[] titles;
+
+    public static final String TAG="SEARCH_FRAGMENT";
+
+    public static SearchFragment newInstance(Bundle args) {
+        SearchFragment fragment = new SearchFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_search, container, false);
         int item = getArguments().getInt("ITEM", 1);
         request = getArguments().getInt("REQUEST");
-        user = getArguments().getParcelable("user");
-        mainActivity = (MainActivity) getActivity();
+        token = getArguments().getString("token");
 
         viewPager = (ViewPager) root.findViewById(R.id.viewpager);
+        titles = new String[]{getString(R.string.contacts), getString(R.string.address), getString(R.string.groups)};
         setupViewPager(viewPager);
 
-        tabLayout = (TabLayout) mainActivity.findViewById(R.id.tabs);
+        tabLayout = (TabLayout) root.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        int[] icons = new int[]{R.mipmap.ic_person_white, R.mipmap.ic_action_search, R.mipmap.ic_group_search};
-        for (int i = 0; i < tabLayout.getTabCount(); i++) {
-            tabLayout.getTabAt(i).setIcon(icons[i]);
-        }
-
         viewPager.setCurrentItem(item);
         return root;
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
         f1 = new SearchFriendsFragment();
         f1.setArguments(getArguments());
         f2 = new SearchPlacesFragment();
@@ -95,7 +101,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
 
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
+    class ViewPagerAdapter extends FragmentStatePagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
 
         public ViewPagerAdapter(FragmentManager manager) {
@@ -118,7 +124,7 @@ public class SearchFragment extends Fragment implements GoogleApiClient.Connecti
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return "";
+            return titles[position];
         }
     }
 }
