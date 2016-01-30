@@ -10,27 +10,14 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-<<<<<<< HEAD
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-=======
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
->>>>>>> feature-new_ui_old_state
 
 import javax.net.ssl.HttpsURLConnection;
 
 import io.goodway.model.Uber;
+import io.goodway.model.UberProduct;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.ErrorAction;
@@ -48,73 +35,61 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<AbstractMap.SimpleEntry<S
     private FinishCallback finish;
     private ProcessJson<T> processJson;
     private String url;
-<<<<<<< HEAD
-    private String array_id;
-=======
->>>>>>> feature-new_ui_old_state
 
-    private GoodwayHttpClientGet(Context c, ProcessJson<T> processJson, Action<T> action, ErrorAction error, final String URL, String array_id){
+    private GoodwayHttpClientGet(Context c, ProcessJson<T> processJson, Action<T> action, ErrorAction error, final String URL){
         this.c = c;
         this.action = action;
         this.error = error;
         this.processJson = processJson;
         this.url = URL;
-<<<<<<< HEAD
-        this.array_id = array_id;
-=======
->>>>>>> feature-new_ui_old_state
     }
 
-    public static AsyncTask getUberEstimate(Context c, Action<Uber> action, ErrorAction error, double start_latitude, double start_longitude, double end_latitude, double end_longitude) {
-        return new GoodwayHttpClientGet<>(c, new ProcessJson<Uber>() {
+    public static AsyncTask getUberEstimate(Context c, Action<List<Uber>> action, ErrorAction error, double start_latitude, double start_longitude, double end_latitude, double end_longitude) {
+        return new GoodwayHttpClientGet<>(c, new ProcessJson<List<Uber>>() {
             @Override
-            public Uber processJson(JSONObject jsonObject) {
-                String localized_display_name = jsonObject.optString("localized_display_name");
-                int high_estimate = jsonObject.optInt("high_estimate");
-                int minimum = jsonObject.optInt("minimum");
-                int duration = jsonObject.optInt("duration");
-                String estimate = jsonObject.optString("estimate");
-                double distance = jsonObject.optInt("distance");
-                String display_name = jsonObject.optString("display_name");
-                String product_id = jsonObject.optString("product_id");
-                int low_estimate = jsonObject.optInt("low_estimate");
-                int surge_multiplier = jsonObject.optInt("surge_multiplier");
-                String currency_code = jsonObject.optString("currency_code");
-                return new Uber(localized_display_name, high_estimate, minimum, duration, estimate,
-                        distance, display_name, product_id, low_estimate, surge_multiplier, currency_code);
+            public List<Uber> processJson(JSONObject jsonObject) throws JSONException {
+                ArrayList<Uber> ret = new ArrayList<Uber>();
+                JSONArray jsonArray = jsonObject.getJSONArray("prices");
+                int length = jsonArray.length();
+                for (int i = 0; i < length; i++) {
+                    JSONObject innerJsonObject = jsonArray.getJSONObject(i);
+                    String localized_display_name = innerJsonObject.optString("localized_display_name");
+                    int high_estimate = innerJsonObject.optInt("high_estimate");
+                    int minimum = innerJsonObject.optInt("minimum");
+                    int duration = innerJsonObject.optInt("duration");
+                    String estimate = innerJsonObject.optString("estimate");
+                    double distance = innerJsonObject.optInt("distance");
+                    String display_name = innerJsonObject.optString("display_name");
+                    String product_id = innerJsonObject.optString("product_id");
+                    int low_estimate = innerJsonObject.optInt("low_estimate");
+                    int surge_multiplier = innerJsonObject.optInt("surge_multiplier");
+                    String currency_code = innerJsonObject.optString("currency_code");
+                    ret.add(new Uber(localized_display_name, high_estimate, minimum, duration, estimate,
+                            distance, display_name, product_id, low_estimate, surge_multiplier, currency_code));
+                }
+                return ret;
             }
-<<<<<<< HEAD
-        }, action, error, "http://developer.goodway.io/api/v1/uber/estimate/price?", "prices").execute(
-                new Pair("start_latitude", Double.toString(start_latitude)),
-                new Pair("start_longitude", Double.toString(start_longitude)),
-                new Pair("end_latitude", Double.toString(end_latitude)),
-                new Pair("end_longitude", Double.toString(end_longitude)));
-=======
         }, action, error, "https://developer.goodway.io/api/v1/uber/estimate?").execute(
                 new AbstractMap.SimpleEntry<String, String>("start_latitude", Double.toString(start_latitude)),
                 new AbstractMap.SimpleEntry<String, String>("start_longitude", Double.toString(start_longitude)),
                 new AbstractMap.SimpleEntry<String, String>("end_latitude", Double.toString(end_latitude)),
                 new AbstractMap.SimpleEntry<String, String>("end_longitude", Double.toString(end_longitude)));
->>>>>>> feature-new_ui_old_state
     }
     public static AsyncTask getUberTimeEstimate(Context c, Action<Integer> action, ErrorAction error, double start_latitude, double start_longitude, String productId) {
         return new GoodwayHttpClientGet<>(c, new ProcessJson<Integer>() {
             @Override
-            public Integer processJson(JSONObject jsonObject) {
-                try {
-                    return jsonObject.getInt("estimate");
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            public Integer processJson(JSONObject jsonObject) throws JSONException {
+                JSONArray jsonArray = jsonObject.getJSONArray("times");
+                int length = jsonArray.length();
+                if(length==1) {
+                    try {
+                        return jsonArray.getJSONObject(0).optInt("estimate");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return -1;
             }
-<<<<<<< HEAD
-        }, action, error, "http://developer.goodway.io/api/v1/uber/estimate/time?", "times").execute(
-                new Pair("start_latitude", Double.toString(start_latitude)),
-                new Pair("start_longitude", Double.toString(start_longitude)),
-                new Pair("product_id", productId));
-    }
-=======
         }, action, error, "https://developer.goodway.io/api/v1/uber/estimate_time?").execute(
                 new AbstractMap.SimpleEntry<String, String>("start_latitude", Double.toString(start_latitude)),
                 new AbstractMap.SimpleEntry<String, String>("start_longitude", Double.toString(start_longitude)),
@@ -172,7 +147,6 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<AbstractMap.SimpleEntry<S
                 new AbstractMap.SimpleEntry<String, String>("end_latitude", Double.toString(end_latitude)),
                 new AbstractMap.SimpleEntry<String, String>("end_longitude", Double.toString(end_longitude)));
     }
->>>>>>> feature-new_ui_old_state
 
     public static AsyncTask uberAuthorize(Context c, Action<String> action, ErrorAction error, String token){
         return new GoodwayHttpClientGet<>(c, new ProcessJson<String>() {
@@ -222,12 +196,7 @@ public class GoodwayHttpClientGet<T> extends AsyncTask<AbstractMap.SimpleEntry<S
                 Log.d("response:", jsonResult.toString());
                 try {
                     JSONObject obj= new JSONObject(jsonResult.toString());
-                    JSONArray jsonArray = obj.getJSONArray(array_id);
-                    length = jsonArray.length();
-                    for (int i = 0; i < length; i++) {
-                        JSONObject jsonObject = jsonArray.getJSONObject(i);
-                        publishProgress(processJson.processJson(jsonObject));
-                    }
+                    publishProgress(processJson.processJson(obj));
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
                     Log.d("error", "json exception");
