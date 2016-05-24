@@ -21,12 +21,27 @@ import io.goodway.navitia_android.Address;
 
 public class FriendVisitWidgetProvider extends AppWidgetProvider {
 
-    public static final String ACTION_WIDGET_RECEIVER = "ActionReceiverWidget";
+    public static String ACTION_WIDGET_RECEIVER = "ActionReceiverWidget";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager,
                          int[] appWidgetIds) {
         // TODO Auto-generated method stub
+        final int count = appWidgetIds.length;
+        for (int i = 0; i < count; i++) {
+            int widgetId = appWidgetIds[i];
+
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+                    R.layout.friendvisit_appwidget);
+            Intent intent = new Intent(context, FriendVisitWidgetProvider.class);
+            intent.setAction(ACTION_WIDGET_RECEIVER);
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
+                    0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            remoteViews.setOnClickPendingIntent(R.id.widget, pendingIntent);
+            appWidgetManager.updateAppWidget(widgetId, remoteViews);
+        }
+        /*
         Log.d("update widget", "update widget");
         for(int i=0;i<appWidgetIds.length;i++){
             RemoteViews remoteViews;
@@ -47,14 +62,10 @@ public class FriendVisitWidgetProvider extends AppWidgetProvider {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
                     0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             remoteViews.setOnClickPendingIntent(R.id.widget, pendingIntent);
-            remoteViews.setOnClickPendingIntent(R.id.layout, pendingIntent);
-            remoteViews.setOnClickPendingIntent(R.id.avatar, pendingIntent);
-            remoteViews.setOnClickPendingIntent(R.id.verticalLayout, pendingIntent);
-            remoteViews.setOnClickPendingIntent(R.id.name, pendingIntent);
-            remoteViews.setOnClickPendingIntent(R.id.location, pendingIntent);
             appWidgetManager.updateAppWidget(appWidgetIds[i], remoteViews);
         }
-        super.onUpdate(context, appWidgetManager, appWidgetIds);
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        */
     }
 
     @Override
@@ -62,10 +73,16 @@ public class FriendVisitWidgetProvider extends AppWidgetProvider {
         // TODO Auto-generated method stub
         Log.d("SWitch Widget", "On Receive");
         Log.d("ACTION", intent.getAction());
-        Bundle bundle = intent.getExtras();
-        if (bundle!=null && bundle.getString(ACTION_WIDGET_RECEIVER) != null){
+        final String action = intent.getAction();
+
+        if (ACTION_WIDGET_RECEIVER.equals(action))
+        {
+            Log.d("YES", "YES");
+            Address arrival = intent.getExtras().getParcelable("address");
+            Log.d("address to send", arrival.toString());
             Intent i = new Intent(context, WayActivity.class);
-            i.putExtra("to", intent.getParcelableExtra("address"));
+            i.putExtra("arrival", arrival);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(i);
         }
         super.onReceive(context, intent);

@@ -1,5 +1,6 @@
 package io.goodway.activities.widgets;
 
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.DialogInterface;
@@ -44,6 +45,7 @@ import io.goodway.navitia_android.ErrorAction;
 import io.goodway.navitia_android.UserLocation;
 import io.goodway.view.ImageTrans_CircleTransform;
 import io.goodway.view.fragment.MainFragmentHome;
+import io.goodway.widgets.FriendVisitWidgetProvider;
 
 
 /**
@@ -286,6 +288,19 @@ public class FriendVisitConfigureActivity extends AppCompatActivity implements S
                     R.layout.friendvisit_appwidget);
             views.setTextViewText(R.id.name, u.getFirstName());
             views.setTextViewText(R.id.location, address.getName());
+
+
+
+            Intent receiverIntent = new Intent(this, FriendVisitWidgetProvider.class);
+            receiverIntent.setAction(FriendVisitWidgetProvider.ACTION_WIDGET_RECEIVER);
+            receiverIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, new int[]{mAppWidgetId});
+            Log.d("address before intent", address.toString());
+            receiverIntent.putExtra("address", address);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
+                    0, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setOnClickPendingIntent(R.id.widget, pendingIntent);
+
+
             Picasso.with(this)
                     .load(u.getAvatar())
                     .resize(100,100)
