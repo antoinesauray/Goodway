@@ -105,13 +105,16 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
 
         avatar = (ImageView) findViewById(R.id.avatar);
         ((TextView)findViewById(R.id.title)).setText(user.getTitle(this));
-        Picasso.with(this)
-                .load(user.getAvatar())
-                .error(R.mipmap.ic_person_white_48dp)
-                .resize(200, 200)
-                .centerCrop()
-                .transform(new ImageTrans_CircleTransform())
-                .into(avatar);
+        if(!user.getAvatar().isEmpty()) {
+            Picasso.with(this)
+                    .load(user.getAvatar())
+                    .error(R.mipmap.ic_person_white_48dp)
+                    .resize(200, 200)
+                    .centerCrop()
+                    .transform(new ImageTrans_CircleTransform())
+                    .into(avatar);
+        }
+
 
         if(self){avatar.setOnClickListener(this);}
 

@@ -216,4 +216,6 @@
 
     <string name="not_set">Non renseigné</string>
 
+    <string name="undefined">Indéfini</string>
+
 </resources>

@@ -35,7 +35,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import io.goodway.R;
 import io.goodway.model.User;
-import io.goodway.model.adapter.AdressSearchAdapter;
+import io.goodway.adapters.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;
 import io.goodway.navitia_android.Address;
 

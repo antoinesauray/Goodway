@@ -23,7 +23,7 @@ import io.goodway.R;
 import io.goodway.model.Group;
 import io.goodway.model.GroupEvent;
 import io.goodway.model.User;
-import io.goodway.model.adapter.GroupLocationAdapter;
+import io.goodway.adapters.GroupLocationAdapter;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.model.callback.GroupLocationCallback;
 import io.goodway.model.network.GoodwayHttpClientPost;

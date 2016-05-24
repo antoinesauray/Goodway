@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,7 +21,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import io.goodway.R;
-import io.goodway.model.adapter.WayPartAdapter;
+import io.goodway.adapters.WayPartAdapter;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.Way;
 import io.goodway.navitia_android.WayPart;

@@ -1,12 +1,22 @@
 package io.goodway.activities;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +29,11 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -26,7 +41,7 @@ import java.util.Locale;
 
 import io.goodway.R;
 import io.goodway.model.ContainerType;
-import io.goodway.model.adapter.WayContainerAdapter;
+import io.goodway.adapters.WayContainerAdapter;
 import io.goodway.model.callback.WayCallback;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.Way;
@@ -34,7 +49,7 @@ import io.goodway.navitia_android.Way;
 /**
  * Created by antoine on 8/23/15.
  */
-public class WayActivity extends AppCompatActivity implements WayCallback, SwipeRefreshLayout.OnRefreshListener {
+public class WayActivity extends AppCompatActivity implements WayCallback, SwipeRefreshLayout.OnRefreshListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -44,6 +59,11 @@ public class WayActivity extends AppCompatActivity implements WayCallback, Swipe
 
     private String mail, password;
     private Calendar departureTime, today;
+
+    private static final int ACCESS_FINE_LOCATION=1;
+    private GoogleApiClient googleApiClient;
+
+    private ProgressDialog getLocationDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +90,59 @@ public class WayActivity extends AppCompatActivity implements WayCallback, Swipe
         swipeRefreshLayout.setOnRefreshListener(this);
         time = (TextView) findViewById(R.id.time);
         date = (TextView) findViewById(R.id.date);
+
+        if(from!=null){
+            prepare();
+        }
+        else{
+            getLocationDialog = new ProgressDialog(this);
+            getLocationDialog.setTitle("Position");
+            getLocationDialog.setMessage("Récupération de la position");
+            getLocationDialog.setIndeterminate(true);
+            getLocationDialog.show();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+                    // Should we show an explanation?
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                        // Show an expanation to the user *asynchronously* -- don't block
+                        // this thread waiting for the user's response! After the user
+                        // sees the explanation, try again to request the permission.
+
+                    } else {
+
+                        // No explanation needed, we can request the permission.
+
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                ACCESS_FINE_LOCATION);
+
+                        // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                        // app-defined int constant. The callback method gets the
+                        // result of the request.
+                    }
+                } else {
+                    googleApiClient = new GoogleApiClient.Builder(this)
+                            .addApi(LocationServices.API)
+                            .addConnectionCallbacks(this)
+                            .addOnConnectionFailedListener(this)
+                            .build();
+                }
+            } else {
+                googleApiClient = new GoogleApiClient.Builder(this)
+                        .addApi(LocationServices.API)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .build();
+            }
+        }
+    }
+
+    private void prepare(){
 
         departureTime =  Calendar.getInstance();
         today = Calendar.getInstance();
@@ -166,6 +239,20 @@ public class WayActivity extends AppCompatActivity implements WayCallback, Swipe
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if(googleApiClient!=null){googleApiClient.connect();}
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (googleApiClient!=null && googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
+    }
+
+    @Override
     public void action(View v, Way w) {
         Intent intent = new Intent(WayActivity.this, DetailedWayActivity.class);
         intent.putExtra("WAY", w);
@@ -183,5 +270,25 @@ public class WayActivity extends AppCompatActivity implements WayCallback, Swipe
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
         refresh();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Location userLocation = LocationServices.FusedLocationApi.getLastLocation(
+                googleApiClient);
+        from = new Address(getString(R.string.current_location), userLocation.getLatitude(), userLocation.getLongitude());
+        prepare();
+        getLocationDialog.hide();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, "Impossible de récupérer la position", Toast.LENGTH_SHORT).show();
+        getLocationDialog.hide();
     }
 }

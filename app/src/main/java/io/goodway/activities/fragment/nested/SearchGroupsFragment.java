@@ -26,7 +26,7 @@ import io.goodway.activities.MainActivity;
 import io.goodway.R;
 import io.goodway.activities.SearchActivity;
 import io.goodway.model.Group;
-import io.goodway.model.adapter.GroupAdapter;
+import io.goodway.adapters.GroupAdapter;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.model.callback.GroupCallback;
 import io.goodway.model.network.GoodwayHttpClientPost;

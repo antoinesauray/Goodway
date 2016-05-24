@@ -1,6 +1,5 @@
-package io.goodway.model.adapter;
+package io.goodway.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.goodway.R;
-import io.goodway.model.User;
-import io.goodway.model.callback.UserCallback;
+import io.goodway.model.Group;
+import io.goodway.model.callback.GroupCallback;
 import io.goodway.view.ImageTrans_CircleTransform;
 
 
@@ -26,53 +25,49 @@ import io.goodway.view.ImageTrans_CircleTransform;
  * @version 1.0
  */
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
+public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.AddressViewHolder> {
 
-    private List<User> mDataset;
-    private UserCallback callback;
-    private Context context;
+    private List<Group> mDataset;
+    private GroupCallback callback;
 
     private static final String TAG="LINE_ADAPTER";
-
+    private Context context;
     // Provide a suitable constructor (depends on the kind of dataset)
-    public UserAdapter(Context context, UserCallback callback) {
+    public GroupAdapter(Context context, GroupCallback callback) {
+        mDataset = new ArrayList<Group>();
         this.callback = callback;
-        mDataset = new ArrayList<User>();
         this.context = context;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
-    public UserAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public AddressViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_user, parent, false);
-        // set the view's size, margins, paddings and layout parameters
-        ViewHolder vh = new ViewHolder(v);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_group, parent, false);
+        AddressViewHolder vh = new AddressViewHolder(v);
         return vh;
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(AddressViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
+        Group g = mDataset.get(position);
         holder.setItem(mDataset.get(position));
-        User a = mDataset.get(position);
-        holder.name.setText(a.getFirstName()+" "+a.getLastName());
-        if(a.getCity()!=null){holder.title.setText(a.getCity());}
-        else{holder.title.setText(a.getTitle(context));}
-        /*
+        holder.name.setText(g.getName());
+        holder.description.setText(g.getDescription());
+
         Picasso.with(context)
-                .load(a.getAvatar())
-                .error(R.mipmap.ic_person_black_36dp)
+                .load(g.getAvatar())
+                .error(R.mipmap.ic_event_black_36dp)
                 .resize(100, 100)
                 .centerCrop()
                 .transform(new ImageTrans_CircleTransform())
                 .into(holder.avatar);
-                */
     }
 
-    public void add(User item) {
+    public void add(Group item) {
         int position = mDataset.size();
         mDataset.add(position, item);
         notifyItemInserted(position);
@@ -92,18 +87,18 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         return mDataset.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class AddressViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
-        TextView name, title;
         ImageView avatar;
-        User item;
+        TextView name, description;
+        Group item;
 
-        public ViewHolder(View lyt_main) {
+        public AddressViewHolder(View lyt_main) {
             super(lyt_main);
             lyt_main.setOnClickListener(this);
-            name = (TextView) lyt_main.findViewById(R.id.name);
-            title = (TextView) lyt_main.findViewById(R.id.title);
             avatar = (ImageView) lyt_main.findViewById(R.id.avatar);
+            name = (TextView) lyt_main.findViewById(R.id.name);
+            description = (TextView) lyt_main.findViewById(R.id.description);
         }
 
         @Override
@@ -111,7 +106,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             callback.action(item);
         }
 
-        public void setItem(User item) {
+        public void setItem(Group item) {
             this.item = item;
         }
     }

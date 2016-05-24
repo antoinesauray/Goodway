@@ -33,7 +33,7 @@ import java.util.List;
 import io.goodway.activities.MainActivity;
 import io.goodway.R;
 import io.goodway.activities.SearchActivity;
-import io.goodway.model.adapter.AdressSearchAdapter;
+import io.goodway.adapters.AdressSearchAdapter;
 import io.goodway.model.callback.AddressSelected;
 import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;

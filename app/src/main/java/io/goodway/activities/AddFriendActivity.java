@@ -16,7 +16,7 @@ import android.widget.EditText;
 
 import io.goodway.R;
 import io.goodway.model.User;
-import io.goodway.model.adapter.UserAdapter;
+import io.goodway.adapters.UserAdapter;
 import io.goodway.model.callback.UserCallback;
 import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;

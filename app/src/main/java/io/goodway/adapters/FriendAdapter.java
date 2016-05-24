@@ -1,4 +1,4 @@
-package io.goodway.model.adapter;
+package io.goodway.adapters;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -67,6 +67,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.ViewHolder
         holder.name.setText(a.getFirstName() + " " + a.getLastName());
         if(a.getCity()!=null){holder.title.setText(a.getCity());}
         else{holder.title.setText(a.getTitle(activity));}
+        Log.d(TAG, "avatar="+a.getAvatar());
         Picasso.with(activity)
                 .load(a.getAvatar())
                 .error(R.mipmap.ic_person_black_36dp)

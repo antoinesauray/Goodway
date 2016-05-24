@@ -61,7 +61,7 @@
             android:screenOrientation="portrait"
             android:label="@string/app_name"/>
         <activity
-            android:name=".AddFriendActivity"
+            android:name=".activities.AddFriendActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name"/>
         <activity
@@ -133,12 +133,28 @@
             android:name="com.facebook.FacebookActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name"/>
+        <activity
+            android:name=".activities.widgets.FriendVisitConfigureActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
         <!--<meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyDWtqjudY90SMSDq2nQOhIpVlNaoXf2UUE" />-->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBsz0DDdPRpVToNdXYzyLoopHDvec1NkhA" />
+
+        <receiver android:name=".widgets.FriendVisitWidgetProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/friendvisit_appwidget_info" />
+        </receiver>
 
     </application>
 

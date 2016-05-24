@@ -1,22 +1,16 @@
-package io.goodway.model.adapter;
+package io.goodway.adapters;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Outline;
-import android.graphics.Rect;
 import android.os.Build;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +18,6 @@ import java.util.List;
 import io.goodway.R;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.BusTrip;
-import io.goodway.navitia_android.Walking;
 import io.goodway.navitia_android.WayPart;
 import io.goodway.navitia_android.WayPartType;
 

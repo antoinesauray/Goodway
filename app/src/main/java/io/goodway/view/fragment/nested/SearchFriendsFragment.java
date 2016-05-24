@@ -25,7 +25,7 @@ import java.util.List;
 import io.goodway.activities.MainActivity;
 import io.goodway.R;
 import io.goodway.model.User;
-import io.goodway.model.adapter.UserAdapter;
+import io.goodway.adapters.UserAdapter;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.model.callback.UserCallback;
 import io.goodway.model.network.GoodwayHttpClientPost;
