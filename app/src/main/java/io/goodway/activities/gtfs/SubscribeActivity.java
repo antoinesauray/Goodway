@@ -1,8 +1,10 @@
 package io.goodway.activities.gtfs;
 
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
@@ -97,7 +99,7 @@ public class SubscribeActivity extends AppCompatActivity implements SchemaCallba
     }
 
     @Override
-    public void callback(Stop t) {
+    public void callback(Stop stop) {
         this.stop = stop;
         final ProgressDialog pd = new ProgressDialog(this);
         pd.setTitle("Enregistrement");
@@ -107,14 +109,27 @@ public class SubscribeActivity extends AppCompatActivity implements SchemaCallba
         HttpRequest.subscribe(new HttpRequest.Action<Void>() {
             @Override
             public void success(Void aVoid) {
-                pd.hide();
+                pd.dismiss();
+                NotificationCompat.Builder mBuilder =
+                        new NotificationCompat.Builder(SubscribeActivity.this)
+                                .setSmallIcon(R.drawable.ic_my_location_black_18dp)
+                                .setContentTitle("Succès")
+                                .setContentText("Vous recevrez dorénavant toutes les horaires de votre choix sur votre téléphone");
+                // Sets an ID for the notification
+                int mNotificationId = 001;
+                // Gets an instance of the NotificationManager service
+                NotificationManager mNotifyMgr =
+                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                // Builds the notification and issues it.
+                mNotifyMgr.notify(mNotificationId, mBuilder.build());
+                finish();
             }
 
             @Override
             public void error() {
-                pd.hide();
+                pd.dismiss();
                 Toast.makeText(SubscribeActivity.this, "Echec de l'ajout à la liste d'envoi", Toast.LENGTH_SHORT).show();
             }
-        }, token, schema, route, stop);
+        }, token, schema, route, service, stop);
     }
 }

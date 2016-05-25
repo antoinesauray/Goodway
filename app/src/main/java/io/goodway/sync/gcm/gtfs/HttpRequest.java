@@ -88,7 +88,8 @@ public class HttpRequest {
                             JSONObject obj = array.optJSONObject(i);
                             routes.add(new Route(
                                     obj.optString("route_id"),
-                                    obj.optString("route_short_name")
+                                    obj.optString("route_short_name"),
+                                    obj.optString("route_color")
                             ));
                         }
                         action.success(routes);
@@ -176,17 +177,21 @@ public class HttpRequest {
         });
     }
 
-    public static void subscribe(final Action<Void> action, String token, Schema schema, Route route, Stop stop){
+    public static void subscribe(final Action<Void> action, String token, Schema schema, Route route, Service service, Stop stop){
         OkHttpClient client = new OkHttpClient();
         RequestBody formBody = new FormBody.Builder()
                 .add("token",token)
                 .add("schema", schema.getName())
-                .add("route", route.getRoute_id())
-                .add("schema", stop.getStop_id())
+                .add("route_id", route.getRoute_id())
+                .add("stop_id", stop.getStop_id())
+                .add("stop_name", stop.getStop_name())
+                .add("trip_name", service.getTrip_headsign())
+                .add("route_short_name",route.getRoute_short_name())
+                .add("route_color", route.getRoute_color())
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://infotel.goodway.io/api/messages/add")
+                .url("https://developer.goodway.io/api/v1/me/time/subscribe")
                 .post(formBody)
                 .build();
         Call call = client.newCall(request);
