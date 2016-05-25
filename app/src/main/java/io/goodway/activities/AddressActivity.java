@@ -105,12 +105,12 @@ public class AddressActivity extends AppCompatActivity{
                         pd.show();
                         GoodwayHttpsClient.addLocation(this, new Action<Boolean>() {
                             @Override
-                            public void action(Boolean e) {
+                            public void success(Boolean e) {
                                 pd.dismiss();
                             }
                         }, new ErrorAction() {
                             @Override
-                            public void action(int length) {
+                            public void success(int length) {
                                 pd.dismiss();
                                 Toast.makeText(ProfileActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
                             }

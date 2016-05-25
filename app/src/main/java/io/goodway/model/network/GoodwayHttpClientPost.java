@@ -18,6 +18,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import io.goodway.model.Group;
 import io.goodway.model.GroupEvent;
+import io.goodway.model.Subscription;
 import io.goodway.model.User;
 import io.goodway.model.callback.FinishCallback;
 import io.goodway.navitia_android.Action;
@@ -31,6 +32,8 @@ import io.goodway.navitia_android.UserLocation;
 
 
 public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<String, String>, T, Integer>{
+
+    private static final String TAG = "GoodwayHttpClientPost";
 
     private Context c;
     private Action<T> action;
@@ -342,6 +345,33 @@ public class GoodwayHttpClientPost<T> extends AsyncTask<AbstractMap.SimpleEntry<
             }
         }
         return null;
+    }
+
+    public static AsyncTask getSubscriptions(Context c, Action<ArrayList<Subscription>> action, ErrorAction error, String token){
+        return new GoodwayHttpClientPost<>(c, new ProcessJson<ArrayList<Subscription>>() {
+            @Override
+            public ArrayList<Subscription> processJson(JSONObject jsonObject) {
+                ArrayList<Subscription> subscriptions = new ArrayList<Subscription>();
+                if (jsonObject.optBoolean("success")) {
+                    JSONArray jsonArray = null;
+                    try {
+                        jsonArray = jsonObject.getJSONArray("subscriptions");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject obj = jsonArray.optJSONObject(i);
+                            String route_id = obj.optString("route_id");
+                            String stop_id = obj.optString("stop_id");
+                            String schema = obj.optString("schema");
+                            Log.d(TAG, schema+"/"+route_id+"-"+stop_id);
+                            subscriptions.add(new Subscription(stop_id, route_id, schema));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return subscriptions;
+            }
+        }, action, error, "https://developer.goodway.io/api/v1/me/user/subscriptions").execute(
+                        new AbstractMap.SimpleEntry<String, String>("token", token));
     }
 
     public static AsyncTask findGroups(Context c, Action<List<Group>> action, ErrorAction error, String token, String name) {

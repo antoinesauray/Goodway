@@ -4,21 +4,35 @@ import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import io.goodway.R;
 import io.goodway.activities.account.FacebookAccountActivity;
 import io.goodway.activities.account.GoodwayAccountActivity;
+import io.goodway.activities.gtfs.SubscribeActivity;
 import io.goodway.model.User;
 import io.goodway.model.network.GoodwayHttpClientPost;
 import io.goodway.navitia_android.Action;
 import io.goodway.navitia_android.Address;
 import io.goodway.navitia_android.ErrorAction;
+import io.goodway.sync.gcm.GCMService;
+import io.goodway.sync.gcm.QuickstartPreferences;
+import io.goodway.sync.gcm.RegistrationIntentService;
 import io.goodway.view.fragment.MainFragment;
 import io.goodway.view.fragment.SearchFragment;
 
@@ -28,6 +42,8 @@ import io.goodway.view.fragment.SearchFragment;
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "MainActivity";
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private Toolbar toolbar;
     public static final int DEPARTURE=1, DESTINATION=2;
@@ -41,6 +57,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int ACCESS_FINE_LOCATION=1;
 
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+    private boolean isReceiverRegistered;
+
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            /*
+            Message message = intent.getParcelableExtra("message");
+            int channel_id = intent.getIntExtra(Constants.CHANNEL, -1);
+            if(message.getSender_id()!= Debug.SENDER_ID){
+                Log.d("displaying type", "type="+message.getAttachment_type());
+                Log.d("displaying image", "url="+message.getAttachment());
+            }
+            if(activeChannel==null || (channel_id!=-1 && activeChannel.getId()!=channel_id)){
+                adapter.incrementChannelPendingMessages(channel_id);
+            }
+            */
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +87,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         token = getIntent().getExtras().getString("token");
         user = getIntent().getExtras().getParcelable("user");
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setupGCM();
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter(GCMService.MESSAGE_RECEIVED));
 
         fragmentManager = getFragmentManager();
 
@@ -197,6 +239,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 i3.putExtra("user", user);
                 startActivity(i3);
                 break;
+            case R.id.subscriptions:
+                Intent i4 = new Intent(this, SubscribeActivity.class);
+                i4.putExtra("token", token);
+                i4.putExtra("user", user);
+                startActivity(i4);
+                break;
             case R.id.share:
                 String message = "Téléchargez Goodway, l'application de déplacement moderne";
                 Intent share = new Intent(Intent.ACTION_SEND);
@@ -205,9 +253,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(Intent.createChooser(share, "Partager"));
                 break;
             case R.id.facebook_account:
-                Intent i4 = new Intent(this, FacebookAccountActivity.class);
-                i4.putExtra("token", token);
-                startActivity(i4);
+                Intent i5 = new Intent(this, FacebookAccountActivity.class);
+                i5.putExtra("token", token);
+                startActivity(i5);
                 break;
             case R.id.goodway_account:
                 Intent i6 = new Intent(this, GoodwayAccountActivity.class);
@@ -230,5 +278,76 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void setDeparture(View v){
         switchToFragment(SearchFragment.newInstance(getIntent().getExtras()));
     }
+
+    /**
+     * Setup the GCM service to listen for incoming notifications
+     */
+    private void setupGCM(){
+        Log.d(TAG, "setupGCM");
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                boolean sentToken = sharedPreferences
+                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                if (sentToken) {
+                    Log.d(TAG, "sentToken");
+                } else {
+                    Log.d(TAG, "Token error");
+                }
+            }
+        };
+        // Registering BroadcastReceiver
+        registerReceiver();
+
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            intent.putExtra("token", token);
+            startService(intent);
+        }
+    }
+
+
+    @Override
+    public void onDestroy() {
+        // Unregister since the activity is about to be closed.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+        super.onDestroy();
+    }
+
+    /**
+     * Register the receiver for incoming GCM notifications
+     */
+    private void registerReceiver(){
+        if(!isReceiverRegistered) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                    new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+            isReceiverRegistered = true;
+        }
+    }
+
+    /**
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
+     */
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
 
 }

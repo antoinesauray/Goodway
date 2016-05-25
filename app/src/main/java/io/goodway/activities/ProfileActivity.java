@@ -153,14 +153,14 @@ public class ProfileActivity extends AppCompatActivity implements SwipeRefreshLa
         /*
         GoodwayHttpClientPost.requestFriend(this, new Action<Boolean>() {
             @Override
-            public void action(Boolean e) {
+            public void success(Boolean e) {
                 Intent returnIntent = new Intent();
                 setResult(Activity.RESULT_OK, returnIntent);
                 finish();
             }
         }, new ErrorAction() {
             @Override
-            public void action(int length) {
+            public void success(int length) {
                 Toast.makeText(ProfileActivity.this, R.string.failure, Toast.LENGTH_SHORT).show();
             }
         }, token, user.getId());

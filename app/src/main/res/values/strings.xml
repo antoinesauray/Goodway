@@ -188,6 +188,7 @@
     <string name="add_group">Ajouter un groupe</string>
     <string name="find_groups">Rechercher des groupes</string>
     <string name="groups">Groupes</string>
+    <string name="subscriptions">Abonnements</string>
 
     <string name="address">Adresses</string>
 
@@ -217,5 +218,7 @@
     <string name="not_set">Non renseigné</string>
 
     <string name="undefined">Indéfini</string>
+
+    <string name="accept">Accepter</string>
 
 </resources>

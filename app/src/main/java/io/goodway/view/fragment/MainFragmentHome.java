@@ -208,7 +208,7 @@ public class MainFragmentHome extends Fragment implements View.OnClickListener, 
 
         //action3.findViewById(R.id.avatar).setBackground(getResources().getDrawable(R.drawable.circle_red_small));
         //((ImageView) action3.findViewById(R.id.avatar)).setImageResource(R.drawable.ic_local_cafe_white_18dp);
-        //((TextView) action3.findViewById(R.id.action)).setText("Aller boire un café");
+        //((TextView) action3.findViewById(R.id.success)).setText("Aller boire un café");
 
         action4.findViewById(R.id.avatar).setBackground(getResources().getDrawable(R.drawable.circle_green_small));
         ((ImageView) action4.findViewById(R.id.avatar)).setImageResource(R.drawable.ic_directions_white_18dp);

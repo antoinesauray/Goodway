@@ -136,6 +136,32 @@
             android:textSize="16sp"
             android:textColor="@android:color/secondary_text_light"
             android:text="@string/groups"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/subscriptions"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="onClick"
+            android:paddingLeft="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_feedback_white_24dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/circle_green"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textSize="16sp"
+                android:textColor="@android:color/secondary_text_light"
+                android:text="@string/subscriptions"/>
     </LinearLayout>
 
     <View style="@style/Divider" android:layout_marginLeft="8dp" android:layout_marginRight="8dp" android:layout_marginBottom="8dp"/>

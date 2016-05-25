@@ -1,0 +1,35 @@
+{
+  "project_info": {
+    "project_number": "953943644427",
+    "project_id": "goodway-51232"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953943644427:android:d8f35a591bb55a2f",
+        "android_client_info": {
+          "package_name": "io.goodway"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPET9vOT6yN5NHbZWwp-MgN2yYFxP9Fnc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
